@@ -1,0 +1,15 @@
+repos:
+  - repo: https://github.com/ambv/black
+    rev: stable
+    hooks:
+      - id: black
+        python_version: python3.6
+  - repo: git://github.com/pre-commit/pre-commit-hooks
+    rev: v1.2.3
+    hooks:
+      - id: trailing-whitespace
+      - id: check-yaml
+      - id: flake8
+        args:
+          - "--max-line-length=100"
+          - "--exclude=test_*.py"

@@ -1,0 +1,46 @@
+version: "2017-09-20"
+pipeline:
+  - id: Build
+    overlay: ci/python
+    type: script
+    commands:
+      - desc: "Build Transformer"
+        cmd: |
+          make configure
+
+      - desc: "Run tests"
+        cmd: |
+          make test
+
+      - desc: "Run linters"
+        cmd: |
+          make lint
+
+      - desc: "Upload code quality data to SonarQube"
+        cmd: |
+          sonar-client \
+            -Dsonar.exclusions=transformer/test_*.py,transformer/builders_*.py,transformer/plugins/test_*.py,images,examples,setup.py \
+            -Dsonar.python.pylint.reportPath=pylint-report.txt \
+            -Dsonar.python.coverage.reportPath=coverage.xml \
+            --recipes=update-dashboard-on-merge,pr-issues-as-comments,compare-pr-coverage
+
+  - id: Publish
+    overlay: ci/python
+    when:
+      branch: master
+      event: push
+    type: script
+    env:
+      TWINE_REPOSITORY_URL: "https://maven.zalando.net/repository/pypi-internal/"
+      TWINE_USERNAME: "root"
+      TWINE_PASSWORD: ""
+      TWINE_CERT: "/etc/ssl/certs/ca-certificates.crt"
+    commands:
+      - desc: Install python packaging toolkit
+        cmd: |
+          make configure
+          pipenv run pip install wheel twine
+      - desc: Package and upload
+        cmd: |
+          pipenv run python setup.py sdist bdist_wheel
+          pipenv run twine upload dist/*
