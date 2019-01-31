@@ -27,7 +27,7 @@ setuptools.setup(
     description="Transforms HAR to Locustfile",
     long_description=long_description,
     long_description_content_type="text/markdown",
-    url="https://github.bus.zalan.do/TIP/transformer",
+    url="https://github.com/zalando-incubator/Transformer",
     packages=setuptools.find_packages(),
     install_requires=requirements,
     classifiers=["Programming Language :: Python :: 3"],
