@@ -5,10 +5,11 @@ A representation of a HAR Request.
 
 import enum
 from datetime import datetime
-from typing import Iterator, NamedTuple, List, Optional
+from typing import Iterator, NamedTuple, List
 from urllib.parse import urlparse, SplitResult
 
 import pendulum
+
 from transformer.naming import to_identifier
 
 

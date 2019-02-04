@@ -13,6 +13,8 @@ from typing import (
     Iterable,
 )
 
+IMMUTABLE_EMPTY_DICT = MappingProxyType({})
+
 
 class Line:
     """
@@ -292,7 +294,9 @@ class Class(Statement):
         return [top, *body]
 
     def __repr__(self) -> str:
-        return "{}(name={!r}, statements={!r}, superclasses={!r}, comments={!r})".format(
+        return (
+            "{}(name={!r}, statements={!r}, " "superclasses={!r}, comments={!r})"
+        ).format(
             self.__class__.__qualname__,
             self.name,
             self.statements,
@@ -469,7 +473,7 @@ class FunctionCall(Expression):
         self,
         name: str,
         positional_args: Sequence[Expression] = (),
-        named_args: Mapping[str, Expression] = MappingProxyType({}),
+        named_args: Mapping[str, Expression] = IMMUTABLE_EMPTY_DICT,
     ) -> None:
         super().__init__()
         self.name = name

@@ -23,7 +23,7 @@ WEIGHT_FILE_SUFFIX = ".weight"
 DEFAULT_WEIGHT = 1
 
 
-class SkippableScenarioError(ValueError):
+class SkippableScenarioError(ValueError):  # noqa: B903
     """
     Raised when a Scenario cannot be created from the provided input path.
 
@@ -58,7 +58,7 @@ class CollidingScenariosError(SkippableScenarioError):
     pass
 
 
-class WeightValueError(ValueError):
+class WeightValueError(ValueError):  # noqa: B903
     """
     Raised when the weight file associated to a scenario contains errors.
     """
@@ -118,7 +118,8 @@ class Scenario(NamedTuple):
         be used as weight for the Scenario by calling weight_from_path.
 
         Errors are handled this way:
-        1. If path itself cannot be transformed into a scenario, raise SkippableScenarioError.
+        1. If path itself cannot be transformed into a scenario,
+           raise SkippableScenarioError.
         2. For each child of path, apply (1) but catch the exception and display
            a warning about skipping this child. (If all children are skipped, (1)
            applies to path itself.)
@@ -130,8 +131,8 @@ class Scenario(NamedTuple):
           into scenarios (e.g. non-JSON files or .git directories), a message
           is emitted and the file or subdirectory is skipped.
 
-        :raise SkippableScenarioError: if the directory contains dangling weight files or
-            no sub-scenarios
+        :raise SkippableScenarioError: if the directory contains dangling weight
+            files or no sub-scenarios.
         """
         try:
             children = list(path.iterdir())

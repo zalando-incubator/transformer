@@ -4,7 +4,8 @@ import logging
 
 def on_blacklist(url):
     """
-    Checks for matching URLs in an ignore file (blacklist) from user's current directory.
+    Checks for matching URLs in an ignore file (blacklist)
+    from user's current directory.
     """
     blacklist_file = f"{os.getcwd()}/.urlignore"
     try:

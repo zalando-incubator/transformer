@@ -12,6 +12,7 @@ from transformer.blacklist import on_blacklist
 from transformer.helpers import zip_kv_pairs
 from transformer.request import HttpMethod, Request, QueryPair
 
+IMMUTABLE_EMPTY_DICT = MappingProxyType({})
 TIMEOUT = 30
 ACTION_INDENTATION_LEVEL = 12
 
@@ -70,7 +71,7 @@ class Task2:
         statements: Sequence[py.Statement] = (),
         # TODO: Replace me with a plugin framework that accesses the full tree.
         #   See https://github.bus.zalan.do/TIP/docs/issues/395.
-        global_code_blocks: Mapping[str, Sequence[str]] = MappingProxyType({}),
+        global_code_blocks: Mapping[str, Sequence[str]] = IMMUTABLE_EMPTY_DICT,
     ) -> None:
         self.name = name
         self.request = request
