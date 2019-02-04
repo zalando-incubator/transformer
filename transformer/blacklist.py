@@ -18,5 +18,7 @@ def on_blacklist(url):
         return False
 
     except OSError as err:
-        logging.debug("Could not read blacklist file %s. Reason: %s", blacklist_file, err)
+        logging.debug(
+            "Could not read blacklist file %s. Reason: %s", blacklist_file, err
+        )
         return False
