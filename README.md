@@ -207,15 +207,7 @@ Single-run
 pipenv run pytest
 ```
 
-Re-run the tests upon filesystem changes (you need to install [pytest-watch][]
-first):
-```bash
-pipenv run ptw
-```
-
-ℹ️  _Using [pytest](https://docs.pytest.org/en/latest/), [mock](https://docs.python.org/3/library/unittest.mock.html), and [Hypothesis](https://hypothesis.readthedocs.io/en/latest/)._
-
-[pytest-watch]: https://github.com/joeyespo/pytest-watch
+ℹ️  _Using [pytest](https://docs.pytest.org/en/latest/), [mock](https://docs.python.org/3/library/unittest.mock.html), and [Hypothesis](https://hypothesis.readthedocs.io/en/latest/).
 
 ### Run linter
 
