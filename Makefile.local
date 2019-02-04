@@ -4,13 +4,13 @@ all: test lint
 include common.mk
 
 .PHONY: lint
-lint: black pylint
+lint: black flake8
 
 # black reformats files.
 .PHONY: black
 black: configure
 	poetry run black $(SRC)
 
-.PHONY: pylint
-pylint: configure
-	poetry run pylint -v $(SRC)
+.PHONY: flake8
+flake8: configure
+	poetry run flake8 $(SRC)

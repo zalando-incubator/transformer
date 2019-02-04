@@ -1,0 +1,8 @@
+[flake8]
+# See https://black.readthedocs.io/en/stable/the_black_code_style.html#line-length
+max-line-length = 80
+select = C,E,F,W,B,B9
+ignore =
+  E501,
+  # see https://black.readthedocs.io/en/stable/the_black_code_style.html#line-breaks-binary-operators
+  W503
