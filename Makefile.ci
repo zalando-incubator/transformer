@@ -4,6 +4,6 @@ all: test lint
 include common.mk
 
 # Don't reformat files but, if there is a diff, display it and return 1.
-.PHONY: lint
-lint: configure
+.PHONY: black
+black: configure
 	poetry run black --diff --check $(SRC)

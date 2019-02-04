@@ -14,3 +14,10 @@ configure: .make/configure
 .PHONY: test
 test: configure
 	poetry run pytest --cov-config .coveragerc --cov-report xml --cov=. transformer/
+
+.PHONY: lint
+lint: black flake8
+
+.PHONY: flake8
+flake8: configure
+	poetry run flake8 $(SRC)
