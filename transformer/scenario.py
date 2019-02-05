@@ -272,7 +272,7 @@ class Scenario(NamedTuple):
     @property
     def global_code_blocks(self) -> Mapping[str, Sequence[str]]:
         # TODO: Replace me with a plugin framework that accesses the full tree.
-        #   See https://github.bus.zalan.do/TIP/docs/issues/395.
+        #   See https://github.com/zalando-incubator/Transformer/issues/11.
         return {
             block_name: block_lines
             for child in self.children
