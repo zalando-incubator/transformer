@@ -1,5 +1,8 @@
 <p align="center"><img src="images/transformer.png"/></div>
 
+[![Build Status](https://travis-ci.org/zalando-incubator/Transformer.svg?branch=master)](https://travis-ci.org/zalando-incubator/Transformer)
+[![Codacy Badge](https://api.codacy.com/project/badge/Grade/10b3feb4e4814429bf288b87443a6c72)](https://www.codacy.com/app/thilp/Transformer?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=zalando-incubator/Transformer&amp;utm_campaign=Badge_Grade)
+
 # Transformer
 
 A tool to transform/convert web browser sessions ([HAR files][]) into
