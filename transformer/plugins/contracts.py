@@ -11,7 +11,8 @@ annotation syntax and the typing module.
 ## OnTask
 
 Kind of "stateless" plugins that operate independently on each task.
-The execution of this plugin could be parallelized.
+When implementing one, imagine their execution could be parallelized by
+Transformer in the future.
 
 Example: a plugin that injects a header in all requests.
 
@@ -21,7 +22,7 @@ Kind of plugins that operate on scenarios.
 
 Each scenario is the root of a tree composed of smaller scenarios and tasks
 (the leaves of this tree). Therefore, in an OnScenario plugin, you have the
-possibility of inspecting the subtree and make decisions based on that.
+possibility of inspecting the subtree and making decisions based on that.
 However, OnScenario plugins will be applied to all scenarios by Transformer,
 so you don't need to recursively apply the plugin yourself on all subtrees.
 If you do that, the plugin will be applied many times more than necessary.
