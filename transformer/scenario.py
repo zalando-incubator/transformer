@@ -15,7 +15,7 @@ from typing import (
 )
 
 from transformer.naming import to_identifier
-from transformer.plugins.contracts import Plugin
+from transformer.plugins.contracts import OnTaskSequence
 from transformer.request import Request
 from transformer.task import Task, Task2
 
@@ -81,7 +81,10 @@ class Scenario(NamedTuple):
 
     @classmethod
     def from_path(
-        cls, path: Path, plugins: Sequence[Plugin] = (), short_name: bool = False
+        cls,
+        path: Path,
+        plugins: Sequence[OnTaskSequence] = (),
+        short_name: bool = False,
     ) -> "Scenario":
         """
         Makes a Scenario (possibly containing sub-scenarios) out of the provided
@@ -105,7 +108,7 @@ class Scenario(NamedTuple):
 
     @classmethod
     def from_dir(
-        cls, path: Path, plugins: Sequence[Plugin], short_name: bool
+        cls, path: Path, plugins: Sequence[OnTaskSequence], short_name: bool
     ) -> "Scenario":
         """
         Makes a Scenario out of the provided directory path.
@@ -208,7 +211,7 @@ class Scenario(NamedTuple):
 
     @classmethod
     def from_har_file(
-        cls, path: Path, plugins: Sequence[Plugin], short_name: bool
+        cls, path: Path, plugins: Sequence[OnTaskSequence], short_name: bool
     ) -> "Scenario":
         """
         Creates a Scenario given a HAR file.
