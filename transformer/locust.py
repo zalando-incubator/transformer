@@ -25,7 +25,7 @@ def _locust_task(task: Union[Task, Task2]) -> py.Function:
     """
     if isinstance(task, Task):
         # TODO: remove when Task2 has replaced Task.
-        #   See https://github.bus.zalan.do/TIP/docs/issues/395.
+        #   See https://github.com/zalando-incubator/Transformer/issues/11.
         task = Task2.from_task(task)
 
     return py.Function(name=task.name, params=["self"], statements=task.statements)
@@ -101,7 +101,7 @@ def locust_program(scenarios: Sequence[Scenario]) -> py.Program:
     """
     global_code_blocks = {
         # TODO: Replace me with a plugin framework that accesses the full tree.
-        #   See https://github.bus.zalan.do/TIP/docs/issues/395.
+        #   See https://github.com/zalando-incubator/Transformer/issues/11.
         block_name: py.OpaqueBlock("\n".join(block), comments=[block_name])
         for scenario in scenarios
         for block_name, block in scenario.global_code_blocks.items()

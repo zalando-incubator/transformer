@@ -11,7 +11,7 @@ authors = [
 license = "MIT"
 
 [tool.poetry.dependencies]
-python = "^3.6"
+python = ">=3.6"
 pendulum = "^2.0"
 chevron = "^0.13"
 

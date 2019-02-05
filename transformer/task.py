@@ -70,7 +70,7 @@ class Task2:
         request: Request,
         statements: Sequence[py.Statement] = (),
         # TODO: Replace me with a plugin framework that accesses the full tree.
-        #   See https://github.bus.zalan.do/TIP/docs/issues/395.
+        #   See https://github.com/zalando-incubator/Transformer/issues/11.
         global_code_blocks: Mapping[str, Sequence[str]] = IMMUTABLE_EMPTY_DICT,
     ) -> None:
         self.name = name
@@ -89,7 +89,7 @@ class Task2:
         """
         # TODO: Update me when merging Task with Task2: "statements" needs to
         #   contain the equivalent of LocustRequest.
-        #   See https://github.bus.zalan.do/TIP/docs/issues/395.
+        #   See https://github.com/zalando-incubator/Transformer/issues/11.
         for req in sorted(requests, key=lambda r: r.timestamp):
             if not on_blacklist(req.url.netloc):
                 yield cls(name=req.task_name(), request=req, statements=...)
@@ -98,7 +98,7 @@ class Task2:
     def from_task(cls, task: "Task") -> "Task2":
         # TODO: Remove me as soon as the old Task is no longer used and Task2 is
         #   renamed to Task.
-        #   See https://github.bus.zalan.do/TIP/docs/issues/395.
+        #   See https://github.com/zalando-incubator/Transformer/issues/11.
         locust_request = task.locust_request
         if locust_request is None:
             locust_request = LocustRequest.from_request(task.request)

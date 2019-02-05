@@ -15,7 +15,7 @@ from typing import (
 )
 
 from transformer.naming import to_identifier
-from transformer.plugins import Plugin
+from transformer.plugins.contracts import OnTaskSequence
 from transformer.request import Request
 from transformer.task import Task, Task2
 
@@ -81,7 +81,10 @@ class Scenario(NamedTuple):
 
     @classmethod
     def from_path(
-        cls, path: Path, plugins: Sequence[Plugin] = (), short_name: bool = False
+        cls,
+        path: Path,
+        plugins: Sequence[OnTaskSequence] = (),
+        short_name: bool = False,
     ) -> "Scenario":
         """
         Makes a Scenario (possibly containing sub-scenarios) out of the provided
@@ -105,7 +108,7 @@ class Scenario(NamedTuple):
 
     @classmethod
     def from_dir(
-        cls, path: Path, plugins: Sequence[Plugin], short_name: bool
+        cls, path: Path, plugins: Sequence[OnTaskSequence], short_name: bool
     ) -> "Scenario":
         """
         Makes a Scenario out of the provided directory path.
@@ -208,7 +211,7 @@ class Scenario(NamedTuple):
 
     @classmethod
     def from_har_file(
-        cls, path: Path, plugins: Sequence[Plugin], short_name: bool
+        cls, path: Path, plugins: Sequence[OnTaskSequence], short_name: bool
     ) -> "Scenario":
         """
         Creates a Scenario given a HAR file.
@@ -269,7 +272,7 @@ class Scenario(NamedTuple):
     @property
     def global_code_blocks(self) -> Mapping[str, Sequence[str]]:
         # TODO: Replace me with a plugin framework that accesses the full tree.
-        #   See https://github.bus.zalan.do/TIP/docs/issues/395.
+        #   See https://github.com/zalando-incubator/Transformer/issues/11.
         return {
             block_name: block_lines
             for child in self.children
