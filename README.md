@@ -2,9 +2,12 @@
 
 # Transformer
 
-A tool to transform/convert web browser sessions ([HAR files][]) into [Locust][] load testing scenarios (locustfile).
+A tool to transform/convert web browser sessions ([HAR files][]) into
+[Locust][] load testing scenarios (locustfile).
 
-This tool can be used when you have HAR files that contain recordings of interactions with your website that you then want to replay in load tests using Locust.
+This tool can be used when you have HAR files (containing recordings of
+interactions with your website) that you then want to replay in load tests
+using Locust.
 
 [HAR files]: https://en.wikipedia.org/wiki/.har
 [Locust]: https://locust.io/
@@ -219,13 +222,14 @@ pipenv run pylint ./*.py
 
 ## Authors
 
-* **Serhii Cherniavskyi** - [@scherniavsky](@scherniavsky)
-* **Thibaut Le Page** - [@thilp](@thilp)
-* **Brian Maher** - [@bmaher](@bmaher)
-* **Oliwia Zaremba** - [@tortila](@tortila)
+* **Serhii Cherniavskyi** - [@scherniavsky](https://github.com/scherniavsky)
+* **Thibaut Le Page** - [@thilp](https://github.com/thilp)
+* **Brian Maher** - [@bmaher](https://github.com/bmaher)
+* **Oliwia Zaremba** - [@tortila](https://github.com/tortila)
 
-See also the list of [contributors](CONTRIBUTORS) who participated in this project.
+See also the list of [contributors](CONTRIBUTORS.md) who participated in this project.
 
 ## License
 
-This project is licensed under the MIT License - see the [LICENSE.md](LICENSE.md) file for details
+This project is licensed under the MIT License - see the
+[LICENSE.md](LICENSE.md) file for details.

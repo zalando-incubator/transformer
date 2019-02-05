@@ -1,0 +1,9 @@
+.PHONY: all
+all: test lint
+
+include common.mk
+
+# black reformats files.
+.PHONY: black
+black: configure
+	poetry run black $(SRC)

@@ -119,3 +119,6 @@ examples/locustfile.py
 # Generated files
 coverage_results
 lint_results
+
+# Makefile pseudo-targets
+.make/

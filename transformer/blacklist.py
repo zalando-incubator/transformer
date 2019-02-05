@@ -4,7 +4,8 @@ import logging
 
 def on_blacklist(url):
     """
-    Checks for matching URLs in an ignore file (blacklist) from user's current directory.
+    Checks for matching URLs in an ignore file (blacklist)
+    from user's current directory.
     """
     blacklist_file = f"{os.getcwd()}/.urlignore"
     try:
@@ -18,5 +19,7 @@ def on_blacklist(url):
         return False
 
     except OSError as err:
-        logging.debug("Could not read blacklist file %s. Reason: %s", blacklist_file, err)
+        logging.debug(
+            "Could not read blacklist file %s. Reason: %s", blacklist_file, err
+        )
         return False
