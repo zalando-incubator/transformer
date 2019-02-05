@@ -44,14 +44,14 @@ Example: a plugin that injects some code in the global scope.
 from typing import Sequence, Callable
 
 from transformer import python
-from transformer.scenario import Scenario
+from transformer import scenario  # noqa: F401
 from transformer.task import Task, Task2
 
 
 OnTask = Callable[[Task2], Task2]
 
 
-OnScenario = Callable[[Scenario], Scenario]
+OnScenario = Callable[["scenario.Scenario"], "scenario.Scenario"]
 
 
 OnPythonProgram = Callable[[python.Program], python.Program]
