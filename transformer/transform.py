@@ -7,7 +7,7 @@ from typing import Sequence, Union
 
 import transformer.python as py
 from transformer.locust import locustfile
-from transformer.plugins import Plugin
+from transformer.plugins.contracts import Plugin
 from transformer.scenario import Scenario
 
 

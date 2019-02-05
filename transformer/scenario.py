@@ -15,7 +15,7 @@ from typing import (
 )
 
 from transformer.naming import to_identifier
-from transformer.plugins import Plugin
+from transformer.plugins.contracts import Plugin
 from transformer.request import Request
 from transformer.task import Task, Task2
 
