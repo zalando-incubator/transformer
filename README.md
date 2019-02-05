@@ -2,6 +2,9 @@
 
 # Transformer
 
+[![Codacy Badge](https://api.codacy.com/project/badge/Grade/06e990f6de394960a67dbc5a39a76d84)](https://app.codacy.com/app/thilp/Transformer?utm_source=github.com&utm_medium=referral&utm_content=zalando-incubator/Transformer&utm_campaign=Badge_Grade_Dashboard)
+
+
 A tool to transform/convert web browser sessions ([HAR files][]) into
 [Locust][] load testing scenarios (locustfile).
 
