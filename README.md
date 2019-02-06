@@ -15,6 +15,24 @@ using Locust.
 [HAR files]: https://en.wikipedia.org/wiki/.har
 [Locust]: https://locust.io/
 
+<!-- toc -->
+
+- [Prerequisites](#prerequisites)
+- [Usage](#usage)
+- [How-to](#how-to)
+  * [Create a HAR file](#create-a-har-file)
+    + [Using Chrome Developer Tools](#using-chrome-developer-tools)
+  * [Scenario weights](#scenario-weights)
+  * [Hierarchical scenarios](#hierarchical-scenarios)
+  * [Blacklist specific URLs](#blacklist-specific-urls)
+  * [Use plugins](#use-plugins)
+- [Contributing](#contributing)
+- [Versioning](#versioning)
+- [Authors](#authors)
+- [License](#license)
+
+<!-- tocstop -->
+
 ## Prerequisites
 
 - [Python][]
