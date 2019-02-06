@@ -2,7 +2,7 @@
 
 ## List of available plugins
 
-- [`sanitize_headers`](sanitize_headers.md)
+- [`sanitize_headers`](sanitize_headers.md) - used by default
 
 ## How to use plugins
 
@@ -18,6 +18,9 @@ from transformer.plugins import sanitize_headers
 paths = [...]
 locustfile = transform.main(paths, plugins=[sanitize_headers.plugin])
 ```
+
+Please note that the example above only aims to illustrate how to use a plugin.
+There's no need to specifically use the `sanitize_headers` plugin, because it's used by default anyway.
 
 [`Plugin`]: __init__.py
 [`sanitize_headers`]: sanitize_headers.py

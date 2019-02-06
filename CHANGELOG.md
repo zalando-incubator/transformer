@@ -35,6 +35,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+- The plugin `sanitize_headers` is now used by default.
 - Open-sourcing of this project in https://github.com/zalando-incubator.
 - `transformer.plugins.Plugin` is renamed
   `transformer.plugins.contracts.OnTaskSequence`.
