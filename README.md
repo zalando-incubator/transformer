@@ -17,7 +17,7 @@ using Locust.
 
 <!-- toc -->
 
-- [Prerequisites](#prerequisites)
+- [Installation](#installation)
 - [Usage](#usage)
 - [How-to](#how-to)
   * [Create a HAR file](#create-a-har-file)
@@ -33,21 +33,13 @@ using Locust.
 
 <!-- tocstop -->
 
-## Prerequisites
+## Installation
 
-- [Python][]
-- [pipenv][]
+[Poetry]: https://poetry.eustace.io/docs/#installation
 
-[Python]: https://www.python.org/
-[pipenv]: https://pipenv.readthedocs.io/en/latest/
+Install with [Poetry][]:
 
 ## Usage
-
-Install as editable dependency with pipenv:
-
-```bash
-$ pipenv install -e local/path/to/transformer
-```
 
 Import in your code and use it:
 ```python
@@ -212,8 +204,6 @@ mechanisms to achieve it. Please see [`plugins` documentation](transformer/plugi
 Please read [CONTRIBUTING.md](CONTRIBUTING.md) for details on our process for
 submitting pull requests to us, and please ensure
 you follow the [CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md).
-
-[Poetry]: https://poetry.eustace.io/docs/#installation
 
 The only required dependency for local development is [Poetry][]:
 ```bash
