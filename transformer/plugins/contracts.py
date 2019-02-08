@@ -137,7 +137,10 @@ def isvalid(plugin_type: type, obj: Any) -> Decision:
     :raise TypeError: if plugin_type is not a plugin contract
     """
     if plugin_type is Plugin:
-        return Decision.any(isvalid(t, obj) for t in Plugin.__args__)
+        return Decision.any(
+            (isvalid(t, obj) for t in Plugin.__args__),
+            "should be valid for a Plugin subtype",
+        )
 
     if not callable(obj):
         return Decision.no(f"{obj!r} is not a function")
@@ -153,5 +156,5 @@ def isvalid(plugin_type: type, obj: Any) -> Decision:
         return Decision.no(f"could not extract signature from {obj!r}: {err}")
 
     return Decision.whether(
-        validator(actual_signature), f"{obj!r} should implement {plugin_type}"
+        validator(actual_signature), f"{obj.__name__!r} should implement {plugin_type}"
     )
