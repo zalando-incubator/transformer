@@ -19,9 +19,18 @@ if "master-" in version:
 elif "pr-" in version:
     version = f"dev{version.split('-')[1]}+{version.split('-')[2]}"
 
+
+def version() -> str:
+    # https://packaging.python.org/guides/single-sourcing-package-version/
+    h = {}
+    with open("transformer/__version__.py") as f:
+        exec(f.read(), h)
+    return h["__version__"]
+
+
 setuptools.setup(
     name="transformer",
-    version=f"0.1.{version}",
+    version=version(),
     author="Team Tip",
     author_email="team-tip@zalando.de",
     description="Transforms HAR to Locustfile",
