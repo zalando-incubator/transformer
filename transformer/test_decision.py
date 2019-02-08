@@ -1,7 +1,7 @@
 from typing import List
 
 import pytest
-from hypothesis import given
+from hypothesis import given, assume
 from hypothesis.strategies import booleans, lists
 
 from .builders_decision import reasons, decisions, yes_decisions, no_decisions
@@ -99,3 +99,8 @@ class TestAny:
         ds = [Decision.no("X") for _ in range(nb_cases)]
         d = Decision.any(ds)
         assert str(nb_cases) in d.reason
+
+    @given(decisions, reasons)
+    def test_provided_reason_prefixes_default_message(self, d: Decision, r: str):
+        assume(r)
+        assert Decision.any([d], r).reason == f"{r}: {Decision.any([d]).reason}"

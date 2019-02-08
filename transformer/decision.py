@@ -1,4 +1,4 @@
-from typing import NamedTuple, Union, Iterable
+from typing import NamedTuple, Union, Iterable, Optional
 
 
 class Decision(NamedTuple):
@@ -35,20 +35,25 @@ class Decision(NamedTuple):
         return Decision.yes()
 
     @classmethod
-    def any(cls, decisions: Iterable["Decision"]) -> "Decision":
+    def any(
+        cls, decisions: Iterable["Decision"], reason: Optional[str] = None
+    ) -> "Decision":
         recorded_decisions = []
         nb_bad_cases = 0
         BAD_CASES_THRESHOLD = 5
         for d in decisions:
             if d:
-                return d
+                return Decision.yes(f"{reason}: {d.reason}") if reason else d
             if nb_bad_cases <= BAD_CASES_THRESHOLD:
                 recorded_decisions.append(d)
             nb_bad_cases += 1
 
         if nb_bad_cases <= BAD_CASES_THRESHOLD:
-            cases = str([d.reason for d in decisions])
+            cases = str([d.reason for d in recorded_decisions])
         else:
             cases = f"{nb_bad_cases} invalid cases"
 
-        return Decision.no(f"no valid case: {cases}")
+        msg = f"no valid case: {cases}"
+        if reason:
+            msg = f"{reason}: {msg}"
+        return Decision.no(msg)
