@@ -15,13 +15,3 @@ def transform(
     scenarios_path: Union[str, Path], plugins: Sequence[OnTaskSequence] = ()
 ) -> py.Program:
     return locustfile([Scenario.from_path(Path(scenarios_path), plugins)])
-
-
-def main(
-    scenarios_path: Union[str, Path], plugins: Sequence[OnTaskSequence] = ()
-) -> str:
-    """
-    Converts a WeightedFilePaths into a Locustfile.
-    """
-
-    return str(transform(Path(scenarios_path), plugins))
