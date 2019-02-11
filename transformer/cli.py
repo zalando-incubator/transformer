@@ -20,7 +20,8 @@ from typing import Sequence, cast, Tuple
 import ecological
 from docopt import docopt
 
-from transformer import plugins as plug, __version__
+from transformer import version
+from transformer import plugins as plug
 from transformer.locust import locustfile
 from transformer.scenario import Scenario
 
@@ -42,7 +43,7 @@ def read_config(cli_args: Sequence[str]) -> Config:
     - If plugins are provided both from the environment and the command-line,
       the union of both groups is taken into account.
     """
-    arguments = docopt(__doc__, version=__version__, argv=cli_args)
+    arguments = docopt(__doc__, version=version(), argv=cli_args)
 
     # TODO: remove this redundancy once Ecological can re-read the environment
     #  at run-time while still having a compile-time definition (Config).
