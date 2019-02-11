@@ -1,10 +1,20 @@
 """
-This module defines the various kinds of plugins supported by Transformer.
+This module defines the various contracts, i.e. types of plugins supported by
+Transformer.
+The term "contract" indicates that these types constrain what plugin
+implementors can do in Transformer.
 
 Transformer plugins are just functions that accept certain inputs and have
-certain outputs. Different kinds of plugins have different input and output
-types. These input and output types are formalized here using Python's
-annotation syntax and the typing module.
+certain outputs.
+Different types of plugins have different input and output types.
+Not all types of plugins can be applied at the same point in Transformer's
+pipeline (e.g. python.Program objects are built much later than Task objects),
+hence the multiplicity of contracts.
+These input and output types are formalized here using Python's annotation
+syntax and the typing module.
+
+In addition to the plugin contracts, this module provides an "isvalid" method
+for checking whether arbitrary Python objects conform to a given plugin contract.
 
 # Plugin kinds
 
@@ -41,12 +51,49 @@ Their downside is that manipulating the syntax tree is more complex than the
 scenario tree or individual tasks.
 
 Example: a plugin that injects some code in the global scope.
+
+# Other types
+
+This module also defines:
+
+## Plugin
+
+Any supported kind of Transformer plugin.
 """
-from typing import Sequence, Callable
+import inspect
+from typing import Sequence, Callable, Union, Dict, Any
 
 from transformer import python
-from transformer import scenario  # noqa: F401
+from transformer.decision import Decision
 from transformer.task import Task, Task2
+
+PluginValidator = Callable[[inspect.Signature], Decision]
+_PluginValidatorDecorator = Callable[[PluginValidator], PluginValidator]
+
+_PLUGIN_VALIDATORS: Dict[type, PluginValidator] = {}
+
+
+def _register_contract(plugin_type: type) -> None:
+    if plugin_type in _PLUGIN_VALIDATORS:
+        raise ValueError(f"{plugin_type} already registered; cannot register it again")
+
+    *expected_params, expected_return = plugin_type.__args__
+
+    def _validator(sig: inspect.Signature) -> Decision:
+        if sig.return_annotation != expected_return:
+            return Decision.no(
+                f"expected {expected_return}, got {sig.return_annotation}"
+            )
+
+        actual_params = [p.annotation for p in sig.parameters.values()]
+        if actual_params != expected_params:
+            return Decision.no(
+                f"expected parameters {expected_params}, got {actual_params}"
+            )
+
+        return Decision.yes()
+
+    _PLUGIN_VALIDATORS[plugin_type] = _validator
 
 
 OnTask = Callable[[Task2], Task2]
@@ -70,3 +117,44 @@ OnPythonProgram = Callable[[python.Program], python.Program]
 # choice for plugin implementers.
 # See https://github.com/zalando-incubator/Transformer/issues/10.
 OnTaskSequence = Callable[[Sequence[Task]], Sequence[Task]]
+
+
+Plugin = Union[OnTask, OnScenario, OnPythonProgram, OnTaskSequence]
+
+for plugin_type in Plugin.__args__:
+    _register_contract(plugin_type)
+
+
+def isvalid(plugin_type: type, obj: Any) -> Decision:
+    """
+    Checks whether obj is an implementation of the plugin contract plugin_type.
+    The return value is basically a boolean, with an additional string
+    describing the reason for this decision.
+
+    :param plugin_type: plugin contract to verify obj against
+    :param obj: any Python object
+    :return: whether obj is conform to the plugin_type contract
+    :raise TypeError: if plugin_type is not a plugin contract
+    """
+    if plugin_type is Plugin:
+        return Decision.any(
+            (isvalid(t, obj) for t in Plugin.__args__),
+            "should be valid for a Plugin subtype",
+        )
+
+    if not callable(obj):
+        return Decision.no(f"{obj!r} is not a function")
+
+    try:
+        validator = _PLUGIN_VALIDATORS[plugin_type]
+    except KeyError:
+        raise TypeError(f"no Plugin contract registered for {plugin_type}")
+
+    try:
+        actual_signature = inspect.signature(obj)
+    except (ValueError, TypeError) as err:
+        return Decision.no(f"could not extract signature from {obj!r}: {err}")
+
+    return Decision.whether(
+        validator(actual_signature), f"{obj.__name__!r} should implement {plugin_type}"
+    )

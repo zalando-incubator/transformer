@@ -13,8 +13,8 @@ class TestTransform:
         har_path = tmp_path / "some.har"
         with har_path.open("w") as file:
             json.dump(_DUMMY_HAR_DICT, file)
-        locust_file = transformer.transform.main(har_path)
+        locustfile_contents = str(transformer.transform.transform(har_path))
         try:
-            compile(locust_file, "locustfile.py", "exec")
+            compile(locustfile_contents, "locustfile.py", "exec")
         except Exception as exception:
             pytest.fail(f"Compiling locustfile failed. [{exception}].")

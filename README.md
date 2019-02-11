@@ -15,21 +15,33 @@ using Locust.
 [HAR files]: https://en.wikipedia.org/wiki/.har
 [Locust]: https://locust.io/
 
-## Prerequisites
+<!-- toc -->
 
-- [Python][]
-- [pipenv][]
+- [Installation](#installation)
+- [Usage](#usage)
+- [How-to](#how-to)
+  * [Create a HAR file](#create-a-har-file)
+    + [Using Chrome Developer Tools](#using-chrome-developer-tools)
+  * [Scenario weights](#scenario-weights)
+  * [Hierarchical scenarios](#hierarchical-scenarios)
+  * [Blacklist specific URLs](#blacklist-specific-urls)
+  * [Use plugins](#use-plugins)
+- [Contributing](#contributing)
+- [Versioning](#versioning)
+- [Authors](#authors)
+- [License](#license)
 
-[Python]: https://www.python.org/
-[pipenv]: https://pipenv.readthedocs.io/en/latest/
+<!-- tocstop -->
 
-## Usage
+## Installation
 
-Install as editable dependency with pipenv:
+Install from PyPI with pip:
 
 ```bash
-$ pipenv install -e local/path/to/transformer
+pip install har-transformer
 ```
+
+## Usage
 
 Import in your code and use it:
 ```python
@@ -191,37 +203,25 @@ mechanisms to achieve it. Please see [`plugins` documentation](transformer/plugi
 
 ## Contributing
 
-Please read [CONTRIBUTING.md](CONTRIBUTING.md) for details on our process for submitting pull requests to us, and please ensure
+Please read [CONTRIBUTING.md](CONTRIBUTING.md) for details on our process for
+submitting pull requests to us, and please ensure
 you follow the [CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md).
+
+[Poetry]: https://poetry.eustace.io/docs/#installation
+
+The only required dependency for local development is [Poetry][].
+
+With Poetry, our `Makefile` installs all necessary dependencies
+and run all tests and linters:
+
+```bash
+make
+```
 
 ## Versioning
 
-We use [SemVer](http://semver.org/) for versioning. For the versions available, see the [tags on this repository](https://github.com/zalando-incubator/transformer/tags).
-
-## Development
-
-### Install dependencies
-
-```bash
-pipenv install --dev
-```
-
-### Run tests
-
-Single-run
-```bash
-pipenv run pytest
-```
-
-ℹ️  _Using [pytest](https://docs.pytest.org/en/latest/), [mock](https://docs.python.org/3/library/unittest.mock.html), and [Hypothesis](https://hypothesis.readthedocs.io/en/latest/).
-
-### Run linter
-
-```bash
-pipenv run pylint ./*.py
-```
-
-ℹ️  _Using [Pylint](https://www.pylint.org/)._
+We use [SemVer](http://semver.org/) for versioning. For the versions available,
+see the [tags on this repository](https://github.com/zalando-incubator/transformer/tags).
 
 ## Authors
 
