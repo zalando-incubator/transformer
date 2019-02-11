@@ -35,9 +35,11 @@ using Locust.
 
 ## Installation
 
-[Poetry]: https://poetry.eustace.io/docs/#installation
+Install from PyPI with pip:
 
-Install with [Poetry][]:
+```bash
+pip install har-transformer
+```
 
 ## Usage
 
@@ -205,10 +207,9 @@ Please read [CONTRIBUTING.md](CONTRIBUTING.md) for details on our process for
 submitting pull requests to us, and please ensure
 you follow the [CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md).
 
-The only required dependency for local development is [Poetry][]:
-```bash
-python3 -m pip install poetry
-```
+[Poetry]: https://poetry.eustace.io/docs/#installation
+
+The only required dependency for local development is [Poetry][].
 
 With Poetry, our `Makefile` installs all necessary dependencies
 and run all tests and linters:
