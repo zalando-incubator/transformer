@@ -21,6 +21,9 @@ classifiers=[
     "Topic :: Internet :: WWW/HTTP",
 ]
 packages = [{ include = "transformer" }]
+# pyproject.toml must be included: Transformer dynamically extracts the version
+# from there.
+include = ["pyproject.toml"]
 
 [tool.poetry.scripts]
 transformer = "transformer:cli.script_entrypoint"
