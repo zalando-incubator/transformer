@@ -1,7 +1,8 @@
 # pylint: skip-file
 
-import setuptools
 import os
+
+import setuptools
 
 MODULE_DIR = os.path.dirname(__file__)
 README = os.path.join(MODULE_DIR, "README.md")
@@ -40,4 +41,7 @@ setuptools.setup(
     packages=setuptools.find_packages(),
     install_requires=requirements,
     classifiers=["Programming Language :: Python :: 3"],
+    entry_points={
+        "console_scripts": ["transformer = transformer.cli:script_entrypoint"]
+    },
 )
