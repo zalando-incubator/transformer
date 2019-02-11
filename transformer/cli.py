@@ -75,7 +75,16 @@ def script_entrypoint() -> None:
     This is an alternative to using directly Scenario.from_path and
     locust.locustfile as a library API in another Python program.
     """
+    logging.basicConfig(
+        level=logging.INFO, format="%(asctime)s\t%(levelname)s\t%(message)s"
+    )
     config = read_config(cli_args=sys.argv[1:])
+    if not config.input_paths:
+        logging.error("No input paths provided in environment nor command-line!")
+        logging.info("Did you mean to provide env TRANSFORMER_INPUT_PATHS=[...]?")
+        logging.info("Otherwise, here is the command-line manual:")
+        print(__doc__, file=sys.stderr)
+        exit(1)
     plugins = tuple(p for name in config.plugins for p in plug.resolve(name))
     scenarios = [Scenario.from_path(path, plugins) for path in config.input_paths]
     print(str(locustfile(scenarios)))
