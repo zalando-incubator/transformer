@@ -9,7 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 -->
 
-## [0.1.0]
+## [1.0.0] - 2019-02-11
 
 ### Added
 
@@ -32,5 +32,5 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `transformer.plugins.Plugin` is renamed
   `transformer.plugins.contracts.OnTaskSequence`.
 
-[Unreleased]: https://github.com/zalando-incubator/transformer/compare/v0.1.0...HEAD
-[0.1.0]: https://github.com/zalando-incubator/transformer/compare/f842c4163e037dc345eaf1992187f58126b7d909...v0.1.0
+[Unreleased]: https://github.com/zalando-incubator/transformer/compare/v1.0.0...HEAD
+[1.0.0]: https://github.com/zalando-incubator/transformer/compare/f842c4163e037dc345eaf1992187f58126b7d909...v1.0.0
