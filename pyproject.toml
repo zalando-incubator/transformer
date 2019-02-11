@@ -1,5 +1,5 @@
 [tool.poetry]
-name = "transformer"
+name = "har-transformer"
 version = "0.1.0"
 description = "A tool to convert HAR files into a locustfile."
 authors = [
@@ -9,6 +9,20 @@ authors = [
     "Oliwia Zaremba <oliwia.zaremba@zalando.de>"
 ]
 license = "MIT"
+readme = "README.md"
+homepage = "https://github.com/zalando-incubator/transformer"
+repository = "https://github.com/zalando-incubator/transformer"
+keywords = ["load testing", "locust", "har"]
+classifiers=[
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: MIT License",
+    "Topic :: Software Development :: Testing :: Traffic Generation",
+    "Topic :: Software Development :: Code Generators",
+    "Topic :: Internet :: WWW/HTTP",
+]
+
+[tool.poetry.scripts]
+transformer = "transformer:cli.script_entrypoint"
 
 [tool.poetry.dependencies]
 python = ">=3.6"
