@@ -20,6 +20,7 @@ classifiers=[
     "Topic :: Software Development :: Code Generators",
     "Topic :: Internet :: WWW/HTTP",
 ]
+packages = [{ include = "transformer" }]
 
 [tool.poetry.scripts]
 transformer = "transformer:cli.script_entrypoint"
