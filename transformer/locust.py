@@ -1,5 +1,6 @@
 import enum
-from typing import Sequence, List, Union
+import warnings
+from typing import Sequence, List, Union, Iterator
 
 import transformer.python as py
 from transformer.scenario import Scenario
@@ -118,7 +119,25 @@ def locust_program(scenarios: Sequence[Scenario]) -> py.Program:
     ]
 
 
+def locustfile_lines(scenarios: Sequence[Scenario]) -> Iterator[str]:
+    """
+    Converts the provided scenarios into a stream of Python statements
+    and iterate on the resulting lines.
+    """
+    for stmt in locust_program(scenarios):
+        for line in stmt.lines():
+            yield str(line)
+
+
 def locustfile(scenarios: Sequence[Scenario]) -> str:
-    return "\n".join(
-        str(line) for stmt in locust_program(scenarios) for line in stmt.lines()
-    )
+    """
+    Simple wrapper around locustfile_lines joining all lines with "\n".
+
+    This function is deprecated and will be removed in a future version.
+    Do not rely on it.
+    Reason: It does not provide significant value over locustfile_lines and has
+    a less clear name and a less flexible API.
+    Deprecated since: v1.0.2.
+    """
+    warnings.warn(DeprecationWarning("locustfile: use locustfile_lines instead"))
+    return "\n".join(locustfile_lines(scenarios))
