@@ -10,7 +10,7 @@ from transformer.plugins import sanitize_headers
 from transformer.plugins.contracts import OnTaskSequence
 from transformer.scenario import Scenario
 
-DEFAULT_PLUGINS = [sanitize_headers.plugin]
+DEFAULT_PLUGINS = (sanitize_headers.plugin,)
 
 
 def transform(
