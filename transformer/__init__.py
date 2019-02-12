@@ -1,3 +1,3 @@
-from .__version__ import version
+import pkg_resources
 
-__all__ = ["version"]
+__version__ = pkg_resources.get_distribution("har-transformer").version
