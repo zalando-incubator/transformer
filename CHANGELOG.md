@@ -5,9 +5,33 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-<!--
 ## [Unreleased]
--->
+
+### Changed
+
+- The `dump`, `dumps`, and `transform` functions by default use the
+  `sanitize_headers` plugin even if users don't provide it in the plugin list.
+  This is because the resulting locustfile would almost certainly be broken
+  without these plugins. Users can still opt-out from these default plugins
+  by passing the keyword-argument `with_default_plugins=False` (e.g. if they
+  implemented their own version). (#14)
+
+### Added
+
+- `transformer.transform.{dump,dumps}`: Similar to `json.{dump,dumps}`, these
+  high-level functions should be all most users need to know about Transformer.
+  They convert lists of scenario paths and plugins into a final locustfile.
+  They will replace the `transform` function, which requires more familiarity
+  with Transformer's internals. (#14)
+- `transformer.locust.locustfile_lines`: Similar to `locustfile` but returns
+  an iterator over lines (as strings) instead of a string containing the full
+  locustfile. This design allows for more flexibility in `dump`/`dumps` and
+  should result in smaller memory usage for huge locustfiles. (#14)
+
+### Deprecated
+
+- `transformer.transform.transform` (#14)
+- `transformer.locust.locustfile` (#14)
 
 ## [1.0.1] - 2019-02-12
 
@@ -35,7 +59,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
-- The plugin `sanitize_headers` is now used by default.
 - Open-sourcing of this project in https://github.com/zalando-incubator.
 - `transformer.plugins.Plugin` is renamed
   `transformer.plugins.contracts.OnTaskSequence`.
