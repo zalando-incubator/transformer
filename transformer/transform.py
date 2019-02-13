@@ -108,7 +108,10 @@ def intersperse(delim: T, iterable: Iterable[T]) -> Iterator[T]:
     ['a', ',', 'b', ',', 'c']
     """
     it = iter(iterable)
-    yield next(it)
+    try:
+        yield next(it)
+    except StopIteration:
+        return
     for x in it:
         yield delim
         yield x
