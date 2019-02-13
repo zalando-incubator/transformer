@@ -40,7 +40,7 @@ PluginName = str
 
 def dumps(
     scenario_paths: Iterable[LaxPath],
-    plugins: Sequence[PluginName],
+    plugins: Sequence[PluginName] = (),
     with_default_plugins: bool = True,
 ) -> str:
     """
@@ -60,7 +60,7 @@ def dumps(
 def dump(
     file: TextIO,
     scenario_paths: Iterable[LaxPath],
-    plugins: Sequence[PluginName],
+    plugins: Sequence[PluginName] = (),
     with_default_plugins: bool = True,
 ) -> None:
     """
@@ -80,7 +80,7 @@ def dump(
 def _dump_as_lines(
     scenario_paths: Iterable[LaxPath],
     plugins: Sequence[PluginName],
-    with_default_plugins: bool = True,
+    with_default_plugins: bool,
 ) -> Iterator[str]:
     if with_default_plugins:
         plugins = (*DEFAULT_PLUGINS, *plugins)
