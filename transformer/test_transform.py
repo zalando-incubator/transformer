@@ -1,21 +1,19 @@
 # pylint: skip-file
 import io
-import json
 from pathlib import Path
 
 import pytest
 
 import transformer
 import transformer.transform as tt
-from transformer.helpers import _DUMMY_HAR_DICT
+from transformer.helpers import DUMMY_HAR_STRING
 from transformer.locust import locustfile_lines
 
 
 class TestTransform:
     def test_it_returns_a_locustfile_program_given_scenario_path(self, tmp_path: Path):
         har_path = tmp_path / "some.har"
-        with har_path.open("w") as file:
-            json.dump(_DUMMY_HAR_DICT, file)
+        har_path.write_text(DUMMY_HAR_STRING)
         locustfile_contents = str(tt.transform(har_path))
         try:
             compile(locustfile_contents, "locustfile.py", "exec")
@@ -24,8 +22,7 @@ class TestTransform:
 
     def test_it_uses_default_plugins(self, tmp_path: Path, monkeypatch):
         har_path = tmp_path / "some.har"
-        with har_path.open("w") as file:
-            json.dump(_DUMMY_HAR_DICT, file)
+        har_path.write_text(DUMMY_HAR_STRING)
 
         times_plugin_called = 0
 
@@ -63,8 +60,7 @@ class TestDumpAndDumps:
 
     def test_dump_and_dumps_have_same_output_for_simple_har(self, tmp_path):
         har_path = tmp_path / "some.har"
-        with har_path.open("w") as file:
-            json.dump(_DUMMY_HAR_DICT, file)
+        har_path.write_text(DUMMY_HAR_STRING)
 
         assert transformer.dumps([tmp_path]) == dump_as_str([tmp_path])
 
@@ -80,8 +76,7 @@ class TestDumpAndDumps:
         self, tmp_path: Path, monkeypatch, f, with_default, expected_times_called
     ):
         har_path = tmp_path / "some.har"
-        with har_path.open("w") as file:
-            json.dump(_DUMMY_HAR_DICT, file)
+        har_path.write_text(DUMMY_HAR_STRING)
 
         times_plugin_called = 0
 
