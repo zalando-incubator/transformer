@@ -13,7 +13,7 @@ configure: .make/configure
 # Runs pytest with coverage reporting.
 .PHONY: test
 test: configure
-	poetry run pytest --cov-config .coveragerc --cov-report xml --cov=. transformer/
+	poetry run pytest --failed-first --cov-config .coveragerc --cov-report xml --cov=. transformer/
 
 .PHONY: lint
 lint: black flake8
