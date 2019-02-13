@@ -1,11 +1,14 @@
 # pylint: skip-file
+import io
 import json
 from pathlib import Path
 
 import pytest
 
+import transformer
 import transformer.transform as tt
 from transformer.helpers import _DUMMY_HAR_DICT
+from transformer.locust import locustfile_lines
 
 
 class TestTransform:
@@ -38,3 +41,59 @@ class TestTransform:
         tt.transform(har_path, plugins=[])  # explicitly provide no plugins
 
         assert times_plugin_called == 1
+
+
+def dump_as_str(*args, **kwargs):
+    """
+    Wraps transformer.dump by passing it a StringIO buffer as file argument and
+    returning the final contents of that buffer.
+    This makes transformer.dump behave like transformer.dumps, and thus allows
+    to test their output more easily.
+    """
+    s = io.StringIO()
+    transformer.dump(s, *args, **kwargs)
+    return s.getvalue()
+
+
+class TestDumpAndDumps:
+    @pytest.mark.parametrize("f", (transformer.dumps, dump_as_str))
+    def test_with_no_paths_it_returns_empty_locustfile(self, f):
+        expected_empty_locustfile = "\n".join(locustfile_lines(scenarios=[]))
+        assert f([]) == expected_empty_locustfile
+
+    def test_dump_and_dumps_have_same_output_for_simple_har(self, tmp_path):
+        har_path = tmp_path / "some.har"
+        with har_path.open("w") as file:
+            json.dump(_DUMMY_HAR_DICT, file)
+
+        assert transformer.dumps([tmp_path]) == dump_as_str([tmp_path])
+
+    @pytest.mark.parametrize(
+        "f,with_default,expected_times_called",
+        (
+            (f, *case)
+            for f in (transformer.dumps, dump_as_str)
+            for case in ((True, 1), (False, 0))
+        ),
+    )
+    def test_it_uses_default_plugins(
+        self, tmp_path: Path, monkeypatch, f, with_default, expected_times_called
+    ):
+        har_path = tmp_path / "some.har"
+        with har_path.open("w") as file:
+            json.dump(_DUMMY_HAR_DICT, file)
+
+        times_plugin_called = 0
+
+        # We don't need to specify a plugin signature here because signatures
+        # are only checked at plugin name resolution.
+        def fake_plugin(tasks):
+            nonlocal times_plugin_called
+            times_plugin_called += 1
+            return tasks
+
+        monkeypatch.setattr(tt, "DEFAULT_PLUGINS", [fake_plugin])
+
+        f([har_path], with_default_plugins=with_default)
+
+        assert times_plugin_called == expected_times_called

@@ -3,7 +3,7 @@ Entrypoint for Transformer when used as a library.
 """
 import warnings
 from pathlib import Path
-from typing import Sequence, Union, Iterable, TextIO, Iterator
+from typing import Sequence, Union, Iterable, TextIO, Iterator, TypeVar
 
 from transformer.locust import locustfile, locustfile_lines
 from transformer.plugins import sanitize_headers
@@ -69,12 +69,16 @@ def dump(
 
     See also: dumps
 
-    :param scenario_paths: paths to scenario files (HAR) or directories
-    :param plugins: names of plugins to use
+    :param file: an object with a `writelines` method (as specified by
+        io.TextIOBase), e.g. `sys.stdout` or the result of `open`.
+    :param scenario_paths: paths to scenario files (HAR) or directories.
+    :param plugins: names of plugins to use.
     :param with_default_plugins: whether the default plugins should be used in
-        addition to those provided (recommended: True)
+        addition to those provided (recommended: True).
     """
-    file.writelines(_dump_as_lines(scenario_paths, plugins, with_default_plugins))
+    file.writelines(
+        intersperse("\n", _dump_as_lines(scenario_paths, plugins, with_default_plugins))
+    )
 
 
 def _dump_as_lines(
@@ -87,3 +91,24 @@ def _dump_as_lines(
     yield from locustfile_lines(
         [Scenario.from_path(path, plugins) for path in scenario_paths]
     )
+
+
+T = TypeVar("T")
+
+
+def intersperse(delim: T, iterable: Iterable[T]) -> Iterator[T]:
+    """
+    >>> list(intersperse(",", "a"))
+    ['a']
+    >>> list(intersperse(",", ""))
+    []
+    >>> list(intersperse(",", "abc"))
+    ['a', ',', 'b', ',', 'c']
+    >>> list(intersperse(",", ["a", "b", "c"]))
+    ['a', ',', 'b', ',', 'c']
+    """
+    it = iter(iterable)
+    yield next(it)
+    for x in it:
+        yield delim
+        yield x
