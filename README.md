@@ -1,16 +1,18 @@
-<p align="center"><img src="images/transformer.png"/></div>
-
-[![Build Status](https://travis-ci.org/zalando-incubator/Transformer.svg?branch=master)](https://travis-ci.org/zalando-incubator/Transformer)
-[![Codacy Badge](https://api.codacy.com/project/badge/Grade/10b3feb4e4814429bf288b87443a6c72)](https://www.codacy.com/app/thilp/Transformer?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=zalando-incubator/Transformer&amp;utm_campaign=Badge_Grade)
+<p align="center">
+<img src="images/transformer.png"/>
+<br>
+<a href="https://travis-ci.org/zalando-incubator/Transformer"><img src="https://travis-ci.org/zalando-incubator/Transformer.svg?branch=master"/></a>
+<a href="https://www.codacy.com/app/thilp/Transformer"><img src="https://api.codacy.com/project/badge/Grade/10b3feb4e4814429bf288b87443a6c72"/></a>
+<a href="https://www.codacy.com/app/thilp/Transformer"><img src="https://api.codacy.com/project/badge/Coverage/10b3feb4e4814429bf288b87443a6c72"/></a>
+</p>
 
 # Transformer
 
-A tool to transform/convert web browser sessions ([HAR files][]) into
-[Locust][] load testing scenarios (locustfile).
+A tool to convert web browser sessions ([HAR files][]) into
+[Locust][] load testing scenarios (locustfiles).
 
-This tool can be used when you have HAR files (containing recordings of
-interactions with your website) that you then want to replay in load tests
-using Locust.
+Use it when you want to **replay HAR files** (containing recordings of
+interactions with your website) **in load tests with Locust**.
 
 [HAR files]: https://en.wikipedia.org/wiki/.har
 [Locust]: https://locust.io/
@@ -19,6 +21,8 @@ using Locust.
 
 - [Installation](#installation)
 - [Usage](#usage)
+  * [Command-line](#command-line)
+  * [Library](#library)
 - [How-to](#how-to)
   * [Create a HAR file](#create-a-har-file)
     + [Using Chrome Developer Tools](#using-chrome-developer-tools)
@@ -43,12 +47,19 @@ pip install har-transformer
 
 ## Usage
 
-Import in your code and use it:
-```python
-from transformer import transform
+### Command-line
 
-with open("locustfile.py", "w") as locust_file:
-  locust_file.write(transform.main("scenarios_directory/"))
+```bash
+$ transformer my_scenarios_dir/
+```
+
+### Library
+
+```python
+import transformer
+
+with open("locustfile.py", "w") as f:
+    transformer.dump(f, ["my_scenarios_dir/"])
 ```
 
 Example HAR files are included in the `examples` directory for you to try out.
