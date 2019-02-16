@@ -1,11 +1,12 @@
 # Sanitizing headers
 
-The [`sanitize_headers` plugin](sanitize_headers.py) should be used for processing scenarios that were generated 
-in the Chrome browser, but is advised to be used whenever cookies handling is important.
- 
-The plugin removes Chrome-specific, RFC non-compliant headers starting with ":". 
+The [`sanitize_headers` plugin](sanitize_headers.py) should be used for
+processing scenarios generated in the Chrome browser, but is also advised to
+use it whenever cookies handling is important.
 
-Example of such headers:
+The plugin removes Chrome-specific, RFC-non-compliant headers starting with `:`.
+
+Examples of such headers:
 ```
 :authority: chrome.google.com
 :method: POST
@@ -13,8 +14,9 @@ Example of such headers:
 :scheme: https
 ```
 
-Additionally the plugin:
-- maps header keys to lowercase, which makes further overriding of headers deterministic,
-- ignores the `cookie` header, as cookies are handled by [Locust's `HttpSession`][http-session].
+Additionally, the plugin:
+  - converts header names to lowercase, which simplifies further header overriding,
+  - ignores the `cookie` header, as cookies are handled by
+  [Locust's _HttpSession_][http-session].
 
 [http-session]: https://docs.locust.io/en/stable/api.html#httpsession-class
