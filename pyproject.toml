@@ -23,7 +23,7 @@ classifiers=[
 packages = [{ include = "transformer" }]
 
 [tool.poetry.scripts]
-transformer = "transformer:cli.script_entrypoint"
+transformer = "transformer.cli:script_entrypoint"
 
 [tool.poetry.dependencies]
 python = "^3.6"
