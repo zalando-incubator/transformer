@@ -173,6 +173,6 @@ def group_by_contract(plugins: Iterable[Plugin]) -> DefaultDict[Contract, List[P
     for p in plugins:
         c = contract(p)
         for bc in _BASE_CONTRACTS:
-            if c & bc:
+            if c & bc:  # Contract is an enum.Flag: & computes the intersection.
                 res[bc].append(p)
     return res
