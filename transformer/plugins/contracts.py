@@ -116,9 +116,10 @@ def plugin(c: Contract) -> Callable[[callable], callable]:
     :raise InvalidContractError: if c is not a valid contract.
     """
     if not isinstance(c, Contract):
+        suggestions = (f"@plugin(Contract.{x.name})" for x in Contract)
         raise InvalidContractError(
             f"{c!r} is not a {Contract.__qualname__}. "
-            "Did you mean e.g. @plugin(Contract.OnTask)?"
+            f"Did you mean {', '.join(suggestions)}?"
         )
 
     def _decorate(f: callable) -> callable:
