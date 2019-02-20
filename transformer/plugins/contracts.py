@@ -10,13 +10,8 @@ Different types of plugins have different input and output types.
 Not all types of plugins can be applied at the same point in Transformer's
 pipeline (e.g. python.Program objects are built much later than Task objects),
 hence the multiplicity of contracts.
-These input and output types are formalized here using Python's annotation
-syntax and the typing module.
 
-In addition to the plugin contracts, this module provides an "isvalid" method
-for checking whether arbitrary Python objects conform to a given plugin contract.
-
-# Plugin kinds
+# Plugin contracts
 
 ## OnTask
 
@@ -52,109 +47,131 @@ scenario tree or individual tasks.
 
 Example: a plugin that injects some code in the global scope.
 
-# Other types
+# Other contracts
 
 This module also defines:
 
 ## Plugin
 
-Any supported kind of Transformer plugin.
+Any supported contract of Transformer plugin.
 """
-import inspect
-from typing import Sequence, Callable, Union, Dict, Any
-
-from transformer import python
-from transformer.decision import Decision
-from transformer.task import Task, Task2
-
-PluginValidator = Callable[[inspect.Signature], Decision]
-_PluginValidatorDecorator = Callable[[PluginValidator], PluginValidator]
-
-_PLUGIN_VALIDATORS: Dict[type, PluginValidator] = {}
+import enum
+from collections import defaultdict
+from typing import Callable, NewType, Iterable, TypeVar, List, DefaultDict
 
 
-def _register_contract(plugin_type: type) -> None:
-    if plugin_type in _PLUGIN_VALIDATORS:
-        raise ValueError(f"{plugin_type} already registered; cannot register it again")
-
-    *expected_params, expected_return = plugin_type.__args__
-
-    def _validator(sig: inspect.Signature) -> Decision:
-        if sig.return_annotation != expected_return:
-            return Decision.no(
-                f"expected {expected_return}, got {sig.return_annotation}"
-            )
-
-        actual_params = [p.annotation for p in sig.parameters.values()]
-        if actual_params != expected_params:
-            return Decision.no(
-                f"expected parameters {expected_params}, got {actual_params}"
-            )
-
-        return Decision.yes()
-
-    _PLUGIN_VALIDATORS[plugin_type] = _validator
-
-
-OnTask = Callable[[Task2], Task2]
-
-
-OnScenario = Callable[["scenario.Scenario"], "scenario.Scenario"]
-
-
-OnPythonProgram = Callable[[python.Program], python.Program]
-
-
-# Historically Transformer has only one kind of plugin, which transformed a
-# sequence of Task objects into another such sequence. Operating on a full list
-# of tasks (instead of task by task) offered more leeway: a plugin could e.g.
-# add a new task, or change only the first task.
-# However this OnTaskSequence model is too constraining for some use-cases,
-# e.g. when a plugin needs to inject code in the global scope, and having to
-# deal with a full, immutable list of tasks in plugins that independently
-# operate on each task implies a lot of verbosity and redundancy.
-# For these reasons, other plugin kinds were created to offer a more varied
-# choice for plugin implementers.
-# See https://github.com/zalando-incubator/Transformer/issues/10.
-OnTaskSequence = Callable[[Sequence[Task]], Sequence[Task]]
-
-
-Plugin = Union[OnTask, OnScenario, OnPythonProgram, OnTaskSequence]
-
-for plugin_type in Plugin.__args__:
-    _register_contract(plugin_type)
-
-
-def isvalid(plugin_type: type, obj: Any) -> Decision:
+class Contract(enum.Flag):
     """
-    Checks whether obj is an implementation of the plugin contract plugin_type.
-    The return value is basically a boolean, with an additional string
-    describing the reason for this decision.
+    Enumeration of all supported plugin contracts. Each contract defines a way
+    for plugins to be used in Transformer.
 
-    :param plugin_type: plugin contract to verify obj against
-    :param obj: any Python object
-    :return: whether obj is conform to the plugin_type contract
-    :raise TypeError: if plugin_type is not a plugin contract
+    Any function may become a Transformer plugin by announcing that
+    it implements at least one contract, using the @plugin decorator.
     """
-    if plugin_type is Plugin:
-        return Decision.any(
-            (isvalid(t, obj) for t in Plugin.__args__),
-            "should be valid for a Plugin subtype",
+
+    OnTask = enum.auto()
+    OnScenario = enum.auto()
+    OnPythonProgram = enum.auto()
+
+    # Historically Transformer has only one plugin contract, which transformed a
+    # sequence of Task objects into another such sequence. Operating on a full list
+    # of tasks (instead of task by task) offered more leeway: a plugin could e.g.
+    # add a new task, or change only the first task.
+    # However this OnTaskSequence model is too constraining for some use-cases,
+    # e.g. when a plugin needs to inject code in the global scope, and having to
+    # deal with a full, immutable list of tasks in plugins that independently
+    # operate on each task implies a lot of verbosity and redundancy.
+    # For these reasons, other plugin contracts were created to offer a more
+    # varied choice for plugin implementers.
+    # See https://github.com/zalando-incubator/Transformer/issues/10.
+    OnTaskSequence = enum.auto()
+
+
+Plugin = NewType("Plugin", callable)
+
+
+class InvalidContractError(ValueError):
+    """
+    Raised for plugin functions associated with invalid contracts.
+
+    What an "invalid contract" represents is not strictly specified,
+    but this includes at least objects that are not members of the Contract
+    enumeration.
+    """
+
+
+class InvalidPluginError(ValueError):
+    """
+    Raised when trying to use as plugin a function that has not been marked
+    as such.
+    """
+
+
+def plugin(c: Contract) -> Callable[[callable], callable]:
+    """
+    Function decorator. Use it to associate a function to a Contract, making it
+    a Transformer plugin that will be detected by resolve().
+
+    :param c: the contract to associate to the decorated function.
+    :raise InvalidContractError: if c is not a valid contract.
+    """
+    if not isinstance(c, Contract):
+        raise InvalidContractError(
+            f"{c!r} is not a {Contract.__qualname__}. "
+            "Did you mean e.g. @plugin(Contract.OnTask)?"
         )
 
-    if not callable(obj):
-        return Decision.no(f"{obj!r} is not a function")
+    def _decorate(f: callable) -> callable:
+        f._transformer_plugin_contract = c
+        return f
 
+    return _decorate
+
+
+def contract(f: Plugin) -> Contract:
+    """
+    Returns the contract associated to a plugin function.
+
+    :raise InvalidPluginError: if f is not a plugin.
+    """
     try:
-        validator = _PLUGIN_VALIDATORS[plugin_type]
-    except KeyError:
-        raise TypeError(f"no Plugin contract registered for {plugin_type}")
+        return getattr(f, "_transformer_plugin_contract")
+    except AttributeError:
+        raise InvalidPluginError(f) from None
 
-    try:
-        actual_signature = inspect.signature(obj)
-    except (ValueError, TypeError) as err:
-        return Decision.no(f"could not extract signature from {obj!r}: {err}")
 
-    return Decision.whether(
-        validator(actual_signature), f"{obj.__name__!r} should implement {plugin_type}"
-    )
+_T = TypeVar("_T")
+
+
+def apply(plugins: Iterable[Plugin], init: _T) -> _T:
+    """
+    Applies each plugin to init in order, and returns the result.
+
+    This just wraps a very simple but common operation.
+    """
+    for p in plugins:
+        init = p(init)
+    return init
+
+
+_BASE_CONTRACTS = (
+    Contract.OnTask,
+    Contract.OnTaskSequence,
+    Contract.OnScenario,
+    Contract.OnPythonProgram,
+)
+
+
+def group_by_contract(plugins: Iterable[Plugin]) -> DefaultDict[Contract, List[Plugin]]:
+    """
+    Groups plugins in lists according to their contracts.
+    Each plugin is found in as many lists as it implements base contracts.
+    Lists keep the order of the original plugins iterable.
+    """
+    res = defaultdict(list)
+    for p in plugins:
+        c = contract(p)
+        for bc in _BASE_CONTRACTS:
+            if c & bc:
+                res[bc].append(p)
+    return res

@@ -2,7 +2,9 @@ import enum
 import warnings
 from typing import Sequence, List, Union, Iterator
 
+import transformer.plugins as plug
 import transformer.python as py
+from transformer.plugins.contracts import Plugin
 from transformer.scenario import Scenario
 from transformer.task import Task, Task2
 
@@ -50,7 +52,7 @@ def locust_taskset(scenario: Scenario) -> py.Class:
     fields: List[py.Statement] = []
     for i, child in enumerate(scenario.children, start=1):
         seq_decorator = f"seq_task({i})"
-        if isinstance(child, Task):
+        if isinstance(child, (Task2, Task)):
             fields.append(py.Decoration(seq_decorator, _locust_task(child)))
         elif isinstance(child, Scenario):
             field = py.Decoration(f"task({child.weight})", locust_taskset(child))
@@ -119,12 +121,15 @@ def locust_program(scenarios: Sequence[Scenario]) -> py.Program:
     ]
 
 
-def locustfile_lines(scenarios: Sequence[Scenario]) -> Iterator[str]:
+def locustfile_lines(
+    scenarios: Sequence[Scenario], program_plugins: Sequence[Plugin]
+) -> Iterator[str]:
     """
     Converts the provided scenarios into a stream of Python statements
     and iterate on the resulting lines.
     """
-    for stmt in locust_program(scenarios):
+    program = plug.apply(program_plugins, locust_program(scenarios))
+    for stmt in program:
         for line in stmt.lines():
             yield str(line)
 
@@ -136,8 +141,9 @@ def locustfile(scenarios: Sequence[Scenario]) -> str:
     This function is deprecated and will be removed in a future version.
     Do not rely on it.
     Reason: It does not provide significant value over locustfile_lines and has
-    a less clear name and a less flexible API.
+    a less clear name and a less flexible API. It does not support new
+    generation plugins contracts like OnPythonProgram.
     Deprecated since: v1.0.2.
     """
     warnings.warn(DeprecationWarning("locustfile: use locustfile_lines instead"))
-    return "\n".join(locustfile_lines(scenarios))
+    return "\n".join(locustfile_lines(scenarios, ()))

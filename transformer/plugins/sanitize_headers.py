@@ -1,7 +1,9 @@
 from transformer.helpers import zip_kv_pairs
+from transformer.plugins import plugin, Contract
 from transformer.task import Task2
 
 
+@plugin(Contract.OnTask)
 def plugin(task: Task2) -> Task2:
     """
     Removes Chrome-specific, RFC-non-compliant headers starting with `:`.

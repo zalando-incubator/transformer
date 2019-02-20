@@ -52,42 +52,6 @@ class LocustForScenarioGroup(HttpLocust):
         assert expected.strip() == script.strip()
 
 
-def test_generates_passed_global_code_blocks():
-    sg1 = Scenario(
-        "sg1",
-        children=[
-            MagicMock(
-                spec_set=Scenario, children=[], global_code_blocks={"b1": ["ab"]}
-            ),
-            MagicMock(
-                spec_set=Scenario, children=[], global_code_blocks={"b2": ["cd"]}
-            ),
-        ],
-        origin=None,
-    )
-    sg2 = Scenario(
-        "sg2",
-        children=[MagicMock(spec_set=Scenario, children=[], global_code_blocks={})],
-        origin=None,
-    )
-    sg3 = Scenario(
-        "sg3",
-        children=[
-            MagicMock(
-                spec_set=Scenario,
-                children=[],
-                global_code_blocks={"b3": ["yz"], "b2": ["yyy", "zzz"]},
-            )
-        ],
-        origin=None,
-    )
-
-    code = locustfile([sg1, sg2, sg3])
-    assert code.endswith(
-        "\n# b1\nab\n# b2\nyyy\nzzz\n# b3\nyz"
-    ), "the latter b2 block should override the former"
-
-
 def test_locust_taskset_raises_on_malformed_scenario():
     bad_child = cast(Scenario, 7)
     bad_scenario = Scenario(name="x", children=[bad_child], origin=None)
