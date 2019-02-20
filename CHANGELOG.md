@@ -27,6 +27,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   an iterator over lines (as strings) instead of a string containing the full
   locustfile. This design allows for more flexibility in `dump`/`dumps` and
   should result in smaller memory usage for huge locustfiles. (#14)
+  - Preliminary support for new-generation plugins. (#25)
 
 ### Deprecated
 
