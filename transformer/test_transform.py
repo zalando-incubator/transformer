@@ -8,6 +8,7 @@ import transformer
 import transformer.transform as tt
 from transformer.helpers import DUMMY_HAR_STRING
 from transformer.locust import locustfile_lines
+from transformer.plugins import plugin, Contract
 
 
 class TestTransform:
@@ -55,7 +56,9 @@ def dump_as_str(*args, **kwargs):
 class TestDumpAndDumps:
     @pytest.mark.parametrize("f", (transformer.dumps, dump_as_str))
     def test_with_no_paths_it_returns_empty_locustfile(self, f):
-        expected_empty_locustfile = "\n".join(locustfile_lines(scenarios=[]))
+        expected_empty_locustfile = "\n".join(
+            locustfile_lines(scenarios=[], program_plugins=())
+        )
         assert f([]) == expected_empty_locustfile
 
     def test_dump_and_dumps_have_same_output_for_simple_har(self, tmp_path):
@@ -80,12 +83,11 @@ class TestDumpAndDumps:
 
         times_plugin_called = 0
 
-        # We don't need to specify a plugin signature here because signatures
-        # are only checked at plugin name resolution.
-        def fake_plugin(tasks):
+        @plugin(Contract.OnScenario)
+        def fake_plugin(t):
             nonlocal times_plugin_called
             times_plugin_called += 1
-            return tasks
+            return t
 
         monkeypatch.setattr(tt, "DEFAULT_PLUGINS", [fake_plugin])
 

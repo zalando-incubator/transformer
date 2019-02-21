@@ -5,9 +5,10 @@ import warnings
 from pathlib import Path
 from typing import Sequence, Union, Iterable, TextIO, Iterator, TypeVar
 
+import transformer.plugins as plug
 from transformer.locust import locustfile, locustfile_lines
-from transformer.plugins import sanitize_headers
-from transformer.plugins.contracts import OnTaskSequence
+from transformer.plugins import sanitize_headers, Contract
+from transformer.plugins.contracts import Plugin
 from transformer.scenario import Scenario
 
 DEFAULT_PLUGINS = (sanitize_headers.plugin,)
@@ -15,7 +16,7 @@ DEFAULT_PLUGINS = (sanitize_headers.plugin,)
 
 def transform(
     scenarios_path: Union[str, Path],
-    plugins: Sequence[OnTaskSequence] = (),
+    plugins: Sequence[Plugin] = (),
     with_default_plugins: bool = True,
 ) -> str:
     """
@@ -86,11 +87,20 @@ def _dump_as_lines(
     plugins: Sequence[PluginName],
     with_default_plugins: bool,
 ) -> Iterator[str]:
+    plugins = [p for name in plugins for p in plug.resolve(name)]
     if with_default_plugins:
         plugins = (*DEFAULT_PLUGINS, *plugins)
-    yield from locustfile_lines(
-        [Scenario.from_path(path, plugins) for path in scenario_paths]
-    )
+
+    plugins_for = plug.group_by_contract(plugins)
+
+    scenarios = [
+        Scenario.from_path(
+            path, plugins_for[Contract.OnTask], plugins_for[Contract.OnTaskSequence]
+        ).apply_plugins(plugins_for[Contract.OnScenario])
+        for path in scenario_paths
+    ]
+
+    yield from locustfile_lines(scenarios, plugins_for[Contract.OnPythonProgram])
 
 
 T = TypeVar("T")

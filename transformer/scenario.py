@@ -3,7 +3,6 @@ import logging
 from collections import defaultdict
 from pathlib import Path
 from typing import (
-    NamedTuple,
     Sequence,
     Mapping,
     Union,
@@ -12,10 +11,13 @@ from typing import (
     Optional,
     Dict,
     Tuple,
+    NamedTuple,
 )
 
+
+import transformer.plugins as plug
 from transformer.naming import to_identifier
-from transformer.plugins.contracts import OnTaskSequence
+from transformer.plugins.contracts import Plugin
 from transformer.request import Request
 from transformer.task import Task, Task2
 
@@ -83,7 +85,8 @@ class Scenario(NamedTuple):
     def from_path(
         cls,
         path: Path,
-        plugins: Sequence[OnTaskSequence] = (),
+        plugins: Sequence[Plugin] = (),
+        ts_plugins: Sequence[Plugin] = (),
         short_name: bool = False,
     ) -> "Scenario":
         """
@@ -102,13 +105,21 @@ class Scenario(NamedTuple):
             names are "scoped" by the parent directory).
         """
         if path.is_dir():
-            return cls.from_dir(path, plugins, short_name=short_name)
+            return cls.from_dir(
+                path, plugins, ts_plugins=ts_plugins, short_name=short_name
+            )
         else:
-            return cls.from_har_file(path, plugins, short_name=short_name)
+            return cls.from_har_file(
+                path, plugins, ts_plugins=ts_plugins, short_name=short_name
+            )
 
     @classmethod
     def from_dir(
-        cls, path: Path, plugins: Sequence[OnTaskSequence], short_name: bool
+        cls,
+        path: Path,
+        plugins: Sequence[Plugin],
+        ts_plugins: Sequence[Plugin],
+        short_name: bool,
     ) -> "Scenario":
         """
         Makes a Scenario out of the provided directory path.
@@ -151,7 +162,9 @@ class Scenario(NamedTuple):
             if child in weight_files:
                 continue
             try:
-                scenario = cls.from_path(child, plugins, short_name=True)
+                scenario = cls.from_path(
+                    child, plugins, ts_plugins=ts_plugins, short_name=True
+                )
             except SkippableScenarioError as err:
                 logging.warning(
                     "while searching for HAR files, skipping %s: %s", child, err.reason
@@ -211,7 +224,11 @@ class Scenario(NamedTuple):
 
     @classmethod
     def from_har_file(
-        cls, path: Path, plugins: Sequence[OnTaskSequence], short_name: bool
+        cls,
+        path: Path,
+        plugins: Sequence[Plugin],
+        ts_plugins: Sequence[Plugin],
+        short_name: bool,
     ) -> "Scenario":
         """
         Creates a Scenario given a HAR file.
@@ -222,10 +239,13 @@ class Scenario(NamedTuple):
             with path.open() as file:
                 har = json.load(file)
             requests = Request.all_from_har(har)
-            tasks = list(Task.from_requests(requests))
+            tasks = Task.from_requests(requests)
 
-            for plugin in plugins:
-                tasks = plugin(tasks)
+            # TODO: Remove this when Contract.OnTaskSequence is removed.
+            tasks = plug.apply(ts_plugins, tasks)
+
+            # TODO: Remove Task-to-Task2 conversion once both are merged.
+            tasks = tuple(plug.apply(plugins, Task2.from_task(t)) for t in tasks)
 
             return Scenario(
                 name=to_identifier(
@@ -278,3 +298,18 @@ class Scenario(NamedTuple):
             for child in self.children
             for block_name, block_lines in child.global_code_blocks.items()
         }
+
+    def apply_plugins(self, plugins: Sequence[Plugin]) -> "Scenario":
+        """
+        Recursively builds a new scenario tree from the leaves by applying all
+        plugins to each cloned scenario subtree.
+        Does not do anything if plugins is empty.
+        """
+        if not plugins:
+            return self
+
+        children = [
+            c.apply_plugins(plugins) if isinstance(c, Scenario) else c
+            for c in self.children
+        ]
+        return plug.apply(plugins, self._replace(children=children))

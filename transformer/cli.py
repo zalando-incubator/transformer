@@ -11,6 +11,8 @@ Options:
     --help              Print this help message and exit.
     -p, --plugin=<name> Use the specified plugin. Repeatable.
     --version           Print version information and exit.
+
+Documentation & code: https://github.com/zalando-incubator/transformer
 """
 import logging
 import sys
@@ -20,10 +22,7 @@ from typing import Sequence, cast, Tuple
 import ecological
 from docopt import docopt
 
-from transformer import __version__
-from transformer import plugins as plug
-from transformer.locust import locustfile
-from transformer.scenario import Scenario
+from transformer import __version__, dump
 
 
 class Config(ecological.AutoConfig, prefix="transformer"):
@@ -86,6 +85,12 @@ def script_entrypoint() -> None:
         logging.info("Otherwise, here is the command-line manual:")
         print(__doc__, file=sys.stderr)
         exit(1)
-    plugins = tuple(p for name in config.plugins for p in plug.resolve(name))
-    scenarios = [Scenario.from_path(path, plugins) for path in config.input_paths]
-    print(str(locustfile(scenarios)))
+    try:
+        dump(file=sys.stdout, scenario_paths=config.input_paths, plugins=config.plugins)
+    except ImportError as err:
+        logging.error(f"Failed loading plugins: {err}")
+        exit(2)
+    except Exception:
+        url = "https://github.com/zalando-incubator/Transformer/issues"
+        logging.exception(f"Please help us fix this error by reporting it! {url}")
+        exit(3)

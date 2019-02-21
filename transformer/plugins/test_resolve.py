@@ -6,9 +6,11 @@ from pathlib import Path
 from types import ModuleType
 
 import pytest
+from hypothesis import given
+from hypothesis._strategies import permutations
 
-from transformer.task import Task2
-from .resolve import load_plugins_from_module, resolve
+from transformer.plugins.contracts import plugin, Contract
+from .resolve import load_plugins_from_module, resolve, NoPluginError
 
 
 @pytest.fixture()
@@ -18,23 +20,28 @@ def module_root(tmp_path: Path, monkeypatch) -> Path:
 
 
 class TestResolve:
-    def test_returns_empty_and_logs_for_module_not_found(self, caplog):
+    def test_raises_for_module_not_found(self):
         modname = f"that_module_does_not_exist.{uuid.uuid4().hex}"
-        assert list(resolve(modname)) == []
-        assert f"failed to import plugin module {modname!r}" in caplog.text
+        with pytest.raises(ImportError):
+            list(resolve(modname))  # must force evaluation of the generator
 
     def test_calls_load_plugins_from_module_with_module(self, module_root: Path):
         modname = "ab.cd.ef"
         modpath = Path(*modname.split(".")).with_suffix(".py")
         Path(module_root, modpath.parent).mkdir(parents=True)
         with Path(module_root, modpath).open("w") as f:
-            f.write("from transformer.plugins.contracts import Task2\n")
-            f.write("def plugin_f(t: Task2) -> Task2:\n")
+            f.write("from transformer.plugins.contracts import plugin, Contract\n")
+            f.write("@plugin(Contract.OnTask)\n")
+            f.write("def f(t):\n")
             f.write("   ...\n")
+            f.write("def helper(t):\n")
+            f.write("   ...\n")
+
         plugins = list(resolve(modname))
         assert len(plugins) == 1
         f = plugins[0]
-        assert f.__name__ == "plugin_f"
+        assert callable(f)
+        assert f.__name__ == "f"
 
     def test_resolve_is_exported_by_the_transformer_plugins_module(self):
         try:
@@ -58,18 +65,18 @@ class TestLoadPluginsFromModule:
             # Iterators are lazy, we need list()
             list(load_plugins_from_module(A))
 
-    def test_ignores_non_plugin_stuff_in_module(self, module, caplog):
-        def signature_not_a_plugin(_: Task2) -> Task2:
-            ...
+    def not_a_plugin(_):
+        ...
 
-        def plugin_prefixed_but_no():
-            ...
+    def plugin_not_a_plugin_either(_):
+        ...
 
-        def plugin_valid(_: Task2) -> Task2:
-            ...
+    @plugin(Contract.OnTask)
+    def plugin_valid(_):
+        ...
 
-        non_plugin_functions = (signature_not_a_plugin, plugin_prefixed_but_no)
-        functions = (*non_plugin_functions, plugin_valid)
+    @given(permutations((not_a_plugin, plugin_not_a_plugin_either, plugin_valid)))
+    def test_ignores_non_plugin_stuff_in_module(self, module, caplog, functions):
         for f in functions:
             module.__dict__[f.__name__] = f
 
@@ -77,15 +84,17 @@ class TestLoadPluginsFromModule:
         caplog.set_level(logging.DEBUG)
         plugins = list(load_plugins_from_module(module))
 
+        plugin_valid = next(f for f in functions if f.__name__ == "plugin_valid")
         assert plugins == [plugin_valid]
 
+        non_plugin_functions = {f for f in functions if f is not plugin_valid}
         print(f">>> log messages: {caplog.messages}")
         for f in non_plugin_functions:
             assert any(
                 f.__name__ in msg for msg in caplog.messages
             ), "ignored function names should be logged"
 
-    def test_empty_iterator_for_modules_without_any_plugin(self, module, caplog):
-        plugins = list(load_plugins_from_module(module))
-        assert plugins == []
-        assert module.__name__ in caplog.text
+    def test_raises_for_modules_without_any_plugin(self, module):
+        with pytest.raises(NoPluginError, match=module.__name__):
+            # must force evaluation of the generator
+            list(load_plugins_from_module(module))
