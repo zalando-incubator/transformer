@@ -1,6 +1,7 @@
 [flake8]
 # See https://black.readthedocs.io/en/stable/the_black_code_style.html#line-length
 max-line-length = 80
+max-complexity = 10
 select = C,E,F,W,B,B9
 ignore =
   E501,

@@ -5,16 +5,11 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+<!--
 ## [Unreleased][]
+-->
 
-### Changed
-
-  - The `dump`, `dumps`, and `transform` functions by default use the
-  `sanitize_headers` plugin even if users don't provide it in the plugin list.
-  This is because the resulting locustfile would almost certainly be broken
-  without these plugins. Users can still opt-out from these default plugins
-  by passing the keyword-argument `with_default_plugins=False` (e.g. if they
-  implemented their own version). (#14)
+## [1.0.2] - 2019-02-21
 
 ### Added
 
@@ -28,6 +23,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   locustfile. This design allows for more flexibility in `dump`/`dumps` and
   should result in smaller memory usage for huge locustfiles. (#14)
   - Preliminary support for new-generation plugins. (#25)
+
+### Changed
+
+  - The `dump`, `dumps`, and `transform` functions by default use the
+  `sanitize_headers` plugin even if users don't provide it in the plugin list.
+  This is because the resulting locustfile would almost certainly be broken
+  without these plugins. Users can still opt-out from these default plugins
+  by passing the keyword-argument `with_default_plugins=False` (e.g. if they
+  implemented their own version). (#14)
 
 ### Deprecated
 
@@ -64,6 +68,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - `transformer.plugins.Plugin` is renamed
   `transformer.plugins.contracts.OnTaskSequence`.
 
-[Unreleased]: https://github.com/zalando-incubator/transformer/compare/v1.0.1...HEAD
+[Unreleased]: https://github.com/zalando-incubator/transformer/compare/v1.0.2...HEAD
+[1.0.2]: https://github.com/zalando-incubator/transformer/compare/v1.0.1...v1.0.2
 [1.0.1]: https://github.com/zalando-incubator/transformer/compare/v1.0.0...v1.0.1
 [1.0.0]: https://github.com/zalando-incubator/transformer/compare/f842c4163e037dc345eaf1992187f58126b7d909...v1.0.0
