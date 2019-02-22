@@ -42,7 +42,7 @@ pip install har-transformer
 ### Command-line
 
 ```bash
-$ transformer my_scenarios_dir/
+$ transformer my_har_files_dir/
 ```
 
 ### Library
@@ -51,7 +51,7 @@ $ transformer my_scenarios_dir/
 import transformer
 
 with open("locustfile.py", "w") as f:
-    transformer.dump(f, ["my_scenarios_dir/"])
+    transformer.dump(f, ["my_har_files_dir/"])
 ```
 
 Example HAR files are included in the `examples` directory for you to try out.
