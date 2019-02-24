@@ -5,7 +5,18 @@ A representation of a Locust Task.
 
 import json
 from types import MappingProxyType
-from typing import Iterable, NamedTuple, Iterator, Sequence, Optional, Mapping, List
+from typing import (
+    Iterable,
+    NamedTuple,
+    Iterator,
+    Sequence,
+    Optional,
+    Mapping,
+    List,
+    Dict,
+)
+
+from dataclasses import dataclass
 
 import transformer.python as py
 from transformer.blacklist import on_blacklist
@@ -38,45 +49,21 @@ class LocustRequest(NamedTuple):
             query=r.query,
         )
 
-    NOOP_HTTP_METHODS = {HttpMethod.GET, HttpMethod.OPTIONS, HttpMethod.DELETE}
 
-    def as_locust_action(self) -> str:
-        args = {
-            "url": self.url,
-            "name": self.url,
-            "headers": self.headers,
-            "timeout": TIMEOUT,
-            "allow_redirects": False,
-        }
-        if self.method is HttpMethod.POST:
-            post_data = _parse_post_data(self.post_data)
-            args[post_data["key"]] = post_data["data"]
-        elif self.method is HttpMethod.PUT:
-            post_data = _parse_post_data(self.post_data)
-            args["params"] = zip_kv_pairs(self.query)
-            args[post_data["key"]] = post_data["data"]
-        elif self.method not in self.NOOP_HTTP_METHODS:
-            raise ValueError(f"unsupported HTTP method: {self.method!r}")
-
-        method = self.method.name.lower()
-        named_args = ", ".join(f"{k}={v}" for k, v in args.items())
-        return f"response = self.client.{method}({named_args})"
-
-
+@dataclass
 class Task2:
-    def __init__(
-        self,
-        name: str,
-        request: Request,
-        statements: Sequence[py.Statement] = (),
-        # TODO: Replace me with a plugin framework that accesses the full tree.
-        #   See https://github.com/zalando-incubator/Transformer/issues/11.
-        global_code_blocks: Mapping[str, Sequence[str]] = IMMUTABLE_EMPTY_DICT,
-    ) -> None:
-        self.name = name
-        self.request = request
-        self.statements = list(statements)
-        self.global_code_blocks = {k: list(v) for k, v in global_code_blocks.items()}
+    name: str
+    request: Request
+    statements: Sequence[py.Statement] = ()
+    # TODO: Replace me with a plugin framework that accesses the full tree.
+    #   See https://github.com/zalando-incubator/Transformer/issues/11.
+    global_code_blocks: Mapping[str, Sequence[str]] = IMMUTABLE_EMPTY_DICT
+
+    def __post_init__(self,) -> None:
+        self.statements = list(self.statements)
+        self.global_code_blocks = {
+            k: list(v) for k, v in self.global_code_blocks.items()
+        }
 
     @classmethod
     def from_requests(cls, requests: Iterable[Request]) -> Iterator["Task2"]:
@@ -88,7 +75,8 @@ class Task2:
         corresponding request.
         """
         # TODO: Update me when merging Task with Task2: "statements" needs to
-        #   contain the equivalent of LocustRequest.
+        #   contain a Placeholder to Task2.request.
+        #   See what is done in from_task (but without the LocustRequest part).
         #   See https://github.com/zalando-incubator/Transformer/issues/11.
         for req in sorted(requests, key=lambda r: r.timestamp):
             if not on_blacklist(req.url.netloc):
@@ -99,21 +87,75 @@ class Task2:
         # TODO: Remove me as soon as the old Task is no longer used and Task2 is
         #   renamed to Task.
         #   See https://github.com/zalando-incubator/Transformer/issues/11.
-        locust_request = task.locust_request
-        if locust_request is None:
-            locust_request = LocustRequest.from_request(task.request)
-        return cls(
-            name=task.name,
-            request=task.request,
-            statements=[
-                py.OpaqueBlock(block)
-                for block in [
-                    *task.locust_preprocessing,
-                    locust_request.as_locust_action(),
-                    *task.locust_postprocessing,
-                ]
-            ],
-        )
+        t = cls(name=task.name, request=task.request)
+        if task.locust_request:
+            placeholder = py.Placeholder(
+                name="this task's request field",
+                target=lambda: task.locust_request,
+                converter=lreq_to_expr,
+            )
+        else:
+            placeholder = py.Placeholder(
+                name="this task's request field",
+                target=lambda: t.request,
+                converter=req_to_expr,
+            )
+        t.statements = [
+            *[py.OpaqueBlock(x) for x in task.locust_preprocessing],
+            py.Assignment("response", placeholder),
+            *[py.OpaqueBlock(x) for x in task.locust_postprocessing],
+        ]
+        return t
+
+
+NOOP_HTTP_METHODS = {HttpMethod.GET, HttpMethod.OPTIONS, HttpMethod.DELETE}
+
+
+def req_to_expr(r: Request) -> py.FunctionCall:
+    url = py.Literal(str(r.url.geturl()))
+    args: Dict[str, py.Expression] = {
+        "url": url,
+        "name": url,
+        "headers": py.Literal(zip_kv_pairs(r.headers)),
+        "timeout": py.Literal(TIMEOUT),
+        "allow_redirects": py.Symbol("False"),
+    }
+    if r.method is HttpMethod.POST:
+        post_data = _parse_post_data(r.post_data)
+        args[post_data["key"]] = post_data["data"]
+    elif r.method is HttpMethod.PUT:
+        post_data = _parse_post_data(r.post_data)
+        args[post_data["key"]] = post_data["data"]
+        args["params"] = zip_kv_pairs(r.query)
+    elif r.method not in NOOP_HTTP_METHODS:
+        raise ValueError(f"unsupported HTTP method: {r.method!r}")
+
+    method = r.method.name.lower()
+    return py.FunctionCall(name=f"self.client.{method}", named_args=args)
+
+
+def lreq_to_expr(lr: LocustRequest) -> py.FunctionCall:
+    # TODO: Remove me once LocustRequest no longer exists.
+    #   See https://github.com/zalando-incubator/Transformer/issues/11.
+    args = {
+        "url": lr.url,
+        "name": lr.url,
+        "headers": lr.headers,
+        "timeout": TIMEOUT,
+        "allow_redirects": False,
+    }
+    if lr.method is HttpMethod.POST:
+        post_data = _parse_post_data(lr.post_data)
+        args[post_data["key"]] = post_data["data"]
+    elif lr.method is HttpMethod.PUT:
+        post_data = _parse_post_data(lr.post_data)
+        args["params"] = zip_kv_pairs(lr.query)
+        args[post_data["key"]] = post_data["data"]
+    elif lr.method not in NOOP_HTTP_METHODS:
+        raise ValueError(f"unsupported HTTP method: {lr.method!r}")
+
+    method = lr.method.name.lower()
+    return py.FunctionCall(name=f"self.client.{method}", named_args=args)
 
 
 class Task(NamedTuple):

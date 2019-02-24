@@ -31,6 +31,7 @@ pendulum = "^2.0"
 chevron = "^0.13"
 docopt = "^0.6.2"
 ecological = "^1.6"
+dataclasses = "^0.6.0"
 
 [tool.poetry.dev-dependencies]
 locustio = "^0.9.0"

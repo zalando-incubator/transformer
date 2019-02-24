@@ -14,7 +14,6 @@ from typing import (
     NamedTuple,
 )
 
-
 import transformer.plugins as plug
 from transformer.naming import to_identifier
 from transformer.plugins.contracts import Plugin

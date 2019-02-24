@@ -1,5 +1,5 @@
-from transformer.helpers import zip_kv_pairs
 from transformer.plugins import plugin, Contract
+from transformer.request import Header
 from transformer.task import Task2
 
 
@@ -10,16 +10,11 @@ def plugin(task: Task2) -> Task2:
     Converts header names to lowercase to simplify further overriding.
     Removes the cookie header as it is handled by Locust's HttpSession.
     """
-    headers = task.request.headers
-
-    if not isinstance(headers, dict):
-        headers = zip_kv_pairs(headers)
-
-    sanitized_headers = {
-        k.lower(): v
-        for (k, v) in headers.items()
-        if not k.startswith(":") and k.lower() != "cookie"
-    }
+    sanitized_headers = [
+        Header(name=h.name.lower(), value=h.value)
+        for h in task.request.headers
+        if not h.name.startswith(":") and h.name.lower() != "cookie"
+    ]
 
     task.request = task.request._replace(headers=sanitized_headers)
 
