@@ -926,3 +926,13 @@ class TestImport:
             repr(stmt)
             == f"Import(targets=['a', 'b'], source=None, alias=None, comments=['hi'])"
         )
+
+
+class TestPlaceholder:
+    def test_wraps_int_into_literal(self):
+        def f(x: int) -> py.Literal:
+            return py.Literal(x * 2)
+
+        p = py.Placeholder(name="hello", target=lambda: 7, converter=f)
+        assert p.converter(p.target()) == py.Literal(14)
+        assert str(p) == "14"
