@@ -6,16 +6,7 @@ A representation of a Locust Task.
 import json
 from collections import OrderedDict
 from types import MappingProxyType
-from typing import (
-    Iterable,
-    NamedTuple,
-    Iterator,
-    Sequence,
-    Optional,
-    Mapping,
-    List,
-    Dict,
-)
+from typing import Iterable, NamedTuple, Iterator, Sequence, Optional, Mapping, Dict
 
 from dataclasses import dataclass
 
@@ -188,27 +179,6 @@ class Task(NamedTuple):
                 continue
             else:
                 yield cls(name=req.task_name(), request=req)
-
-    def as_locust_action(self, indentation=ACTION_INDENTATION_LEVEL) -> str:
-        """
-        Converts a Task into a Locust Action.
-        """
-        action: List[str] = []
-
-        for preprocessing in self.locust_preprocessing:
-            action.append(_indent(preprocessing, indentation))
-
-        if self.locust_request is None:
-            locust_request = LocustRequest.from_request(self.request)
-        else:
-            locust_request = self.locust_request
-
-        action.append(locust_request.as_locust_action())
-
-        for postprocessing in self.locust_postprocessing:
-            action.append(_indent(postprocessing, indentation))
-
-        return "\n".join(action)
 
     def inject_headers(self, headers: dict):
         if self.locust_request is None:
