@@ -4,6 +4,7 @@ A representation of a Locust Task.
 """
 
 import json
+from collections import OrderedDict
 from types import MappingProxyType
 from typing import (
     Iterable,
@@ -113,13 +114,13 @@ NOOP_HTTP_METHODS = {HttpMethod.GET, HttpMethod.OPTIONS, HttpMethod.DELETE}
 
 def req_to_expr(r: Request) -> py.FunctionCall:
     url = py.Literal(str(r.url.geturl()))
-    args: Dict[str, py.Expression] = {
-        "url": url,
-        "name": url,
-        "headers": py.Literal(zip_kv_pairs(r.headers)),
-        "timeout": py.Literal(TIMEOUT),
-        "allow_redirects": py.Symbol("False"),
-    }
+    args: Dict[str, py.Expression] = OrderedDict(
+        url=url,
+        name=url,
+        headers=py.Literal(zip_kv_pairs(r.headers)),
+        timeout=py.Literal(TIMEOUT),
+        allow_redirects=py.Symbol("False"),
+    )
     if r.method is HttpMethod.POST:
         post_data = _parse_post_data(r.post_data)
         args[post_data["key"]] = post_data["data"]
@@ -137,19 +138,24 @@ def req_to_expr(r: Request) -> py.FunctionCall:
 def lreq_to_expr(lr: LocustRequest) -> py.FunctionCall:
     # TODO: Remove me once LocustRequest no longer exists.
     #   See https://github.com/zalando-incubator/Transformer/issues/11.
-    args = {
-        "url": lr.url,
-        "name": lr.url,
-        "headers": lr.headers,
-        "timeout": TIMEOUT,
-        "allow_redirects": False,
-    }
+    if lr.url.startswith("f"):
+        url = py.FString(lr.url[2:-1])
+    else:
+        url = py.Literal(lr.url[1:-1])
+
+    args: Dict[str, py.Expression] = OrderedDict(
+        url=url,
+        name=url,
+        headers=py.Literal(lr.headers),
+        timeout=py.Literal(TIMEOUT),
+        allow_redirects=py.Symbol("False"),
+    )
     if lr.method is HttpMethod.POST:
         post_data = _parse_post_data(lr.post_data)
         args[post_data["key"]] = post_data["data"]
     elif lr.method is HttpMethod.PUT:
-        post_data = _parse_post_data(lr.post_data)
         args["params"] = zip_kv_pairs(lr.query)
+        post_data = _parse_post_data(lr.post_data)
         args[post_data["key"]] = post_data["data"]
     elif lr.method not in NOOP_HTTP_METHODS:
         raise ValueError(f"unsupported HTTP method: {lr.method!r}")
