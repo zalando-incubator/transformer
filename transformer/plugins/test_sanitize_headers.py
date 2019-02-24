@@ -38,7 +38,8 @@ def test_it_removes_headers_beginning_with_a_colon():
 def test_it_downcases_header_names():
     task = task_with_header("Some Name", "some value")
     sanitized_headers = plugin(task).request.headers
-    assert "some name" in sanitized_headers
+    header_names = {h.name for h in sanitized_headers}
+    assert "some name" in header_names
 
 
 def test_it_removes_cookies():
