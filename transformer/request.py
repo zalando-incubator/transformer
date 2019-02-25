@@ -5,7 +5,7 @@ A representation of a HAR Request.
 
 import enum
 from datetime import datetime
-from typing import Iterator, NamedTuple, List
+from typing import Iterator, NamedTuple, List, Optional
 from urllib.parse import urlparse, SplitResult
 
 import pendulum
@@ -51,10 +51,10 @@ class Request(NamedTuple):
     timestamp: datetime
     method: HttpMethod
     url: SplitResult
-    name: str
     headers: List[Header]
     post_data: dict
     query: List[QueryPair]
+    name: Optional[str] = None
 
     @classmethod
     def from_har_entry(cls, entry: dict) -> "Request":
@@ -67,7 +67,7 @@ class Request(NamedTuple):
             timestamp=pendulum.parse(entry["startedDateTime"]),
             method=HttpMethod[request["method"]],
             url=urlparse(request["url"]),
-            name=request["name"] if "name" in request else request["url"],
+            name=None,
             headers=[
                 Header(name=d["name"], value=d["value"])
                 for d in request.get("headers", [])
