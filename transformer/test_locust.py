@@ -20,6 +20,7 @@ class TestLocustfile:
         a_request.url.path = "some_path"
         a_request.url.geturl()
         a_request.url.geturl.return_value = "some_url"
+        a_request.name = "some_name"
         task = Task(a_name, a_request)
         scenario = Scenario(name="SomeScenario", children=[task], origin=None)
         scenario_group = Scenario(
@@ -41,7 +42,7 @@ class ScenarioGroup(TaskSet):
     class SomeScenario(TaskSequence):
         @seq_task(1)
         def some_task(self):
-            response = self.client.get(url='some_url', name='some_url', headers={}, timeout=$TIMEOUT, allow_redirects=False)
+            response = self.client.get(url='some_url', name='some_name', headers={}, timeout=$TIMEOUT, allow_redirects=False)
 class LocustForScenarioGroup(HttpLocust):
     task_set = ScenarioGroup
     weight = 2

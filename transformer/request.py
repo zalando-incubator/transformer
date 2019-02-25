@@ -51,6 +51,7 @@ class Request(NamedTuple):
     timestamp: datetime
     method: HttpMethod
     url: SplitResult
+    name: str
     headers: List[Header]
     post_data: dict
     query: List[QueryPair]
@@ -66,6 +67,7 @@ class Request(NamedTuple):
             timestamp=pendulum.parse(entry["startedDateTime"]),
             method=HttpMethod[request["method"]],
             url=urlparse(request["url"]),
+            name=request["name"] if "name" in request else request["url"],
             headers=[
                 Header(name=d["name"], value=d["value"])
                 for d in request.get("headers", [])

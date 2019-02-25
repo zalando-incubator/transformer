@@ -24,6 +24,7 @@ class LocustRequest(NamedTuple):
 
     method: HttpMethod
     url: str
+    name: str
     headers: Mapping[str, str]
     post_data: dict = MappingProxyType({})
     query: Sequence[QueryPair] = ()
@@ -33,6 +34,7 @@ class LocustRequest(NamedTuple):
         return LocustRequest(
             method=r.method,
             url=repr(r.url.geturl()),
+            name=repr(r.name if r.name else r.url.geturl()),
             headers=zip_kv_pairs(r.headers),
             post_data=r.post_data,
             query=r.query,
@@ -43,7 +45,7 @@ class LocustRequest(NamedTuple):
     def as_locust_action(self) -> str:
         args = {
             "url": self.url,
-            "name": self.url,
+            "name": self.name if self.name else self.url,
             "headers": self.headers,
             "timeout": TIMEOUT,
             "allow_redirects": False,

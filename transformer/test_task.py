@@ -40,7 +40,7 @@ class TestFromRequests:
 
     @patch("builtins.open")
     def test_it_creates_a_task_if_the_path_not_host_is_on_the_blacklist(
-        self, mock_open
+            self, mock_open
     ):
         mock_open.return_value = io.StringIO("search\namazon")
         request = MagicMock()
@@ -66,7 +66,7 @@ class TestAsLocustAction:
         a_request = MagicMock(spec_set=Request)
         a_request.method = HttpMethod.GET
         locust_request = LocustRequest(
-            method=HttpMethod.GET, url=repr("http://locust-task"), headers={}
+            method=HttpMethod.GET, url=repr("http://locust-task"), name="task name", headers={}
         )
         task = Task("some_task", request=a_request, locust_request=locust_request)
         action = task.as_locust_action()
@@ -173,7 +173,7 @@ class TestAsLocustAction:
 
     def test_it_returns_a_task_with_the_injected_headers(self):
         locust_request = LocustRequest(
-            method=MagicMock(), url=MagicMock(), headers={"x-forwarded-for": ""}
+            method=MagicMock(), url=MagicMock(), name=MagicMock(), headers={"x-forwarded-for": ""}
         )
         task = Task(
             name="some name", request=MagicMock(), locust_request=locust_request
@@ -245,7 +245,7 @@ class TestReplaceURL:
 
     def test_it_returns_a_task_with_the_replaced_url(self):
         locust_request = LocustRequest(
-            method=MagicMock(), url=MagicMock(), headers=MagicMock()
+            method=MagicMock(), url=MagicMock(), name=MagicMock(), headers=MagicMock()
         )
         task = Task(
             name="some name", request=MagicMock(), locust_request=locust_request
