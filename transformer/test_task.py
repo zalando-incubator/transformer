@@ -95,7 +95,7 @@ class TestTask2:
             assert isinstance(assign, py.Assignment)
             assert assign.lhs == "response"
 
-            assert isinstance(assign.rhs, py.Placeholder)
+            assert isinstance(assign.rhs, py.ExpressionView)
             assert assign.rhs.target() == task2.request
             assert assign.rhs.converter is req_to_expr
 
@@ -113,7 +113,7 @@ class TestTask2:
             assert isinstance(assign, py.Assignment)
             assert assign.lhs == "response"
 
-            assert isinstance(assign.rhs, py.Placeholder)
+            assert isinstance(assign.rhs, py.ExpressionView)
             assert assign.rhs.target() == lr
             assert assign.rhs.converter is lreq_to_expr
 

@@ -933,6 +933,6 @@ class TestPlaceholder:
         def f(x: int) -> py.Literal:
             return py.Literal(x * 2)
 
-        p = py.Placeholder(name="hello", target=lambda: 7, converter=f)
+        p = py.ExpressionView(name="hello", target=lambda: 7, converter=f)
         assert p.converter(p.target()) == py.Literal(14)
         assert str(p) == "14"

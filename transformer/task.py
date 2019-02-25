@@ -79,7 +79,7 @@ class Task2:
         corresponding request.
         """
         # TODO: Update me when merging Task with Task2: "statements" needs to
-        #   contain a Placeholder to Task2.request.
+        #   contain a ExpressionView to Task2.request.
         #   See what is done in from_task (but without the LocustRequest part).
         #   See https://github.com/zalando-incubator/Transformer/issues/11.
         for req in sorted(requests, key=lambda r: r.timestamp):
@@ -93,13 +93,13 @@ class Task2:
         #   See https://github.com/zalando-incubator/Transformer/issues/11.
         t = cls(name=task.name, request=task.request)
         if task.locust_request:
-            placeholder = py.Placeholder(
+            placeholder = py.ExpressionView(
                 name="this task's request field",
                 target=lambda: task.locust_request,
                 converter=lreq_to_expr,
             )
         else:
-            placeholder = py.Placeholder(
+            placeholder = py.ExpressionView(
                 name="this task's request field",
                 target=lambda: t.request,
                 converter=req_to_expr,

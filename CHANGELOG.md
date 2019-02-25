@@ -9,9 +9,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-  - `transformer.python.Placeholder`: An Expression that wraps a non-Expression
+  - `transformer.python.ExpressionView`: An Expression that wraps a non-Expression
   (e.g. a Request instance), similarly to how Standalone is a Statement that
-  wraps an Expression. A Placeholder has a `target` (the wrapped object), a
+  wraps an Expression. A ExpressionView has a `target` (the wrapped object), a
   `converter` (function capable of transforming the target into an Expression),
   and a `name` for inspection purposes.
 

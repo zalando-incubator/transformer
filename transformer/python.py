@@ -696,12 +696,12 @@ _T = TypeVar("_T")
 
 
 @dataclass
-class Placeholder(Expression):
+class ExpressionView(Expression):
     """
     The promise of an Expression representing an object currently not in
     Expression format.
 
-    The Placeholder allows to mix non-Expression objects in the syntax tree,
+    The ExpressionView allows to mix non-Expression objects in the syntax tree,
     along with a function capable of transforming these objects into actual
     Expression objects at any time.
     This is useful when there is a simpler representation than Expression.
@@ -709,19 +709,19 @@ class Placeholder(Expression):
     For instance, any Request object can be converted into an equivalent
     Expression, but Request has a simpler API than Expression for all
     request-oriented operations like accessing the URL, etc.
-    Embedding a Request in a Placeholder allows to pretend that the Request is
+    Embedding a Request in a ExpressionView allows to pretend that the Request is
     already in Expression format (with all associated benefits) but still use
     the Request API.
 
     `target` is a callable returning the non-Expression object. That callable
     allows to specify as target some mutable field of an object, rather than a
     fixed reference to an object. See for example task.Task2, which contains a
-    Placeholder to its own "request" field; if the value of that field is
-    changed, the Placeholder will refer to the new value instead of keeping a
+    ExpressionView to its own "request" field; if the value of that field is
+    changed, the ExpressionView will refer to the new value instead of keeping a
     reference to the old value.
 
     `name` is purely descriptive: it can make inspection of data structures
-    containing Placeholder objects more comfortable.
+    containing ExpressionView objects more comfortable.
     """
 
     name: str
