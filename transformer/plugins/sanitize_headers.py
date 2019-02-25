@@ -10,12 +10,10 @@ def plugin(task: Task2) -> Task2:
     Converts header names to lowercase to simplify further overriding.
     Removes the cookie header as it is handled by Locust's HttpSession.
     """
-    sanitized_headers = [
+    task.request.headers = [
         Header(name=h.name.lower(), value=h.value)
         for h in task.request.headers
         if not h.name.startswith(":") and h.name.lower() != "cookie"
     ]
-
-    task.request = task.request._replace(headers=sanitized_headers)
 
     return task

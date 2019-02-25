@@ -2,12 +2,24 @@
 """
 A representation of a Locust Task.
 """
-
 import json
 from collections import OrderedDict
+from json import JSONDecodeError
 from types import MappingProxyType
-from typing import Iterable, NamedTuple, Iterator, Sequence, Optional, Mapping, Dict
+from typing import (
+    Iterable,
+    NamedTuple,
+    Iterator,
+    Sequence,
+    Optional,
+    Mapping,
+    Dict,
+    List,
+    Tuple,
+    cast,
+)
 
+import dataclasses
 from dataclasses import dataclass
 
 import transformer.python as py
@@ -110,15 +122,19 @@ def req_to_expr(r: Request) -> py.FunctionCall:
         name=url,
         headers=py.Literal(zip_kv_pairs(r.headers)),
         timeout=py.Literal(TIMEOUT),
-        allow_redirects=py.Symbol("False"),
+        allow_redirects=py.Literal(False),
     )
     if r.method is HttpMethod.POST:
-        post_data = _parse_post_data(r.post_data)
-        args[post_data["key"]] = post_data["data"]
+        rpd = RequestsPostData.from_har_post_data(r.post_data)
+        args.update(rpd.as_kwargs())
     elif r.method is HttpMethod.PUT:
-        post_data = _parse_post_data(r.post_data)
-        args[post_data["key"]] = post_data["data"]
-        args["params"] = zip_kv_pairs(r.query)
+        rpd = RequestsPostData.from_har_post_data(r.post_data)
+        args.update(rpd.as_kwargs())
+
+        args.setdefault("params", py.Literal({}))
+        cast(py.Literal, args["params"]).value.extend(
+            _params_from_name_value_dicts([dataclasses.asdict(q) for q in r.query])
+        )
     elif r.method not in NOOP_HTTP_METHODS:
         raise ValueError(f"unsupported HTTP method: {r.method!r}")
 
@@ -139,15 +155,19 @@ def lreq_to_expr(lr: LocustRequest) -> py.FunctionCall:
         name=url,
         headers=py.Literal(lr.headers),
         timeout=py.Literal(TIMEOUT),
-        allow_redirects=py.Symbol("False"),
+        allow_redirects=py.Literal(False),
     )
     if lr.method is HttpMethod.POST:
-        post_data = _parse_post_data(lr.post_data)
-        args[post_data["key"]] = post_data["data"]
+        rpd = RequestsPostData.from_har_post_data(lr.post_data)
+        args.update(rpd.as_kwargs())
     elif lr.method is HttpMethod.PUT:
-        args["params"] = zip_kv_pairs(lr.query)
-        post_data = _parse_post_data(lr.post_data)
-        args[post_data["key"]] = post_data["data"]
+        rpd = RequestsPostData.from_har_post_data(lr.post_data)
+        args.update(rpd.as_kwargs())
+
+        args.setdefault("params", py.Literal({}))
+        cast(py.Literal, args["params"]).value.extend(
+            _params_from_name_value_dicts([dataclasses.asdict(q) for q in lr.query])
+        )
     elif lr.method not in NOOP_HTTP_METHODS:
         raise ValueError(f"unsupported HTTP method: {lr.method!r}")
 
@@ -203,26 +223,114 @@ class Task(NamedTuple):
         return self._replace(locust_request=new_locust_request)
 
 
-def _parse_post_data(post_data: dict) -> dict:
-    data = post_data.get("text")
-    mime: str = post_data.get("mimeType")
-    if mime == "application/json":
-        key = "json"
-        # Workaround for bug in chrome-har:
-        # https://github.com/sitespeedio/chrome-har/issues/23
-        # TODO: Remove once bug fixed.
-        if data is None:
-            params = post_data.get("params")
-            if params is None:
-                data = ""
-            else:
-                data = {}
-                for param in params:
-                    data[param.get("name")] = param.get("value")
-        else:
-            data = json.loads(data)
-    else:
-        key = "data"
-        if data:
-            data = data.encode()
-    return {"key": key, "data": data}
+@dataclass
+class RequestsPostData:
+    """
+    Data to be sent via HTTP POST, along with which API of the requests library
+    to use.
+    """
+
+    data: Optional[py.Literal] = None
+    params: Optional[py.Literal] = None
+    json: Optional[py.Literal] = None
+
+    def as_kwargs(self) -> Dict[str, py.Expression]:
+        return {k: v for k, v in dataclasses.asdict(self).items() if v is not None}
+
+    @classmethod
+    def from_har_post_data(cls, post_data: dict) -> "RequestsPostData":
+        """
+        Converts a HAR postData object into a RequestsPostData instance.
+
+        :param post_data: a HAR "postData" object,
+            see http://www.softwareishard.com/blog/har-12-spec/#postData.
+        :raise ValueError: if *post_data* is invalid.
+        """
+        try:
+            return _from_har_post_data(post_data)
+        except ValueError as err:
+            raise ValueError(f"invalid HAR postData object: {post_data!r}") from err
+
+
+def _from_har_post_data(post_data: dict) -> RequestsPostData:
+    mime_k = "mimeType"
+    try:
+        mime: str = post_data[mime_k]
+    except KeyError:
+        raise ValueError(f"missing {mime_k!r} field") from None
+
+    rpd = RequestsPostData()
+
+    # The "text" and "params" fields are supposed to be mutually
+    # exclusive (according to the HAR spec) but nobody respects that.
+    # Often, both text and params are provided for x-www-form-urlencoded.
+    text_k, params_k = "text", "params"
+    if text_k not in post_data and params_k not in post_data:
+        raise ValueError(f"should contain {text_k!r} or {params_k!r}")
+
+    _extract_text(mime, post_data, text_k, rpd)
+
+    try:
+        params = _params_from_post_data(params_k, post_data)
+        if params is not None:
+            rpd.params = py.Literal(params)
+    except (KeyError, UnicodeEncodeError, TypeError) as err:
+        raise ValueError("unreadable params field") from err
+
+    return rpd
+
+
+def _extract_text(
+    mime: str, post_data: dict, text_k: str, rpd: RequestsPostData
+) -> None:
+    text = post_data.get(text_k)
+    if mime == JSON_MIME_TYPE:
+        if text is None:
+            raise ValueError(f"missing {text_k!r} field for {JSON_MIME_TYPE} content")
+        try:
+            rpd.json = py.Literal(json.loads(text))
+        except JSONDecodeError as err:
+            raise ValueError(f"unreadable JSON from field {text_k!r}") from err
+    elif text is not None:  # Probably application/x-www-form-urlencoded.
+        try:
+            rpd.data = py.Literal(text.encode())
+        except UnicodeEncodeError as err:
+            raise ValueError(f"cannot encode the {text_k!r} field in UTF-8") from err
+
+
+def _params_from_post_data(
+    key: str, post_data: dict
+) -> Optional[List[Tuple[bytes, bytes]]]:
+    """
+    Extracts the *key* list from *post_data* and calls
+    _params_from_name_value_dicts with that list.
+
+    :raise TypeError: if the object at *key* is built using unexpected data types.
+    """
+    params = post_data.get(key)
+    if params is None:
+        return
+    if not isinstance(params, list):
+        raise TypeError(f"the {key!r} field should be a list")
+    return _params_from_name_value_dicts(params)
+
+
+def _params_from_name_value_dicts(
+    dicts: Iterable[Mapping[str, str]]
+) -> List[Tuple[bytes, bytes]]:
+    """
+    Converts a HAR "params" element [0] into a list of tuples that can be used
+    as value for requests' "params" keyword-argument.
+
+    [0]: http://www.softwareishard.com/blog/har-12-spec/#params
+    [1]: http://docs.python-requests.org/en/master/user/quickstart/
+        #more-complicated-post-requests
+
+    :raise KeyError: if one of the elements doesn't contain a "name" or "value" field.
+    :raise UnicodeEncodeError: if an element's "name" or "value" string cannot
+        be encoded in UTF-8.
+    """
+    return [(d["name"].encode(), d["value"].encode()) for d in dicts]
+
+
+JSON_MIME_TYPE = "application/json"
