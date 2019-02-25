@@ -203,33 +203,6 @@ class Task(NamedTuple):
         return self._replace(locust_request=new_locust_request)
 
 
-def _indent(input_string: str, requested_indentation: int) -> str:
-    output_string = ""
-    indentation = requested_indentation
-    initial_leading_spaces = 0
-    for i, line in enumerate(input_string.splitlines()):
-
-        leading_spaces = len(line) - len(line.lstrip())
-        if leading_spaces > 0:
-
-            # We need to check the indentation of the second line in order to
-            # account for the case where the existing indentation is greater than
-            # the requested; it is used for reapplying sub-level-indentation e.g.
-            # to if statements.
-            if i == 1:
-                initial_leading_spaces = leading_spaces
-            else:
-                indentation = requested_indentation + (
-                    leading_spaces - initial_leading_spaces
-                )
-
-            line = line.lstrip()
-
-        output_string += line.rjust(len(line) + indentation, " ") + "\n"
-
-    return output_string
-
-
 def _parse_post_data(post_data: dict) -> dict:
     data = post_data.get("text")
     mime: str = post_data.get("mimeType")
