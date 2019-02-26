@@ -45,7 +45,7 @@ class ScenarioGroup(TaskSet):
     class SomeScenario(TaskSequence):
         @seq_task(1)
         def some_task(self):
-            response = self.client.get(url='some_url', name='some_url', headers={}, timeout=$TIMEOUT, allow_redirects=False)
+            response = self.client.get(url='some_url', name='some_url', timeout=$TIMEOUT, allow_redirects=False)
 class LocustForScenarioGroup(HttpLocust):
     task_set = ScenarioGroup
     weight = 2
@@ -58,7 +58,7 @@ class LocustForScenarioGroup(HttpLocust):
     def test_it_renders_a_locustfile_template_with_plugin_change_task_name(self):
         @plugin(Contract.OnTask)
         def plugin_change_task_name(t: Task2) -> Task2:
-            t.request.name = 'changed_name'
+            t.request.name = "changed_name"
             return t
 
         a_name = "some_task"
@@ -91,7 +91,7 @@ class ScenarioGroup(TaskSet):
     class SomeScenario(TaskSequence):
         @seq_task(1)
         def some_task(self):
-            response = self.client.get(url='some_url', name='changed_name', headers={}, timeout=$TIMEOUT, allow_redirects=False)
+            response = self.client.get(url='some_url', name='changed_name', timeout=$TIMEOUT, allow_redirects=False)
 class LocustForScenarioGroup(HttpLocust):
     task_set = ScenarioGroup
     weight = 2

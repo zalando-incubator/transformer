@@ -9,6 +9,7 @@ from typing import Iterator, NamedTuple, List, Optional
 from urllib.parse import urlparse, SplitResult
 
 import pendulum
+from dataclasses import dataclass
 
 from transformer.naming import to_identifier
 
@@ -34,7 +35,8 @@ class Header(NamedTuple):
     value: str
 
 
-class QueryPair(NamedTuple):
+@dataclass
+class QueryPair:
     """
     Query String as recorded in HAR file.
     """
@@ -43,18 +45,28 @@ class QueryPair(NamedTuple):
     value: str
 
 
-class Request(NamedTuple):
+@dataclass
+class Request:
     """
     An HTTP request as recorded in a HAR file.
+
+    Note that *post_data*, if present, will be a dict of the same format as read
+    in the HAR file.
+    Although not consistently followed by HAR generators, its format is
+    documented here: http://www.softwareishard.com/blog/har-12-spec/#postData.
     """
 
     timestamp: datetime
     method: HttpMethod
     url: SplitResult
-    headers: List[Header]
-    post_data: dict
-    query: List[QueryPair]
+    headers: List[Header] = ()
+    post_data: Optional[dict] = None
+    query: List[QueryPair] = ()
     name: Optional[str] = None
+
+    def __post_init__(self):
+        self.headers = list(self.headers)
+        self.query = list(self.query)
 
     @classmethod
     def from_har_entry(cls, entry: dict) -> "Request":
@@ -109,6 +121,6 @@ class Request(NamedTuple):
                 self.timestamp,
                 self.method,
                 self.url,
-                tuple(self.post_data) if self.post_data else None,
+                tuple(self.post_data.items()) if self.post_data else None,
             )
         )

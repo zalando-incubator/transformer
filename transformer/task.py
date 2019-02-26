@@ -2,10 +2,25 @@
 """
 A representation of a Locust Task.
 """
-
 import json
+from collections import OrderedDict
+from json import JSONDecodeError
 from types import MappingProxyType
-from typing import Iterable, NamedTuple, Iterator, Sequence, Optional, Mapping, List
+from typing import (
+    Iterable,
+    NamedTuple,
+    Iterator,
+    Sequence,
+    Optional,
+    Mapping,
+    Dict,
+    List,
+    Tuple,
+    cast,
+)
+
+import dataclasses
+from dataclasses import dataclass
 
 import transformer.python as py
 from transformer.blacklist import on_blacklist
@@ -15,6 +30,7 @@ from transformer.request import HttpMethod, Request, QueryPair
 IMMUTABLE_EMPTY_DICT = MappingProxyType({})
 TIMEOUT = 30
 ACTION_INDENTATION_LEVEL = 12
+JSON_MIME_TYPE = "application/json"
 
 
 class LocustRequest(NamedTuple):
@@ -40,45 +56,21 @@ class LocustRequest(NamedTuple):
             name=repr(r.name or r.url.geturl()),
         )
 
-    NOOP_HTTP_METHODS = {HttpMethod.GET, HttpMethod.OPTIONS, HttpMethod.DELETE}
 
-    def as_locust_action(self) -> str:
-        args = {
-            "url": self.url,
-            "name": self.name or self.url,
-            "headers": self.headers,
-            "timeout": TIMEOUT,
-            "allow_redirects": False,
-        }
-        if self.method is HttpMethod.POST:
-            post_data = _parse_post_data(self.post_data)
-            args[post_data["key"]] = post_data["data"]
-        elif self.method is HttpMethod.PUT:
-            post_data = _parse_post_data(self.post_data)
-            args["params"] = zip_kv_pairs(self.query)
-            args[post_data["key"]] = post_data["data"]
-        elif self.method not in self.NOOP_HTTP_METHODS:
-            raise ValueError(f"unsupported HTTP method: {self.method!r}")
-
-        method = self.method.name.lower()
-        named_args = ", ".join(f"{k}={v}" for k, v in args.items())
-        return f"response = self.client.{method}({named_args})"
-
-
+@dataclass
 class Task2:
-    def __init__(
-        self,
-        name: str,
-        request: Request,
-        statements: Sequence[py.Statement] = (),
-        # TODO: Replace me with a plugin framework that accesses the full tree.
-        #   See https://github.com/zalando-incubator/Transformer/issues/11.
-        global_code_blocks: Mapping[str, Sequence[str]] = IMMUTABLE_EMPTY_DICT,
-    ) -> None:
-        self.name = name
-        self.request = request
-        self.statements = list(statements)
-        self.global_code_blocks = {k: list(v) for k, v in global_code_blocks.items()}
+    name: str
+    request: Request
+    statements: Sequence[py.Statement] = ()
+    # TODO: Replace me with a plugin framework that accesses the full tree.
+    #   See https://github.com/zalando-incubator/Transformer/issues/11.
+    global_code_blocks: Mapping[str, Sequence[str]] = IMMUTABLE_EMPTY_DICT
+
+    def __post_init__(self,) -> None:
+        self.statements = list(self.statements)
+        self.global_code_blocks = {
+            k: list(v) for k, v in self.global_code_blocks.items()
+        }
 
     @classmethod
     def from_requests(cls, requests: Iterable[Request]) -> Iterator["Task2"]:
@@ -90,7 +82,8 @@ class Task2:
         corresponding request.
         """
         # TODO: Update me when merging Task with Task2: "statements" needs to
-        #   contain the equivalent of LocustRequest.
+        #   contain a ExpressionView to Task2.request.
+        #   See what is done in from_task (but without the LocustRequest part).
         #   See https://github.com/zalando-incubator/Transformer/issues/11.
         for req in sorted(requests, key=lambda r: r.timestamp):
             if not on_blacklist(req.url.netloc):
@@ -101,21 +94,100 @@ class Task2:
         # TODO: Remove me as soon as the old Task is no longer used and Task2 is
         #   renamed to Task.
         #   See https://github.com/zalando-incubator/Transformer/issues/11.
-        locust_request = task.locust_request
-        if locust_request is None:
-            locust_request = LocustRequest.from_request(task.request)
-        return cls(
-            name=task.name,
-            request=task.request,
-            statements=[
-                py.OpaqueBlock(block)
-                for block in [
-                    *task.locust_preprocessing,
-                    locust_request.as_locust_action(),
-                    *task.locust_postprocessing,
-                ]
-            ],
+        t = cls(name=task.name, request=task.request)
+        if task.locust_request:
+            expr_view = py.ExpressionView(
+                name="this task's request field",
+                target=lambda: task.locust_request,
+                converter=lreq_to_expr,
+            )
+        else:
+            expr_view = py.ExpressionView(
+                name="this task's request field",
+                target=lambda: t.request,
+                converter=req_to_expr,
+            )
+        t.statements = [
+            *[py.OpaqueBlock(x) for x in task.locust_preprocessing],
+            py.Assignment("response", expr_view),
+            *[py.OpaqueBlock(x) for x in task.locust_postprocessing],
+        ]
+        return t
+
+
+NOOP_HTTP_METHODS = {HttpMethod.GET, HttpMethod.OPTIONS, HttpMethod.DELETE}
+
+
+def req_to_expr(r: Request) -> py.FunctionCall:
+    url = py.Literal(str(r.url.geturl()))
+    headers = zip_kv_pairs(r.headers)
+    args: Dict[str, py.Expression] = OrderedDict(
+        url=url,
+        name=py.Literal(r.name) if r.name else url,
+        timeout=py.Literal(TIMEOUT),
+        allow_redirects=py.Literal(False),
+    )
+    if headers:
+        args["headers"] = py.Literal(headers)
+
+    if r.method is HttpMethod.POST:
+        rpd = RequestsPostData.from_har_post_data(r.post_data)
+        args.update(rpd.as_kwargs())
+    elif r.method is HttpMethod.PUT:
+        rpd = RequestsPostData.from_har_post_data(r.post_data)
+        args.update(rpd.as_kwargs())
+
+        args.setdefault("params", py.Literal({}))
+        cast(py.Literal, args["params"]).value.extend(
+            _params_from_name_value_dicts([dataclasses.asdict(q) for q in r.query])
         )
+    elif r.method not in NOOP_HTTP_METHODS:
+        raise ValueError(f"unsupported HTTP method: {r.method!r}")
+
+    method = r.method.name.lower()
+    return py.FunctionCall(name=f"self.client.{method}", named_args=args)
+
+
+def lreq_to_expr(lr: LocustRequest) -> py.FunctionCall:
+    # TODO: Remove me once LocustRequest no longer exists.
+    #   See https://github.com/zalando-incubator/Transformer/issues/11.
+    url = _peel_off_repr(lr.url)
+    name = _peel_off_repr(lr.name) if lr.name else url
+
+    args: Dict[str, py.Expression] = OrderedDict(
+        url=url,
+        name=name,
+        timeout=py.Literal(TIMEOUT),
+        allow_redirects=py.Literal(False),
+    )
+    if lr.headers:
+        args["headers"] = py.Literal(lr.headers)
+
+    if lr.method is HttpMethod.POST:
+        rpd = RequestsPostData.from_har_post_data(lr.post_data)
+        args.update(rpd.as_kwargs())
+    elif lr.method is HttpMethod.PUT:
+        rpd = RequestsPostData.from_har_post_data(lr.post_data)
+        args.update(rpd.as_kwargs())
+
+        args.setdefault("params", py.Literal({}))
+        cast(py.Literal, args["params"]).value.extend(
+            _params_from_name_value_dicts([dataclasses.asdict(q) for q in lr.query])
+        )
+    elif lr.method not in NOOP_HTTP_METHODS:
+        raise ValueError(f"unsupported HTTP method: {lr.method!r}")
+
+    method = lr.method.name.lower()
+    return py.FunctionCall(name=f"self.client.{method}", named_args=args)
+
+
+def _peel_off_repr(s: str) -> py.Literal:
+    """
+    Reverse the effect of LocustRequest's repr() calls on url and name.
+    """
+    if s.startswith("f"):
+        return py.FString(eval(s[1:], {}, {}))
+    return py.Literal(eval(s, {}, {}))
 
 
 class Task(NamedTuple):
@@ -143,27 +215,6 @@ class Task(NamedTuple):
             else:
                 yield cls(name=req.task_name(), request=req)
 
-    def as_locust_action(self, indentation=ACTION_INDENTATION_LEVEL) -> str:
-        """
-        Converts a Task into a Locust Action.
-        """
-        action: List[str] = []
-
-        for preprocessing in self.locust_preprocessing:
-            action.append(_indent(preprocessing, indentation))
-
-        if self.locust_request is None:
-            locust_request = LocustRequest.from_request(self.request)
-        else:
-            locust_request = self.locust_request
-
-        action.append(locust_request.as_locust_action())
-
-        for postprocessing in self.locust_postprocessing:
-            action.append(_indent(postprocessing, indentation))
-
-        return "\n".join(action)
-
     def inject_headers(self, headers: dict):
         if self.locust_request is None:
             original_locust_request = LocustRequest.from_request(self.request)
@@ -187,53 +238,111 @@ class Task(NamedTuple):
         return self._replace(locust_request=new_locust_request)
 
 
-def _indent(input_string: str, requested_indentation: int) -> str:
-    output_string = ""
-    indentation = requested_indentation
-    initial_leading_spaces = 0
-    for i, line in enumerate(input_string.splitlines()):
+@dataclass
+class RequestsPostData:
+    """
+    Data to be sent via HTTP POST, along with which API of the requests library
+    to use.
+    """
 
-        leading_spaces = len(line) - len(line.lstrip())
-        if leading_spaces > 0:
+    data: Optional[py.Literal] = None
+    params: Optional[py.Literal] = None
+    json: Optional[py.Literal] = None
 
-            # We need to check the indentation of the second line in order to
-            # account for the case where the existing indentation is greater than
-            # the requested; it is used for reapplying sub-level-indentation e.g.
-            # to if statements.
-            if i == 1:
-                initial_leading_spaces = leading_spaces
-            else:
-                indentation = requested_indentation + (
-                    leading_spaces - initial_leading_spaces
-                )
+    def as_kwargs(self) -> Dict[str, py.Expression]:
+        return {k: v for k, v in dataclasses.asdict(self).items() if v is not None}
 
-            line = line.lstrip()
+    @classmethod
+    def from_har_post_data(cls, post_data: dict) -> "RequestsPostData":
+        """
+        Converts a HAR postData object into a RequestsPostData instance.
 
-        output_string += line.rjust(len(line) + indentation, " ") + "\n"
+        :param post_data: a HAR "postData" object,
+            see http://www.softwareishard.com/blog/har-12-spec/#postData.
+        :raise ValueError: if *post_data* is invalid.
+        """
+        try:
+            return _from_har_post_data(post_data)
+        except ValueError as err:
+            raise ValueError(f"invalid HAR postData object: {post_data!r}") from err
 
-    return output_string
+
+def _from_har_post_data(post_data: dict) -> RequestsPostData:
+    mime_k = "mimeType"
+    try:
+        mime: str = post_data[mime_k]
+    except KeyError:
+        raise ValueError(f"missing {mime_k!r} field") from None
+
+    rpd = RequestsPostData()
+
+    # The "text" and "params" fields are supposed to be mutually
+    # exclusive (according to the HAR spec) but nobody respects that.
+    # Often, both text and params are provided for x-www-form-urlencoded.
+    text_k, params_k = "text", "params"
+    if text_k not in post_data and params_k not in post_data:
+        raise ValueError(f"should contain {text_k!r} or {params_k!r}")
+
+    _extract_text(mime, post_data, text_k, rpd)
+
+    try:
+        params = _params_from_post_data(params_k, post_data)
+        if params is not None:
+            rpd.params = py.Literal(params)
+    except (KeyError, UnicodeEncodeError, TypeError) as err:
+        raise ValueError("unreadable params field") from err
+
+    return rpd
 
 
-def _parse_post_data(post_data: dict) -> dict:
-    data = post_data.get("text")
-    mime: str = post_data.get("mimeType")
-    if mime == "application/json":
-        key = "json"
-        # Workaround for bug in chrome-har:
-        # https://github.com/sitespeedio/chrome-har/issues/23
-        # TODO: Remove once bug fixed.
-        if data is None:
-            params = post_data.get("params")
-            if params is None:
-                data = ""
-            else:
-                data = {}
-                for param in params:
-                    data[param.get("name")] = param.get("value")
-        else:
-            data = json.loads(data)
-    else:
-        key = "data"
-        if data:
-            data = data.encode()
-    return {"key": key, "data": data}
+def _extract_text(
+    mime: str, post_data: dict, text_k: str, rpd: RequestsPostData
+) -> None:
+    text = post_data.get(text_k)
+    if mime == JSON_MIME_TYPE:
+        if text is None:
+            raise ValueError(f"missing {text_k!r} field for {JSON_MIME_TYPE} content")
+        try:
+            rpd.json = py.Literal(json.loads(text))
+        except JSONDecodeError as err:
+            raise ValueError(f"unreadable JSON from field {text_k!r}") from err
+    elif text is not None:  # Probably application/x-www-form-urlencoded.
+        try:
+            rpd.data = py.Literal(text.encode())
+        except UnicodeEncodeError as err:
+            raise ValueError(f"cannot encode the {text_k!r} field in UTF-8") from err
+
+
+def _params_from_post_data(
+    key: str, post_data: dict
+) -> Optional[List[Tuple[bytes, bytes]]]:
+    """
+    Extracts the *key* list from *post_data* and calls
+    _params_from_name_value_dicts with that list.
+
+    :raise TypeError: if the object at *key* is built using unexpected data types.
+    """
+    params = post_data.get(key)
+    if params is None:
+        return None
+    if not isinstance(params, list):
+        raise TypeError(f"the {key!r} field should be a list")
+    return _params_from_name_value_dicts(params)
+
+
+def _params_from_name_value_dicts(
+    dicts: Iterable[Mapping[str, str]]
+) -> List[Tuple[bytes, bytes]]:
+    """
+    Converts a HAR "params" element [0] into a list of tuples that can be used
+    as value for requests' "params" keyword-argument.
+
+    [0]: http://www.softwareishard.com/blog/har-12-spec/#params
+    [1]: http://docs.python-requests.org/en/master/user/quickstart/
+        #more-complicated-post-requests
+
+    :raise KeyError: if one of the elements doesn't contain a "name" or "value" field.
+    :raise UnicodeEncodeError: if an element's "name" or "value" string cannot
+        be encoded in UTF-8.
+    """
+    return [(d["name"].encode(), d["value"].encode()) for d in dicts]
