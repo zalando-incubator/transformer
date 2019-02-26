@@ -30,6 +30,7 @@ from transformer.request import HttpMethod, Request, QueryPair
 IMMUTABLE_EMPTY_DICT = MappingProxyType({})
 TIMEOUT = 30
 ACTION_INDENTATION_LEVEL = 12
+JSON_MIME_TYPE = "application/json"
 
 
 class LocustRequest(NamedTuple):
@@ -331,6 +332,3 @@ def _params_from_name_value_dicts(
         be encoded in UTF-8.
     """
     return [(d["name"].encode(), d["value"].encode()) for d in dicts]
-
-
-JSON_MIME_TYPE = "application/json"
