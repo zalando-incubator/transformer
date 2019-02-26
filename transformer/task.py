@@ -43,6 +43,7 @@ class LocustRequest(NamedTuple):
     headers: Mapping[str, str]
     post_data: dict = MappingProxyType({})
     query: Sequence[QueryPair] = ()
+    name: Optional[str] = None
 
     @classmethod
     def from_request(cls, r: Request) -> "LocustRequest":
@@ -52,6 +53,7 @@ class LocustRequest(NamedTuple):
             headers=zip_kv_pairs(r.headers),
             post_data=r.post_data,
             query=r.query,
+            name=repr(r.name or r.url.geturl()),
         )
 
 
@@ -118,13 +120,16 @@ NOOP_HTTP_METHODS = {HttpMethod.GET, HttpMethod.OPTIONS, HttpMethod.DELETE}
 
 def req_to_expr(r: Request) -> py.FunctionCall:
     url = py.Literal(str(r.url.geturl()))
+    headers = zip_kv_pairs(r.headers)
     args: Dict[str, py.Expression] = OrderedDict(
         url=url,
-        name=url,
-        headers=py.Literal(zip_kv_pairs(r.headers)),
+        name=py.Literal(r.name) if r.name else url,
         timeout=py.Literal(TIMEOUT),
         allow_redirects=py.Literal(False),
     )
+    if headers:
+        args["headers"] = py.Literal(headers)
+
     if r.method is HttpMethod.POST:
         rpd = RequestsPostData.from_har_post_data(r.post_data)
         args.update(rpd.as_kwargs())
@@ -146,18 +151,18 @@ def req_to_expr(r: Request) -> py.FunctionCall:
 def lreq_to_expr(lr: LocustRequest) -> py.FunctionCall:
     # TODO: Remove me once LocustRequest no longer exists.
     #   See https://github.com/zalando-incubator/Transformer/issues/11.
-    if lr.url.startswith("f"):
-        url = py.FString(lr.url[2:-1])
-    else:
-        url = py.Literal(lr.url[1:-1])
+    url = _peel_off_repr(lr.url)
+    name = _peel_off_repr(lr.name) if lr.name else url
 
     args: Dict[str, py.Expression] = OrderedDict(
         url=url,
-        name=url,
-        headers=py.Literal(lr.headers),
+        name=name,
         timeout=py.Literal(TIMEOUT),
         allow_redirects=py.Literal(False),
     )
+    if lr.headers:
+        args["headers"] = py.Literal(lr.headers)
+
     if lr.method is HttpMethod.POST:
         rpd = RequestsPostData.from_har_post_data(lr.post_data)
         args.update(rpd.as_kwargs())
@@ -174,6 +179,15 @@ def lreq_to_expr(lr: LocustRequest) -> py.FunctionCall:
 
     method = lr.method.name.lower()
     return py.FunctionCall(name=f"self.client.{method}", named_args=args)
+
+
+def _peel_off_repr(s: str) -> py.Literal:
+    """
+    Reverse the effect of LocustRequest's repr() calls on url and name.
+    """
+    if s.startswith("f"):
+        return py.FString(eval(s[1:], {}, {}))
+    return py.Literal(eval(s, {}, {}))
 
 
 class Task(NamedTuple):
@@ -310,7 +324,7 @@ def _params_from_post_data(
     """
     params = post_data.get(key)
     if params is None:
-        return
+        return None
     if not isinstance(params, list):
         raise TypeError(f"the {key!r} field should be a list")
     return _params_from_name_value_dicts(params)

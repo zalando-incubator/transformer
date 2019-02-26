@@ -127,6 +127,7 @@ class _KindOfDict(enum.Flag):
 _formats = sampled_from(("json", "www"))
 _kinds_of_dicts = sampled_from(_KindOfDict)
 
+
 # From http://www.softwareishard.com/blog/har-12-spec/#postData.
 @composite
 def har_post_dicts(draw, format=None):
@@ -311,6 +312,22 @@ class TestReqToExpr:
             },
         )
 
+    def test_it_uses_the_custom_name_if_provided(self):
+        url = "http://abc.de"
+        name = "my-req"
+        r = Request(
+            name=name, timestamp=MagicMock(), method=HttpMethod.GET, url=urlparse(url)
+        )
+        assert req_to_expr(r) == py.FunctionCall(
+            name="self.client.get",
+            named_args={
+                "url": py.Literal(url),
+                "name": py.Literal(name),
+                "timeout": py.Literal(TIMEOUT),
+                "allow_redirects": py.Literal(False),
+            },
+        )
+
 
 class TestLreqToExpr:
     def test_it_supports_get_requests(self):
@@ -431,5 +448,26 @@ class TestLreqToExpr:
                 "allow_redirects": py.Literal(False),
                 "json": py.Literal({"z": 7}),
                 "params": py.Literal([(b"x", b"y"), (b"c", b"d")]),
+            },
+        )
+
+    def test_it_uses_the_custom_name_if_provided(self):
+        url = "http://abc.de"
+        name = "my-req"
+        r = LocustRequest.from_request(
+            Request(
+                name=name,
+                timestamp=MagicMock(),
+                method=HttpMethod.GET,
+                url=urlparse(url),
+            )
+        )
+        assert lreq_to_expr(r) == py.FunctionCall(
+            name="self.client.get",
+            named_args={
+                "url": py.Literal(url),
+                "name": py.Literal(name),
+                "timeout": py.Literal(TIMEOUT),
+                "allow_redirects": py.Literal(False),
             },
         )

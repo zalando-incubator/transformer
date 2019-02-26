@@ -62,6 +62,7 @@ class Request:
     headers: List[Header] = ()
     post_data: Optional[dict] = None
     query: List[QueryPair] = ()
+    name: Optional[str] = None
 
     def __post_init__(self):
         self.headers = list(self.headers)
@@ -78,6 +79,7 @@ class Request:
             timestamp=pendulum.parse(entry["startedDateTime"]),
             method=HttpMethod[request["method"]],
             url=urlparse(request["url"]),
+            name=None,
             headers=[
                 Header(name=d["name"], value=d["value"])
                 for d in request.get("headers", [])

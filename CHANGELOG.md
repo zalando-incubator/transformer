@@ -9,11 +9,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+  - `transformer.request.Request.name`: Controls
+  [Locust's URL grouping][locust-dynamic-parameters]. Its default value is
+  `Request.url`, which ensures retrocompatibility. (#32)
   - `transformer.python.ExpressionView`: An Expression that wraps a non-Expression
   (e.g. a Request instance), similarly to how Standalone is a Statement that
   wraps an Expression. A ExpressionView has a `target` (the wrapped object), a
   `converter` (function capable of transforming the target into an Expression),
-  and a `name` for inspection purposes.
+  and a `name` for inspection purposes. (#33)
+
+### Changed
+
+  - When processing HAR requests with the `application/json` MIME type,
+  Transformer no longer uses the `params` field as a replacement for a missing
+  `text` field. This was a mitigation for a bug in a different, internal tool. (#33)
 
 ### Fixed
 
@@ -92,3 +101,5 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 [1.0.0]: https://github.com/zalando-incubator/transformer/compare/f842c4163e037dc345eaf1992187f58126b7d909...v1.0.0
 
 [@xinke2411]: https://github.com/xinke2411
+
+[locust-dynamic-parameters]: https://docs.locust.io/en/stable/writing-a-locustfile.html#grouping-requests-to-urls-with-dynamic-parameters
