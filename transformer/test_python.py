@@ -928,11 +928,11 @@ class TestImport:
         )
 
 
-class TestPlaceholder:
+class TestExpressionView:
     def test_wraps_int_into_literal(self):
         def f(x: int) -> py.Literal:
             return py.Literal(x * 2)
 
-        p = py.ExpressionView(name="hello", target=lambda: 7, converter=f)
-        assert p.converter(p.target()) == py.Literal(14)
-        assert str(p) == "14"
+        ev = py.ExpressionView(name="hello", target=lambda: 7, converter=f)
+        assert ev.converter(ev.target()) == py.Literal(14)
+        assert str(ev) == "14"

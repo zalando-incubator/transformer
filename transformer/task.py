@@ -93,20 +93,20 @@ class Task2:
         #   See https://github.com/zalando-incubator/Transformer/issues/11.
         t = cls(name=task.name, request=task.request)
         if task.locust_request:
-            placeholder = py.ExpressionView(
+            expr_view = py.ExpressionView(
                 name="this task's request field",
                 target=lambda: task.locust_request,
                 converter=lreq_to_expr,
             )
         else:
-            placeholder = py.ExpressionView(
+            expr_view = py.ExpressionView(
                 name="this task's request field",
                 target=lambda: t.request,
                 converter=req_to_expr,
             )
         t.statements = [
             *[py.OpaqueBlock(x) for x in task.locust_preprocessing],
-            py.Assignment("response", placeholder),
+            py.Assignment("response", expr_view),
             *[py.OpaqueBlock(x) for x in task.locust_postprocessing],
         ]
         return t
