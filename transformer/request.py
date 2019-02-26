@@ -52,7 +52,7 @@ class Request:
 
     Note that *post_data*, if present, will be a dict of the same format as read
     in the HAR file.
-    Although not consistently followed by HAR generators, his format is
+    Although not consistently followed by HAR generators, its format is
     documented here: http://www.softwareishard.com/blog/har-12-spec/#postData.
     """
 
