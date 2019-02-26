@@ -5,9 +5,13 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-<!--
 ## [Unreleased][]
--->
+
+### Added
+
+  - `transformer.request.Request.name`: This attribute is default set as `Request.url`, 
+  users can change `Request.name` in `OnTask` plugin. If `Request.name` is changed, 
+  the locust request name argument will changed to `Request.name`.  (#32)
 
 ## [1.0.2] - 2019-02-21
 
