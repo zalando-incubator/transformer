@@ -17,6 +17,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   wraps an Expression. A ExpressionView has a `target` (the wrapped object), a
   `converter` (function capable of transforming the target into an Expression),
   and a `name` for inspection purposes. (#33)
+  - A functional test suite in `functional-tests/`. It is part of `make test`
+  and can be run alone with `make functest`. (#37)
 
 ### Changed
 
