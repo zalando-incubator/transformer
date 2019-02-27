@@ -35,6 +35,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - `transformer.task.Task.as_locust_action`: As part of the merge between Task
   and Task2 (#11). `as_locust_action` generates locustfile code as a string,
   which is made obsolete by the `transformer.python` syntax tree framework. (#33)
+  - `transformer.decision`: Unused API for combining a boolean (the decision
+  itself) with a string (a user-friendly reason for that decision). (#36)
 
 ## [1.0.2][] - 2019-02-21
 
