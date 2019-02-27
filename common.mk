@@ -18,9 +18,9 @@ unittest: configure
 
 .PHONY: functest
 functest: configure
-	poetry run python functional-tests/run.py
+	$(MAKE) -C functional-tests/
 
-.PHONY: test
+.PHONY: functest
 test: unittest functest
 
 .PHONY: lint
