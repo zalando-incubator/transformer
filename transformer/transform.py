@@ -1,5 +1,9 @@
 """
-Entrypoint for Transformer when used as a library.
+:mod:transformer.transform -- Entrypoint functions
+==================================================
+
+Defines user-facing functions performing all or most of the HAR-to-locustfile
+conversion.
 """
 import warnings
 from pathlib import Path
@@ -45,10 +49,10 @@ def dumps(
     with_default_plugins: bool = True,
 ) -> str:
     """
-    Transforms the provided scenarios using the provided plugins, and returns
-    the resulting locustfile code as a string.
+    Transforms the provided *scenario_paths* using the provided *plugins*,
+    and returns the resulting locustfile code as a string.
 
-    See also: dump
+    See also: :func:`dump`
 
     :param scenario_paths: paths to scenario files (HAR) or directories
     :param plugins: names of plugins to use
@@ -65,10 +69,10 @@ def dump(
     with_default_plugins: bool = True,
 ) -> None:
     """
-    Transforms the provided scenarios using the provided plugins, and writes
-    the resulting locustfile code in the provided file.
+    Transforms the provided *scenario_paths* using the provided *plugins*,
+    and writes the resulting locustfile code in the provided *file*.
 
-    See also: dumps
+    See also: :func:`dumps`
 
     :param file: an object with a `writelines` method (as specified by
         io.TextIOBase), e.g. `sys.stdout` or the result of `open`.

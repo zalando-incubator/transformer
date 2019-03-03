@@ -1,18 +1,31 @@
+"""
+:mod:`transformer.scenario` -- Grouping related tasks into scenarios
+====================================================================
+
+.. |Scenario| replace:: :class:`Scenario`
+
+Transformer creates a |Scenario| object for each HAR file it reads, so each
+:term:`task` (representing an HTTP request in a HAR file) is part of a
+:term:`scenario`.
+Transformer also creates |Scenario| objects for directories that contain
+HAR files, so a :term:`scenario` can also be part of another :term:`scenario`.
+
+To sum up, |Scenario| objects form a tree_, the leaves of which are all
+:term:`task` objects.
+This hierarchical structure maps cleanly to Locust's :class:`~locust.core.TaskSet`
+objects, which can also be nested and have a weight.
+
+.. _tree: https://en.wikipedia.org/wiki/Tree_(data_structure)
+"""
+
 import json
 import logging
 from collections import defaultdict
 from pathlib import Path
-from typing import (
-    Sequence,
-    Mapping,
-    Union,
-    Set,
-    List,
-    Optional,
-    Dict,
-    Tuple,
-    NamedTuple,
-)
+from typing import Sequence, Mapping, Union, Set, List, Optional, Dict, Tuple
+
+import dataclasses
+from dataclasses import dataclass
 
 import transformer.plugins as plug
 from transformer.naming import to_identifier
@@ -51,9 +64,10 @@ class CollidingScenariosError(SkippableScenarioError):
     """
     Raised when scenarios created from different paths end up having the same
     name.
-    The only way this happens is if the paths are identical save for the
-    extension (e.g. ".har" vs ".json"), or if there is a bug (collision) in
-    transformer.naming.to_identifier (which should never happen).
+
+    The only way this happens is if the paths are identical save for their
+    extension (e.g. ``.har`` vs ``.json``), or if there is a bug (collision) in
+    :func:`~transformer.naming.to_identifier` (which should never happen).
     """
 
     pass
@@ -69,10 +83,32 @@ class WeightValueError(ValueError):  # noqa: B903
         self.reason = reason
 
 
-class Scenario(NamedTuple):
+@dataclass
+class Scenario:
     """
-    A user's web session that we want to emulate, i.e. a sequence of
-    tasks to be performed in order.
+    A web browsing session that we want to emulate, i.e. a sequence of
+    :term:`tasks <task>` to be performed.
+
+    .. attribute:: name
+
+        :any:`str` -- Name of the corresponding :class:`~locust.core.TaskSet`.
+
+    .. attribute:: children
+
+        |Sequence| [ :class:`~transformer.task.Task2` :data:`| <typing.Union>`
+        :class:`Scenario` ] --
+        Tasks and scenarios that are part of this scenario.
+
+    .. attribute:: origin
+
+        :data:`~typing.Optional` :class:`~pathlib.Path` --
+        Path to the HAR file or directory this scenario represents.
+
+    .. attribute:: weight
+       :annotation: = 1
+
+       :any:`int` -- Weight of this scenario.
+       See :ref:`Specifying-weights` and :ref:`Hierarchical-scenarios` for details.
     """
 
     name: str
@@ -89,19 +125,26 @@ class Scenario(NamedTuple):
         short_name: bool = False,
     ) -> "Scenario":
         """
-        Makes a Scenario (possibly containing sub-scenarios) out of the provided
-        path, which may point to either:
-        - a HAR file (x/y/z.har),
+        Makes a :class:`Scenario` (possibly containing sub-scenarios) out of
+        the provided *path*, which may point to either:
+
+        - a HAR file (like :file:`x/y/z.har`),
+
         - a scenario directory (a directory containing HAR files or other
           scenario directories).
 
         :raise SkippableScenarioError: if path is neither a directory nor a HAR file,
             or is a directory containing dangling weight files
+        :param path: path to the HAR file or scenario directory.
+        :param plugins: list of :term:`OnScenario` plugins to apply.
+        :param ts_plugins: deprecated -- for backward compatibility only.
         :param short_name: whether the returned scenarios have names based only
-            on their path's basename, instead of the full path. By default False
-            to avoid generating homonym scenarios, but True when generating
-            sub-scenarios (children) from a directory path (because then the
-            names are "scoped" by the parent directory).
+            on their path's basename, instead of the full path.
+            By default *False* to avoid generating homonym scenarios
+            (and therefore homonym :class:~locust.core.TaskSet` classes),
+            but *True* when generating sub-scenarios (:attr:`children`) from
+            a directory *path* (because then the names are "scoped" by
+            the parent directory).
         """
         if path.is_dir():
             return cls.from_dir(
@@ -121,29 +164,42 @@ class Scenario(NamedTuple):
         short_name: bool,
     ) -> "Scenario":
         """
-        Makes a Scenario out of the provided directory path.
+        Makes a :class:`Scenario` out of the provided directory *path*.
 
-        The directory must be a "scenario directory", which means that it must
-        contain at least one HAR file or another scenario directory.
+        *path* must represent a "scenario directory", which contains at least
+        one HAR file or another scenario directory.
         Symbolic link loops are not checked but forbidden!
 
-        There may exist a weight file <path>.weight. If so, its contents will
-        be used as weight for the Scenario by calling weight_from_path.
+        There may exist a weight file :file:`{path}.weight`.
+        If so, its contents will be used as :attr:`weight` after calling
+        :meth:`weight_from_path`.
 
         Errors are handled this way:
-        1. If path itself cannot be transformed into a scenario,
-           raise SkippableScenarioError.
-        2. For each child of path, apply (1) but catch the exception and display
-           a warning about skipping this child. (If all children are skipped, (1)
-           applies to path itself.)
+
+        #. If *path* itself cannot be transformed into a scenario,
+           raise :exc:`SkippableScenarioError`.
+
+        #. For each child of *path*, apply (1) but catch the exception and
+           display a warning about skipping that child.
+           (If all children are skipped, (1) applies to *path* itself.)
 
         Therefore:
-        - If the directory contains weight files that don't match any HAR file or
-          subdirectory, an error will be emitted as this is probably a mistake.
-        - If the directory contains files or directory that cannot be converted
-          into scenarios (e.g. non-JSON files or .git directories), a message
-          is emitted and the file or subdirectory is skipped.
 
+        - If the directory contains weight files that don't match any HAR file or
+          subdirectory, an error is emitted as this is probably a mistake.
+
+        - If the directory contains files or directories that cannot be converted
+          into scenarios (e.g. non-JSON files or :file:`.git` directories),
+          a message is emitted and the file or subdirectory is skipped.
+
+        :param path: path to the directory.
+        :param plugins: list of :term:`OnScenario` plugins to apply.
+        :param ts_plugins: deprecated -- for backward compatibility only.
+        :param short_name: whether to simplify the resulting
+            :class:`~locust.core.TaskSet` class name. If *short_name* is *False*,
+            that class name is guaranteed to be unique across all TaskSets of the
+            locustfile, but this is generally not necessary and results in less
+            readable class names.
         :raise SkippableScenarioError: if the directory contains dangling weight
             files or no sub-scenarios.
         """
@@ -290,6 +346,18 @@ class Scenario(NamedTuple):
 
     @property
     def global_code_blocks(self) -> Mapping[str, Sequence[str]]:
+        """
+        .. deprecated:: 1.0.2
+
+            This attribute is only kept for backward compatibility purposes.
+            It exists because Transformer's first plugin system didn't have
+            :term:`OnPythonProgram`, so plugins had to specify the top-level
+            locustfile code blocks they needed (e.g. imports, global variables)
+            at the :class:`Task` level and let the plugin system percolate these
+            code blocks through the scenario tree.
+            This explains why tasks have the similar
+            :any:`transformer.task.Task2.global_code_blocks` field.
+        """
         # TODO: Replace me with a plugin framework that accesses the full tree.
         #   See https://github.com/zalando-incubator/Transformer/issues/11.
         return {
@@ -301,8 +369,12 @@ class Scenario(NamedTuple):
     def apply_plugins(self, plugins: Sequence[Plugin]) -> "Scenario":
         """
         Recursively builds a new scenario tree from the leaves by applying all
-        plugins to each cloned scenario subtree.
-        Does not do anything if plugins is empty.
+        *plugins* to each cloned scenario subtree.
+
+        Does not do anything if *plugins* is empty.
+
+        :param plugins: the plugins to apply.
+            See :ref:`Specifying-plugins` for details.
         """
         if not plugins:
             return self
@@ -311,4 +383,4 @@ class Scenario(NamedTuple):
             c.apply_plugins(plugins) if isinstance(c, Scenario) else c
             for c in self.children
         ]
-        return plug.apply(plugins, self._replace(children=children))
+        return plug.apply(plugins, dataclasses.replace(self, children=children))

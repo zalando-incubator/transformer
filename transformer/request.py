@@ -1,11 +1,13 @@
-# -*- coding: utf-8 -*-
 """
-A representation of a HAR Request.
+:mod:`transformer.request` -- HTTP requests read from HAR
+=========================================================
+
+Representation of HAR Request objects.
 """
 
 import enum
 from datetime import datetime
-from typing import Iterator, NamedTuple, List, Optional
+from typing import Iterator, List, Optional
 from urllib.parse import urlparse, SplitResult
 
 import pendulum
@@ -16,19 +18,22 @@ from transformer.naming import to_identifier
 
 class HttpMethod(enum.Enum):
     """
-    Enumeration of HTTP method types.
+    Enumeration of supported HTTP method types.
     """
 
-    GET = enum.auto()
-    POST = enum.auto()
-    PUT = enum.auto()
-    OPTIONS = enum.auto()
-    DELETE = enum.auto()
+    GET = enum.auto()  #: GET
+    POST = enum.auto()  #: POST
+    PUT = enum.auto()  #: PUT
+    OPTIONS = enum.auto()  #: OPTIONS
+    DELETE = enum.auto()  #: DELETE
 
 
-class Header(NamedTuple):
+@dataclass
+class Header:
     """
-    HTTP header as recorded in HAR file.
+    An HTTP header, as recorded in a HAR file (headers__).
+
+    __ http://www.softwareishard.com/blog/har-12-spec/#headers
     """
 
     name: str
@@ -38,7 +43,9 @@ class Header(NamedTuple):
 @dataclass
 class QueryPair:
     """
-    Query String as recorded in HAR file.
+    A pair of query parameters, as recorded in a HAR file (queryString__).
+
+    __ http://www.softwareishard.com/blog/har-12-spec/#queryString
     """
 
     name: str
@@ -48,12 +55,61 @@ class QueryPair:
 @dataclass
 class Request:
     """
-    An HTTP request as recorded in a HAR file.
+    An HTTP request, as recorded in a HAR file (request__).
 
-    Note that *post_data*, if present, will be a dict of the same format as read
-    in the HAR file.
-    Although not consistently followed by HAR generators, its format is
-    documented here: http://www.softwareishard.com/blog/har-12-spec/#postData.
+    __ http://www.softwareishard.com/blog/har-12-spec/#request
+
+    Note that *post_data*, if present, will be a dict of the same format
+    as recorded in the HAR file
+    (postData__ -- although it is not consistently followed by HAR generators).
+
+    __ http://www.softwareishard.com/blog/har-12-spec/#postData
+
+    .. attribute:: timestamp
+
+       :class:`~datetime.datetime` --
+       Time at which the request was recorded.
+
+    .. attribute:: method
+
+       :class:`HttpMethod` --
+       HTTP method of the request.
+
+    .. attribute:: url
+
+       :class:`urllib.parse.SplitResult` --
+       URL targeted by the request.
+
+    .. attribute:: headers
+       :annotation: = []
+
+       :class:`~typing.List` of :class:`Header` --
+       HTTP headers sent with the request.
+
+    .. attribute:: post_data
+       :annotation: = None
+
+       :data:`~typing.Optional` :any:`dict` --
+       If :attr:`method` is ``POST``, the corresponding data payload.
+
+    .. attribute:: query
+       :annotation: = []
+
+       :class:`~typing.List` of :class:`QueryPair` --
+       Key-value arguments sent as part of the :attr:`url`'s `query string`__.
+
+       __ https://en.wikipedia.org/wiki/Query_string
+
+    .. attribute:: name
+       :annotation: = None
+
+       :data:`~typing.Optional` :any:`str` --
+       Value provided for :class:`locust.clients.HttpSession`'s "dynamic"
+       ``name`` parameter.
+       See `Grouping requests to URLs with dynamic parameters`__ for details.
+
+       __ https://docs.locust.io/en/stable/writing-a-locustfile.html
+          #grouping-requests-to-urls-with-dynamic-parameters
     """
 
     timestamp: datetime
@@ -71,7 +127,13 @@ class Request:
     @classmethod
     def from_har_entry(cls, entry: dict) -> "Request":
         """
-        Creates a request from a HAR entry.
+        Creates a request from a HAR entry__.
+
+        __ http://www.softwareishard.com/blog/har-12-spec/#entries
+
+        :raise KeyError: if *entry* is not a valid HAR "entry" object.
+        :raise ValueError: if the ``request.startedDateTime`` value cannot be
+            interpreted as a timestamp.
         """
 
         request = entry["request"]
@@ -94,7 +156,9 @@ class Request:
     @classmethod
     def all_from_har(cls, har: dict) -> Iterator["Request"]:
         """
-        Generates requests for all entries in a given HAR file.
+        Generates requests for all entries__ in a given HAR top-level object.
+
+        __ http://www.softwareishard.com/blog/har-12-spec/#entries
         """
 
         for entry in har["log"]["entries"]:
@@ -102,7 +166,8 @@ class Request:
 
     def task_name(self) -> str:
         """
-        Generates a simple name suitable for use as a Python function.
+        Generates a simple name to be used as
+        :attr:`~transformer.task.Task2.name` by the :term:`task` of this request.
         """
 
         return "_".join(

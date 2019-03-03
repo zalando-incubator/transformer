@@ -7,3 +7,7 @@ include common.mk
 .PHONY: black
 black: configure
 	poetry run black $(SRC)
+
+.PHONY: doc
+doc:
+	poetry run $(MAKE) -C docs html

@@ -103,32 +103,21 @@ class LocustForScenarioGroup(HttpLocust):
 
 
 def test_generates_passed_global_code_blocks():
+    def mock(name, blocks=None):
+        m = MagicMock(spec=Scenario, children=[], global_code_blocks=blocks or {})
+        # https://docs.python.org/3/library/unittest.mock.html#mock-names-and-the-name-attribute
+        m.name = name
+        return m
+
     sg1 = Scenario(
         "sg1",
-        children=[
-            MagicMock(
-                spec_set=Scenario, children=[], global_code_blocks={"b1": ["ab"]}
-            ),
-            MagicMock(
-                spec_set=Scenario, children=[], global_code_blocks={"b2": ["cd"]}
-            ),
-        ],
+        children=[mock("a", blocks={"b1": ["ab"]}), mock("b", blocks={"b2": ["cd"]})],
         origin=None,
     )
-    sg2 = Scenario(
-        "sg2",
-        children=[MagicMock(spec_set=Scenario, children=[], global_code_blocks={})],
-        origin=None,
-    )
+    sg2 = Scenario("sg2", children=[mock("c")], origin=None)
     sg3 = Scenario(
         "sg3",
-        children=[
-            MagicMock(
-                spec_set=Scenario,
-                children=[],
-                global_code_blocks={"b3": ["yz"], "b2": ["yyy", "zzz"]},
-            )
-        ],
+        children=[mock("d", blocks={"b3": ["yz"], "b2": ["yyy", "zzz"]})],
         origin=None,
     )
 

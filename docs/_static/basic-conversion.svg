@@ -1,0 +1,258 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   id="svg8"
+   version="1.1"
+   viewBox="0 0 186.38448 67.304565"
+   height="67.304565mm"
+   width="186.38448mm"
+   sodipodi:docname="basic-conversion.svg"
+   inkscape:version="0.92.4 (unknown)">
+  <sodipodi:namedview
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1"
+     objecttolerance="10"
+     gridtolerance="10"
+     guidetolerance="10"
+     inkscape:pageopacity="0"
+     inkscape:pageshadow="2"
+     inkscape:window-width="1920"
+     inkscape:window-height="1016"
+     id="namedview876"
+     showgrid="false"
+     inkscape:zoom="1.8794931"
+     inkscape:cx="352.22263"
+     inkscape:cy="65.470961"
+     inkscape:window-x="961"
+     inkscape:window-y="1107"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="layer1" />
+  <defs
+     id="defs2">
+    <marker
+       style="overflow:visible"
+       id="Arrow2Mend"
+       refX="0"
+       refY="0"
+       orient="auto">
+      <path
+         transform="scale(-0.6)"
+         d="M 8.7185878,4.0337352 -2.2072895,0.01601326 8.7185884,-4.0017078 c -1.7454984,2.3720609 -1.7354408,5.6174519 -6e-7,8.035443 z"
+         style="fill:#000000;fill-opacity:1;fill-rule:evenodd;stroke:#000000;stroke-width:0.625;stroke-linejoin:round;stroke-opacity:1"
+         id="path936" />
+    </marker>
+    <marker
+       style="overflow:visible"
+       id="Arrow2Mend-3"
+       refX="0"
+       refY="0"
+       orient="auto">
+      <path
+         transform="scale(-0.6)"
+         d="M 8.7185878,4.0337352 -2.2072895,0.01601326 8.7185884,-4.0017078 c -1.7454984,2.3720609 -1.7354408,5.6174519 -6e-7,8.035443 z"
+         style="fill:#000000;fill-opacity:1;fill-rule:evenodd;stroke:#000000;stroke-width:0.625;stroke-linejoin:round;stroke-opacity:1"
+         id="path936-6" />
+    </marker>
+  </defs>
+  <metadata
+     id="metadata5">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title />
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <g
+     transform="translate(-12.027173,-27.641057)"
+     id="layer1">
+    <path
+       id="path907"
+       d="M 75.102738,59.664657 H 121.34037"
+       style="fill:none;stroke:#000000;stroke-width:1.36500001;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;marker-end:url(#Arrow2Mend)" />
+    <path
+       id="path907-7"
+       d="M 75.048609,80.569384 H 121.28636"
+       style="fill:none;stroke:#000000;stroke-width:1.36500001;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;marker-end:url(#Arrow2Mend-3)" />
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:4.23333311px;line-height:1.25;font-family:'Fantasque Sans Mono';-inkscape-font-specification:'Fantasque Sans Mono';letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.26458332"
+       x="32.3396"
+       y="37.451767"
+       id="text882"><tspan
+         sodipodi:role="line"
+         x="32.3396"
+         y="37.451767"
+         id="tspan880"
+         style="stroke-width:0.26458332"><tspan
+           x="32.3396"
+           y="37.451767"
+           style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:11.28888893px;font-family:Cantarell;-inkscape-font-specification:Cantarell;stroke-width:0.26458332"
+           id="tspan878">HAR</tspan></tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:4.23333359px;line-height:1.25;font-family:'Fantasque Sans Mono';-inkscape-font-specification:'Fantasque Sans Mono';letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.26458335"
+       x="12.337591"
+       y="46.597424"
+       id="text886"><tspan
+         sodipodi:role="line"
+         id="tspan884"
+         x="12.337591"
+         y="46.597424"
+         style="stroke-width:0.26458335">[</tspan><tspan
+         sodipodi:role="line"
+         x="12.337591"
+         y="51.889091"
+         style="stroke-width:0.26458335"
+         id="tspan890">  {</tspan><tspan
+         sodipodi:role="line"
+         x="12.337591"
+         y="57.180756"
+         style="stroke-width:0.26458335"
+         id="tspan892">    <tspan
+   style="fill:#000080"
+   id="tspan906">&quot;url&quot;</tspan>: <tspan
+   style="fill:#000080"
+   id="tspan908">&quot;http://abc.de&quot;</tspan>,</tspan><tspan
+         sodipodi:role="line"
+         x="12.337591"
+         y="62.472424"
+         style="stroke-width:0.26458335"
+         id="tspan894">    <tspan
+   style="fill:#000080"
+   id="tspan912">&quot;method&quot;</tspan>: <tspan
+   style="fill:#000080"
+   id="tspan910">&quot;GET&quot;</tspan></tspan><tspan
+         sodipodi:role="line"
+         x="12.337591"
+         y="67.764091"
+         style="stroke-width:0.26458335"
+         id="tspan896">  },</tspan><tspan
+         sodipodi:role="line"
+         x="12.337591"
+         y="73.055756"
+         style="stroke-width:0.26458335"
+         id="tspan898">  {</tspan><tspan
+         sodipodi:role="line"
+         x="12.337591"
+         y="78.347427"
+         style="stroke-width:0.26458335"
+         id="tspan900">    <tspan
+   style="fill:#000080"
+   id="tspan914">&quot;url&quot;</tspan>: <tspan
+   style="fill:#000080"
+   id="tspan916">&quot;https://z.com&quot;</tspan>,</tspan><tspan
+         sodipodi:role="line"
+         x="12.337591"
+         y="83.639091"
+         style="stroke-width:0.26458335"
+         id="tspan902">    <tspan
+   style="fill:#000080"
+   id="tspan932">&quot;method&quot;</tspan>: <tspan
+   style="fill:#000080"
+   id="tspan918">&quot;POST&quot;</tspan>,</tspan><tspan
+         sodipodi:role="line"
+         x="12.337591"
+         y="88.930756"
+         style="stroke-width:0.26458335"
+         id="tspan904">  }</tspan><tspan
+         sodipodi:role="line"
+         x="12.337591"
+         y="94.222427"
+         style="stroke-width:0.26458335"
+         id="tspan888">]</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:4.23333359px;line-height:1.25;font-family:'Fantasque Sans Mono';-inkscape-font-specification:'Fantasque Sans Mono';letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.26458335"
+       x="123.72862"
+       y="47.330162"
+       id="text936"><tspan
+         sodipodi:role="line"
+         id="tspan934"
+         x="123.72862"
+         y="47.330162"
+         style="stroke-width:0.26458335"><tspan
+   style="fill:#ff0000"
+   id="tspan956">class</tspan> <tspan
+   style="fill:#800080"
+   id="tspan962">Scenario</tspan>(<tspan
+   style="fill:#800080"
+   id="tspan964">TaskSet</tspan>):</tspan><tspan
+         sodipodi:role="line"
+         x="123.72862"
+         y="52.62183"
+         style="stroke-width:0.26458335"
+         id="tspan938">  <tspan
+   style="fill:#800080"
+   id="tspan966">@task</tspan></tspan><tspan
+         sodipodi:role="line"
+         x="123.72862"
+         y="57.913498"
+         style="stroke-width:0.26458335"
+         id="tspan940">  <tspan
+   style="fill:#ff0000"
+   id="tspan958">def</tspan> <tspan
+   style="fill:#800080"
+   id="tspan968">abc_de</tspan>():</tspan><tspan
+         sodipodi:role="line"
+         x="123.72862"
+         y="63.205162"
+         style="stroke-width:0.26458335"
+         id="tspan942">    requests.<tspan
+   style="font-weight:bold"
+   id="tspan870">get</tspan>(<tspan
+   style="fill:#000080"
+   id="tspan954">&quot;http://abc.de&quot;</tspan>)</tspan><tspan
+         sodipodi:role="line"
+         x="123.72862"
+         y="68.496826"
+         style="stroke-width:0.26458335"
+         id="tspan944" /><tspan
+         sodipodi:role="line"
+         x="123.72862"
+         y="73.788498"
+         style="stroke-width:0.26458335"
+         id="tspan946">  <tspan
+   style="fill:#800080"
+   id="tspan972">@task</tspan></tspan><tspan
+         sodipodi:role="line"
+         x="123.72862"
+         y="79.080162"
+         style="stroke-width:0.26458335"
+         id="tspan948">  <tspan
+   style="fill:#ff0000"
+   id="tspan960">def</tspan> <tspan
+   style="fill:#800080"
+   id="tspan970">z_com</tspan>():</tspan><tspan
+         sodipodi:role="line"
+         x="123.72862"
+         y="84.371834"
+         style="stroke-width:0.26458335"
+         id="tspan950">    requests.<tspan
+   style="font-weight:bold"
+   id="tspan872">post</tspan>(<tspan
+   style="fill:#000080"
+   id="tspan952">&quot;https://z.com&quot;</tspan>)</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:4.23333359px;line-height:1.25;font-family:'Fantasque Sans Mono';-inkscape-font-specification:'Fantasque Sans Mono';letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.26458335"
+       x="132.1512"
+       y="36.928085"
+       id="text976"><tspan
+         sodipodi:role="line"
+         id="tspan974"
+         x="132.1512"
+         y="36.928085"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:11.28888893px;font-family:Cantarell;-inkscape-font-specification:Cantarell;stroke-width:0.26458335">locustfile</tspan></text>
+  </g>
+</svg>

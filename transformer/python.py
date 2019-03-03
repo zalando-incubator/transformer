@@ -1,3 +1,19 @@
+"""
+:mod:`transformer.python` -- Python Syntax Tree
+===============================================
+
+Transformer's Python Syntax Tree framework allows you to create and manipulate
+Python source code without bothering with irrelevant, style-related details.
+
+It is the main API for writing :term:`OnPythonProgram` plugins.
+
+A non-goal of this framework is *customization of style*: users should rely on
+an external tool (such as `black`_) if they need style customization of their
+generated locustfile.
+
+.. _black: https://github.com/ambv/black
+"""
+
 import re
 from types import MappingProxyType
 from typing import (
@@ -81,7 +97,7 @@ class Statement:
     multiple lines (and not just for style), whereas all expressions can be
     expressed in a single line.
 
-    This class serves as abstract base for all implementors of lines() and
+    This class serves as abstract base for all implementors of :meth:`lines` and
     handles comment processing for them.
     """
 
@@ -186,7 +202,7 @@ class OpaqueBlock(Statement):
 
 class Function(Statement):
     """
-    A function definition (def ...).
+    A function definition (``def ...``).
     """
 
     def __init__(
@@ -234,7 +250,7 @@ class Function(Statement):
 class Decoration(Statement):
     """
     A function or class definition to which is applied a decorator
-    (e.g. @task).
+    (e.g. ``@task``).
     """
 
     def __init__(
@@ -319,14 +335,17 @@ class Class(Statement):
 
 class Expression:
     """
-    See the documentation of Statement for why Expression is a separate class.
-    An expression is still a statement in Python (e.g. functions can be called
-    anywhere), but this Expression class is NOT a Statement because we can't
-    attach comments to arbitrary expressions (e.g. between braces).
-    If you need to use an Expression as a Statement, see the Standalone wrapper
+    See the documentation of :class:`Statement` for why Expression is a separate
     class.
+    An expression is still a statement in Python (e.g. functions can be called
+    anywhere), but this :class:`Expression` class is **not** a
+    :class:`Statement` because we can't attach comments to arbitrary expressions
+    (e.g. between braces).
+    If you need to use an :class:`Expression` as a :class:`Statement`,
+    see the :class:`Standalone` wrapper class.
 
-    This class serves as abstract base for all our implementors of __str__().
+    This class serves as abstract base for all our implementors of
+    :meth:`__str__`.
     """
 
     def __str__(self) -> str:
@@ -338,7 +357,7 @@ class Expression:
 
 class Standalone(Statement):
     """
-    Wraps an Expression so that it can be used as a Statement.
+    Wraps an :class:`Expression` so that it can be used as a :class:`Statement`.
     """
 
     def __init__(self, expr: Expression, comments: Sequence[str] = ()) -> None:
@@ -347,8 +366,8 @@ class Standalone(Statement):
 
     def lines(self, indent_level: int = 0, comments: bool = True) -> List[Line]:
         """
-        An Expression E used as a Statement is serialized as the result of
-        str(E) on its own Line.
+        An :class:`Expression` E used as a :class:`Statement` is serialized as
+        the result of :samp:`str({E})` on its own :class:`Line`.
         """
         line = Line(str(self.expr), indent_level)
         if comments:
@@ -366,7 +385,7 @@ class Standalone(Statement):
 
 def _all_subclasses_of(cls: Type) -> Set[Type]:
     """
-    All subclasses of cls, including non-direct ones (child of child of ...).
+    All subclasses of *cls*, including non-direct ones (child of child of ...).
     """
     direct_subclasses = set(cls.__subclasses__())
     return direct_subclasses.union(
@@ -378,15 +397,15 @@ class Literal(Expression):
     """
     All literal Python expressions (integers, strings, lists, etc.).
 
-    Everything will be serialized using repr(), except Expression objects that
-    could be contained in a composite value like list: they will be serialized
-    with str(), as is probably expected.
+    Everything will be serialized using :func:`repr`, except :class:`Expression`
+    objects that could be contained in a composite value like ``list``:
+    they will be serialized with :func:`str`, as is probably expected.
     Thus:
 
     >>> str(Literal([1, {"a": FString("-{x}")}]))
     "[1, {'a': f'-{x}'}]"
 
-    instead of something like "[1, {'a': FString('-{x}')}]".
+    instead of something like ``[1, {'a': FString('-{x}')}]``.
     """
 
     def __init__(self, value: Any) -> None:
@@ -420,7 +439,7 @@ class Literal(Expression):
 class FString(Literal):
     """
     f-strings cannot be handled like most literals because they are evaluated
-    first, so they lose their "f" prefix and their template is executed too
+    first, so they lose their ``f`` prefix and their template is executed too
     early.
     """
 
@@ -438,16 +457,17 @@ class FString(Literal):
 class Symbol(Expression):
     """
     The name of something (variable, function, etc.).
-    Avoids any kind of text transformation that would happen with Literal.
+    Avoids any kind of text transformation that would happen with
+    :class:`Literal`.
 
     >>> str(Literal("x"))
     "'x'"
     >>> str(Symbol("x"))
     'x'
 
-    The provided argument's type is explicitly checked and a TypeError may be
-    raised to avoid confusion when a user expects e.g. Symbol(True) to work like
-    Symbol("True").
+    The provided argument's type is explicitly checked and a :class:`TypeError`
+    may be raised to avoid confusion when a user expects e.g. ``Symbol(True)``
+    to work like ``Symbol("True")``.
     """
 
     def __init__(self, name: str) -> None:
@@ -698,35 +718,60 @@ _T = TypeVar("_T")
 @dataclass
 class ExpressionView(Expression):
     """
-    The promise of an Expression representing an object currently not in
-    Expression format.
+    A "proxy" for an object that is not an :class:`Expression`.
 
-    The ExpressionView allows to mix non-Expression objects in the syntax tree,
-    along with a function capable of transforming these objects into actual
-    Expression objects at any time.
-    This is useful when there is a simpler representation than Expression.
+    .. |Expr| replace:: :class:`Expression`
+    .. |EV| replace:: :class:`ExpressionView`
 
-    For instance, any Request object can be converted into an equivalent
-    Expression, but Request has a simpler API than Expression for all
-    request-oriented operations like accessing the URL, etc.
-    Embedding a Request in a ExpressionView allows to pretend that the Request is
-    already in Expression format (with all associated benefits) but still use
-    the Request API.
+    |EV| allows to mix non-|Expr| objects in the syntax tree, along with
+    a function capable of transforming these objects into actual |Expr| objects
+    at any time.
+    This is useful when these objects are easier to manipulate than their |Expr|
+    equivalent.
 
-    `target` is a callable returning the non-Expression object. That callable
-    allows to specify as target some mutable field of an object, rather than a
-    fixed reference to an object. See for example task.Task2, which contains a
-    ExpressionView to its own "request" field; if the value of that field is
-    changed, the ExpressionView will refer to the new value instead of keeping a
-    reference to the old value.
+    .. |Request| replace:: :class:`Request <transformer.request.Request>`
 
-    `name` is purely descriptive: it can make inspection of data structures
-    containing ExpressionView objects more comfortable.
+    For example: any |Request| object can be converted into an equivalent |Expr|,
+    but |Request| has a simpler API than |Expr| for request-oriented operations
+    like accessing the URL, etc.
+    |EV| can "wrap" a |Request| to pretend that the |Request| is an |Expr|
+    (with all associated benefits of being part of the syntax tree), but still
+    support the |Request| API.
+
+    .. attribute:: target
+
+        :any:`() → T <typing.Callable>` --
+        A function (without parameters) returning the wrapped, non-|Expr| object.
+
+        The benefit of :attr:`target` being a function (instead of a direct
+        reference to the wrapped object) is that it allows to specify some
+        mutable field of an object.
+        See for example :class:`Task2 <transformer.task.Task2>`, which contains
+        an |EV| wrapping its own :attr:`request <transformer.task.Task2.request>`
+        attribute.
+        If the value of that attribute changes, the |EV| will refer to the new
+        value (found by accessing the attribute via *self*),
+        not the old value (which would still be referenced by a non-callable
+        :attr:`target`).
+
+    .. attribute:: converter
+
+        :any:`T → <typing.Callable>` |Expr| --
+        A function capable of transforming the result of :attr:`target` into
+        an |Expr|.
+        The result of :attr:`converter` is computed each time this |EV| has to
+        behave like an |Expr|, for example when passed as argument to :any:`str`.
+
+    .. attribute:: name
+
+        :any:`str` --
+        Purely descriptive: makes the inspection of data structures containing
+        |EV| objects more comfortable.
     """
 
-    name: str
     target: Callable[[], _T]
     converter: Callable[[_T], Expression]
+    name: str
 
     def __str__(self) -> str:
         return str(self.converter(self.target()))
