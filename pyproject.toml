@@ -46,6 +46,7 @@ flake8-tidy-imports = "^2.0"
 tomlkit = "^0.5.3"
 sphinx = "^1.8"
 sphinx-autodoc-typehints = "^1.6"
+sphinx-issues = "^1.2"
 
 [build-system]
 requires = ["poetry>=0.12"]

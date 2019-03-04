@@ -44,9 +44,9 @@ extensions = [
     "sphinx.ext.doctest",
     "sphinx.ext.coverage",
     "sphinx.ext.viewcode",
-    "sphinx.ext.githubpages",
+    # "sphinx.ext.githubpages",
     "sphinx.ext.intersphinx",
-    # 'sphinx.ext.autosectionlabel',
+    "sphinx_issues",
 ]
 
 # Add any paths that contain templates here, relative to this directory.
@@ -201,3 +201,7 @@ intersphinx_mapping = {
     "https://docs.python.org/3/": None,
     "locust": ("https://docs.locust.io/en/stable/", None),
 }
+
+# -- Options for intersphinx extension ---------------------------------------
+
+issues_github_path = "zalando-incubator/transformer"

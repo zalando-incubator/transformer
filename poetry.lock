@@ -570,6 +570,17 @@ Sphinx = ">=1.7"
 
 [[package]]
 category = "dev"
+description = "A Sphinx extension for linking to your project's issue tracker"
+name = "sphinx-issues"
+optional = false
+python-versions = "*"
+version = "1.2.0"
+
+[package.dependencies]
+sphinx = "*"
+
+[[package]]
+category = "dev"
 description = "Sphinx API for Web Apps"
 name = "sphinxcontrib-websupport"
 optional = false
@@ -609,7 +620,7 @@ python-versions = "*"
 version = "0.14.1"
 
 [metadata]
-content-hash = "5a4bf601e1c919b6d074a42fc1ca9f5d9dbea98ecc87d90cba20d13dc763f638"
+content-hash = "16a5d437d8f1eb68cc228506591d7915bd86c17815295fe0cc77a05396df649d"
 python-versions = "^3.6"
 
 [metadata.hashes]
@@ -670,6 +681,7 @@ six = ["3350809f0555b11f552448330d0b52d5f24c91a322ea4a15ef22629740f3761c", "d16a
 snowballstemmer = ["919f26a68b2c17a7634da993d91339e288964f93c274f1343e3bbbe2096e1128", "9f3bcd3c401c3e862ec0ebe6d2c069ebc012ce142cce209c098ccb5b09136e89"]
 sphinx = ["b53904fa7cb4b06a39409a492b949193a1b68cc7241a1a8ce9974f86f0d24287", "c1c00fc4f6e8b101a0d037065043460dffc2d507257f2f11acaed71fd2b0c83c"]
 sphinx-autodoc-typehints = ["19fe0b426b7c008181f67f816060da7f046bd8a42723f67a685d26d875bcefd7", "f9c06acfec80766fe8f542a6d6a042e751fcf6ce2e2711a7dc00d8b6daf8aa36"]
+sphinx-issues = ["1208e1869742b7800a45b3c47ab987b87b2ad2024cbc36e0106e8bba3549dd22", "845294736c7ac4c09c706f13431f709e1164037cbb00f6bf623ae16eccf509f3"]
 sphinxcontrib-websupport = ["68ca7ff70785cbe1e7bccc71a48b5b6d965d79ca50629606c7861a21b206d9dd", "9de47f375baf1ea07cdb3436ff39d7a9c76042c10a769c52353ec46e4e8fc3b9"]
 toml = ["229f81c57791a41d65e399fc06bf0848bab550a9dfd5ed66df18ce5f05e73d5c", "235682dd292d5899d361a811df37e04a8828a5b1da3115886b73cf81ebc9100e", "f1db651f9657708513243e61e6cc67d101a39bad662eaa9b5546f789338e07a3"]
 tomlkit = ["d6506342615d051bc961f70bfcfa3d29b6616cc08a3ddfd4bc24196f16fd4ec2", "f077456d35303e7908cc233b340f71e0bec96f63429997f38ca9272b7d64029e"]

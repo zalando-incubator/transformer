@@ -79,6 +79,7 @@ Conventions
 - All user-facing APIs are clearly documented using Sphinx_ in docstrings
   (for developers) and in reST files in the :file:`docs/` directory (for
   users).
+  See :ref:`documentation` for details.
 
 - All user-facing changes are reported in CHANGELOG.md_, along with a reference
   to the relevant pull request or issue identifiers.
@@ -177,6 +178,46 @@ Suggested workflow
     it can be merged.
 
 **Thank you** for your contributions!
+
+.. _documentation:
+
+Documentation
+-------------
+
+It is important that *all* features of Transformer are **documented**:
+
+- **user-facing features**, like new built-in plugins, new command-line options,
+  or changes to the plugin API: if our users don't know these features
+  exist, they will not use them and Transformer will be less useful to them;
+
+- **contributor-facing features**, like internal APIs, design decisions, and
+  contribution workflows: if our potential contributors struggle finding the
+  right place to contribute, or cannot get a working development environment,
+  the barrier of entry will be too high and the project will not benefit from
+  their valuable contributions.
+
+Transformer uses Sphinx_ to make the documentation accessible and readable to
+anyone with a web browser.
+It also makes it easy to link user documentation (in :file:`docs/*.rst`) and
+contributor documentation (as docstrings_ in Transformer's Python source files)
+when appropriate.
+
+.. _docstrings: https://en.wikipedia.org/wiki/Docstring
+
+Sphinx is automatically installed during the :ref:`set-up-dev` step.
+**You can easily build the documentation** on your own machine by running
+``make doc`` at the root of the repository.
+This converts the reST files under the :file:`docs/` directory into HTML files
+under :file:`docs/_build/html/`, so you can do something like::
+
+   $ firefox docs/_build/html/index.html
+
+to start browsing the documentation locally.
+
+.. note::
+
+   Be careful not to track these generated HTML files with git.
+   The reST files and docstrings are the only source of truth.
 
 .. _commit-messages:
 

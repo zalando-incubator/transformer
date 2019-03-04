@@ -46,5 +46,6 @@ Other Topics
 .. toctree::
    :maxdepth: 2
 
+   Changelog
    🚢 Versioning <Versioning>
    ⚙ Technical Documentation <dev>
