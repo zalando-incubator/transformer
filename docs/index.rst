@@ -1,17 +1,8 @@
-.. Transformer documentation master file, created by
-   sphinx-quickstart on Thu Feb 28 11:53:12 2019.
-   You can adapt this file completely to your liking, but it should at least
-   contain the root `toctree` directive.
+.. title:: Transformer - documentation
 
-.. raw:: html
-
-   <p align="center">
-   <img src="_static/transformer.png"/>
-   <br>
-   <a href="https://travis-ci.org/zalando-incubator/Transformer"><img src="https://travis-ci.org/zalando-incubator/Transformer.svg?branch=master"/></a>
-   <a href="https://www.codacy.com/app/thilp/Transformer"><img src="https://api.codacy.com/project/badge/Grade/10b3feb4e4814429bf288b87443a6c72"/></a>
-   <a href="https://www.codacy.com/app/thilp/Transformer"><img src="https://api.codacy.com/project/badge/Coverage/10b3feb4e4814429bf288b87443a6c72"/></a>
-   </p>
+.. image:: _static/transformer.png
+   :alt: Transformer logo
+   :align: center
 
 **Welcome to Transformer's documentation!**
 
@@ -20,7 +11,7 @@ Getting Started
 
 See `our README`_ for basic information like:
 
-.. _our README: https://github.com/zalando-incubator/Transformer/blob/master/README.md#installation
+.. _our README: https://github.com/zalando-incubator/Transformer/blob/master/README.rst
 
 - how to **install** Transformer,
 - how to use the ``transformer`` **command-line tool**,
@@ -44,8 +35,13 @@ Other Topics
 ------------
 
 .. toctree::
-   :maxdepth: 2
+   :maxdepth: 1
 
    Changelog
-   🚢 Versioning <Versioning>
-   ⚙ Technical Documentation <dev>
+   Contributors
+   Versioning
+
+.. toctree::
+   :maxdepth: 2
+
+   dev
