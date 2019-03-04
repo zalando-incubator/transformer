@@ -9,7 +9,7 @@ authors = [
     "Oliwia Zaremba <oliwia.zaremba@zalando.de>"
 ]
 license = "MIT"
-readme = "README.md"
+readme = "README.rst"
 homepage = "https://github.com/zalando-incubator/transformer"
 repository = "https://github.com/zalando-incubator/transformer"
 keywords = ["load testing", "locust", "har"]
