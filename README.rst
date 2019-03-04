@@ -1,6 +1,3 @@
-Transformer
-***********
-
 .. raw:: html
 
    <div align="center">
@@ -36,6 +33,9 @@ Transformer
 .. raw:: html
 
    </div>
+
+Transformer
+***********
 
 A **command-line tool** and **Python library** to convert web browser sessions
 (`HAR`_ files) into Locust_ load test scenarios ("locustfiles").
