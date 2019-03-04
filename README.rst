@@ -1,9 +1,17 @@
 Transformer
 ***********
 
+.. raw:: html
+
+   <div align="center">
+
 .. image:: docs/_static/transformer.png
    :alt: Transformer logo
    :align: center
+
+.. raw:: html
+
+   <br>
 
 .. image:: https://travis-ci.org/zalando-incubator/Transformer.svg?branch=master
    :alt: travis-ci status badge
@@ -24,6 +32,10 @@ Transformer
 .. image:: https://badgen.net/badge/code%20style/black/000
    :alt: Code style: Black
    :target: https://github.com/ambv/black
+
+.. raw:: html
+
+   </div>
 
 A **command-line tool** and **Python library** to convert web browser sessions
 (`HAR`_ files) into Locust_ load test scenarios ("locustfiles").
@@ -47,7 +59,7 @@ Install from PyPI::
 Usage
 =====
 
-Example HAR files are included in the :file:`examples/` directory, try them
+Example HAR files are included in the ``examples/`` directory, try them
 out.
 
 Command-line
@@ -78,13 +90,13 @@ HAR files**, **customize your scenarios**, use or write **plugins**, etc.
 Authors
 =======
 
-- **Serhii Cherniavskyi** -- `@scherniavsky <https://github.com/scherniavsky>`_
+- **Serhii Cherniavskyi** — `@scherniavsky <https://github.com/scherniavsky>`_
 
-- **Thibaut Le Page** -- `@thilp <https://github.com/thilp>`_
+- **Thibaut Le Page** — `@thilp <https://github.com/thilp>`_
 
-- **Brian Maher** -- `@bmaher <https://github.com/bmaher>`_
+- **Brian Maher** — `@bmaher <https://github.com/bmaher>`_
 
-- **Oliwia Zaremba** -- `@tortila <https://github.com/tortila>`_
+- **Oliwia Zaremba** — `@tortila <https://github.com/tortila>`_
 
 See also the list of contributors_ to this project.
 
@@ -94,8 +106,8 @@ See also the list of contributors_ to this project.
 License
 =======
 
-This project is licensed under the MIT license -- see the LICENSE.md_ file for
+This project is licensed under the MIT license — see the LICENSE.md_ file for
 details.
 
 .. _LICENSE.md: https://github.com/zalando-incubator/Transformer/blob/master
-   /LICENSE.md
+   /LICENSE.m`d
