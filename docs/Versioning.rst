@@ -45,7 +45,7 @@ In doubt, please refer to SemVer_, which is the source of these guidelines.
 Update pyproject.toml
 '''''''''''''''''''''
 
-In :file:`pyproject.toml`, update the ``version`` value to ``vX.Y.Z``.
+In :file:`pyproject.toml`, update the ``version`` value to ``X.Y.Z``.
 
 .. code-block:: diff
 
