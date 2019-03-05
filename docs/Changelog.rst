@@ -79,6 +79,11 @@ Fixed
   plugins to :attr:`~transformer.task.Task2.request`.
   Thank you :user:`xinke2411` for reporting this! (:pr:`33`)
 
+- Lack of functional tests made us miss the fact that Transformer started
+  crashing when run on the HAR files from the :file:`examples/` directory.
+  Transformer was fixed and the appropriate unit and functional tests were
+  added. (:pr:`44`)
+
 Removed
 -------
 
