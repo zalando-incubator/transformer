@@ -85,7 +85,7 @@ Documentation
 Take a look at our documentation_ for more details, including how to **generate
 HAR files**, **customize your scenarios**, use or write **plugins**, etc.
 
-.. _documentation: https://github.com/zalando-incubator/transformer/wiki
+.. _documentation: https://transformer.readthedocs.io/
 
 Authors
 =======
@@ -100,8 +100,7 @@ Authors
 
 See also the list of contributors_ to this project.
 
-.. _contributors: https://github.com/zalando-incubator/Transformer/blob/master
-   /docs/Contributors.rst
+.. _contributors: https://transformer.readthedocs.io/en/latest/Contributors.html
 
 License
 =======
@@ -110,4 +109,4 @@ This project is licensed under the MIT license — see the LICENSE.md_ file for
 details.
 
 .. _LICENSE.md: https://github.com/zalando-incubator/Transformer/blob/master
-   /LICENSE.m`d
+   /LICENSE.md
