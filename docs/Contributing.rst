@@ -81,14 +81,13 @@ Conventions
   users).
   See :ref:`documentation` for details.
 
-- All user-facing changes are reported in CHANGELOG.md_, along with a reference
-  to the relevant pull request or issue identifiers.
+- All user-facing changes are reported in :ref:`changelog`, along with a
+  reference to the relevant pull request or issue identifiers.
 
 .. _black: https://black.readthedocs.io/
 .. _flake8: http://flake8.pycqa.org/
 .. _Pytest: https://docs.pytest.org/
 .. _Sphinx: https://www.sphinx-doc.org/
-.. _CHANGELOG.md: https://github.com/zalando-incubator/Transformer/blob/master/CHANGELOG.md
 
 Suggested workflow
 ''''''''''''''''''
