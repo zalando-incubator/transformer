@@ -192,7 +192,7 @@ internal objects of category :term:`Task` one-by-one.
    they will all be plugins **with the same name**.
 
    However, their relative order of execution will be unspecified.
-   For that reason, if multiple plugins should be executed on after the other
+   For that reason, if multiple plugins should be executed one after the other
    in a specific order, they should be **implemented in different modules**,
    so that users can specify the order themselves when providing the plugin
    names to Transformer.
