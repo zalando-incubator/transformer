@@ -65,6 +65,9 @@ Changed
   Most Markdown files have been converted to reStructuredText_ in the process,
   including this changelog. (:pr:`38`)
 
+- The documentation is no longer accessible from the GitHub wiki, but is now
+  hosted by Read The Docs at https://transformer.readthedocs.io. (:pr:`43`)
+
 .. _Sphinx: http://www.sphinx-doc.org
 .. _reStructuredText: http://www.sphinx-doc.org/en/master/usage/restructuredtext
 

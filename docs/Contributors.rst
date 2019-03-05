@@ -4,10 +4,10 @@
 All external contributors to this project.
 We are grateful for all their help!
 
-Current maintainers are listed in the CODEOWNERS_ file.
+Current maintainers are listed in the MAINTAINERS_ file.
 
-.. _CODEOWNERS: https://github.com/zalando-incubator/Transformer/blob/master
-  /.github/CODEOWNERS
+.. _MAINTAINERS: https://github.com/zalando-incubator/Transformer/blob/master
+  /MAINTAINERS
 
 **Here are our contributors**, sorted alphabetically:
 
