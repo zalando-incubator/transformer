@@ -206,6 +206,10 @@ intersphinx_mapping = {
     "locust": ("https://docs.locust.io/en/stable/", None),
 }
 
-# -- Options for intersphinx extension ---------------------------------------
+# -- Options for sphinx-issues extension -------------------------------------
 
 issues_github_path = "zalando-incubator/transformer"
+
+# -- Options for autodoc extension -------------------------------------------
+
+autoclass_content = "both"
