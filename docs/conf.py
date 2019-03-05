@@ -22,8 +22,8 @@ import packaging.version
 # -- Project information -----------------------------------------------------
 
 project = "Transformer"
-copyright = "2019, zalando-incubator"
-author = "zalando-incubator"
+copyright = "2019, Zalando"
+author = "the Zalando maintainers"
 
 _version = packaging.version.parse(transformer.__version__)
 
