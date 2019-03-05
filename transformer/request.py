@@ -28,7 +28,7 @@ class HttpMethod(enum.Enum):
     DELETE = enum.auto()  #: DELETE
 
 
-@dataclass
+@dataclass(frozen=True)
 class Header:
     """
     An HTTP header, as recorded in a HAR file (headers__).
@@ -40,7 +40,7 @@ class Header:
     value: str
 
 
-@dataclass
+@dataclass(frozen=True)
 class QueryPair:
     """
     A pair of query parameters, as recorded in a HAR file (queryString__).
@@ -146,7 +146,7 @@ class Request:
                 Header(name=d["name"], value=d["value"])
                 for d in request.get("headers", [])
             ],
-            post_data=request.get("postData", {}),
+            post_data=request.get("postData"),
             query=[
                 QueryPair(name=d["name"], value=d["value"])
                 for d in request.get("queryString", [])
@@ -186,6 +186,8 @@ class Request:
                 self.timestamp,
                 self.method,
                 self.url,
-                tuple(self.post_data.items()) if self.post_data else None,
+                tuple(self.headers),
+                repr(self.post_data) if self.post_data else None,
+                tuple(self.query),
             )
         )

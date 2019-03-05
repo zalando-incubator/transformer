@@ -285,7 +285,27 @@ class TestReqToExpr:
             },
         )
 
-    def test_it_supports_put_requests(self):
+    def test_it_supports_empty_post_requests(self):
+        url = "http://abc.de"
+        r = Request(
+            timestamp=MagicMock(),
+            method=HttpMethod.POST,
+            url=urlparse(url),
+            headers=[Header("a", "b")],
+            post_data=None,
+        )
+        assert req_to_expr(r) == py.FunctionCall(
+            name="self.client.post",
+            named_args={
+                "url": py.Literal(url),
+                "name": py.Literal(url),
+                "headers": py.Literal({"a": "b"}),
+                "timeout": py.Literal(TIMEOUT),
+                "allow_redirects": py.Literal(False),
+            },
+        )
+
+    def test_it_supports_put_requests_with_payload(self):
         url = "http://abc.de"
         r = Request(
             timestamp=MagicMock(),
@@ -309,6 +329,28 @@ class TestReqToExpr:
                 "allow_redirects": py.Literal(False),
                 "json": py.Literal({"z": 7}),
                 "params": py.Literal([(b"x", b"y"), (b"c", b"d")]),
+            },
+        )
+
+    def test_it_supports_put_requests_without_payload(self):
+        url = "http://abc.de"
+        r = Request(
+            timestamp=MagicMock(),
+            method=HttpMethod.PUT,
+            url=urlparse(url),
+            headers=[Header("a", "b")],
+            query=[QueryPair("c", "d")],
+            post_data=None,
+        )
+        assert req_to_expr(r) == py.FunctionCall(
+            name="self.client.put",
+            named_args={
+                "url": py.Literal(url),
+                "name": py.Literal(url),
+                "headers": py.Literal({"a": "b"}),
+                "timeout": py.Literal(TIMEOUT),
+                "allow_redirects": py.Literal(False),
+                "params": py.Literal([(b"c", b"d")]),
             },
         )
 
@@ -422,7 +464,29 @@ class TestLreqToExpr:
             },
         )
 
-    def test_it_supports_put_requests(self):
+    def test_it_supports_empty_post_requests(self):
+        url = "http://abc.de"
+        r = LocustRequest.from_request(
+            Request(
+                timestamp=MagicMock(),
+                method=HttpMethod.POST,
+                url=urlparse(url),
+                headers=[Header("a", "b")],
+                post_data=None,
+            )
+        )
+        assert lreq_to_expr(r) == py.FunctionCall(
+            name="self.client.post",
+            named_args={
+                "url": py.Literal(url),
+                "name": py.Literal(url),
+                "headers": py.Literal({"a": "b"}),
+                "timeout": py.Literal(TIMEOUT),
+                "allow_redirects": py.Literal(False),
+            },
+        )
+
+    def test_it_supports_put_requests_with_payload(self):
         url = "http://abc.de"
         r = LocustRequest.from_request(
             Request(
@@ -448,6 +512,30 @@ class TestLreqToExpr:
                 "allow_redirects": py.Literal(False),
                 "json": py.Literal({"z": 7}),
                 "params": py.Literal([(b"x", b"y"), (b"c", b"d")]),
+            },
+        )
+
+    def test_it_supports_put_requests_without_payload(self):
+        url = "http://abc.de"
+        r = LocustRequest.from_request(
+            Request(
+                timestamp=MagicMock(),
+                method=HttpMethod.PUT,
+                url=urlparse(url),
+                headers=[Header("a", "b")],
+                query=[QueryPair("c", "d")],
+                post_data=None,
+            )
+        )
+        assert lreq_to_expr(r) == py.FunctionCall(
+            name="self.client.put",
+            named_args={
+                "url": py.Literal(url),
+                "name": py.Literal(url),
+                "headers": py.Literal({"a": "b"}),
+                "timeout": py.Literal(TIMEOUT),
+                "allow_redirects": py.Literal(False),
+                "params": py.Literal([(b"c", b"d")]),
             },
         )
 

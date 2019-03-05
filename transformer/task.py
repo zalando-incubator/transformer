@@ -209,13 +209,15 @@ def req_to_expr(r: Request) -> py.FunctionCall:
         args["headers"] = py.Literal(headers)
 
     if r.method is HttpMethod.POST:
-        rpd = RequestsPostData.from_har_post_data(r.post_data)
-        args.update(rpd.as_kwargs())
+        if r.post_data:
+            rpd = RequestsPostData.from_har_post_data(r.post_data)
+            args.update(rpd.as_kwargs())
     elif r.method is HttpMethod.PUT:
-        rpd = RequestsPostData.from_har_post_data(r.post_data)
-        args.update(rpd.as_kwargs())
+        if r.post_data:
+            rpd = RequestsPostData.from_har_post_data(r.post_data)
+            args.update(rpd.as_kwargs())
 
-        args.setdefault("params", py.Literal({}))
+        args.setdefault("params", py.Literal([]))
         cast(py.Literal, args["params"]).value.extend(
             _params_from_name_value_dicts([dataclasses.asdict(q) for q in r.query])
         )
@@ -242,13 +244,15 @@ def lreq_to_expr(lr: LocustRequest) -> py.FunctionCall:
         args["headers"] = py.Literal(lr.headers)
 
     if lr.method is HttpMethod.POST:
-        rpd = RequestsPostData.from_har_post_data(lr.post_data)
-        args.update(rpd.as_kwargs())
+        if lr.post_data:
+            rpd = RequestsPostData.from_har_post_data(lr.post_data)
+            args.update(rpd.as_kwargs())
     elif lr.method is HttpMethod.PUT:
-        rpd = RequestsPostData.from_har_post_data(lr.post_data)
-        args.update(rpd.as_kwargs())
+        if lr.post_data:
+            rpd = RequestsPostData.from_har_post_data(lr.post_data)
+            args.update(rpd.as_kwargs())
 
-        args.setdefault("params", py.Literal({}))
+        args.setdefault("params", py.Literal([]))
         cast(py.Literal, args["params"]).value.extend(
             _params_from_name_value_dicts([dataclasses.asdict(q) for q in lr.query])
         )
