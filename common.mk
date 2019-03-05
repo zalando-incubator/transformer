@@ -8,7 +8,7 @@ DIST := pyproject.toml poetry.lock
 configure: .make/configure
 
 .make/configure: $(DIST)
-	poetry install
+	poetry install -E docs
 	mkdir -p .make && touch .make/configure
 
 # Runs pytest with coverage reporting.
