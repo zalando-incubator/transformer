@@ -16,6 +16,8 @@
 # import sys
 # sys.path.insert(0, os.path.abspath('.'))
 
+import transformer
+import packaging.version
 
 # -- Project information -----------------------------------------------------
 
@@ -23,10 +25,12 @@ project = "Transformer"
 copyright = "2019, zalando-incubator"
 author = "zalando-incubator"
 
+_version = packaging.version.parse(transformer.__version__)
+
 # The short X.Y version
-version = ""
+version = ".".join(str(x) for x in _version.release[:2])
 # The full version, including alpha/beta/rc tags
-release = "1.0.2"
+release = transformer.__version__
 
 
 # -- General configuration ---------------------------------------------------
