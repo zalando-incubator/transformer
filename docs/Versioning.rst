@@ -12,6 +12,9 @@ unlikely to be fixed if they don't exist in the most recent release.
 
 For all available releases, see the `releases page`_.
 
+.. contents::
+   :local:
+
 .. _releases page: https://github.com/zalando-incubator/Transformer/releases
 
 Release process
@@ -38,6 +41,32 @@ The identifier of the new release must follow the :samp:`v{X}.{Y}.{Z}` format
 - Otherwise, when you make **backwards-compatible bug fixes**, **increment Z**.
 
 In doubt, please refer to SemVer_, which is the source of these guidelines.
+
+Update pyproject.toml
+'''''''''''''''''''''
+
+In :file:`pyproject.toml`, update the ``version`` value to ``X.Y.Z``.
+
+.. code-block:: diff
+
+     [tool.poetry]
+     name = "har-transformer"
+   - version = "A.B.C"
+   + version = "X.Y.Z"
+
+Update the Sphinx config
+''''''''''''''''''''''''
+
+In :file:`docs/conf.py`, update the ``version`` and ``release`` values:
+
+.. code-block:: diff
+
+     # The short X.Y version
+   - version = "A.B"
+   + version = "X.Y"
+     # The full version, including alpha/beta/rc tags
+   - release = "A.B.C"
+   + release = "X.Y.Z"
 
 Update the changelog
 ''''''''''''''''''''
