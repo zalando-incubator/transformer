@@ -44,6 +44,12 @@ Added
    Helps manipulating non-syntax tree objects as part of the syntax tree.
    (:pr:`33`)
 
+**Functional test suite**
+   A functional test suite in :file:`functional-tests/` (with only one simple
+   test for starting).
+   It is part of ``make test`` and can be run alone with ``make functest``.
+   (:pr:`37`)
+
 Changed
 -------
 
