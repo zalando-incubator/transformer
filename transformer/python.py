@@ -1,3 +1,19 @@
+"""
+:mod:`transformer.python` -- Python Syntax Tree
+===============================================
+
+Transformer's Python Syntax Tree framework allows you to create and manipulate
+Python source code without bothering with irrelevant, style-related details.
+
+It is the main API for writing :term:`OnPythonProgram` plugins.
+
+A non-goal of this framework is *customization of style*: users should rely on
+an external tool (such as `black`_) if they need style customization of their
+generated locustfile.
+
+.. _black: https://github.com/ambv/black
+"""
+
 import re
 from types import MappingProxyType
 from typing import (
@@ -13,6 +29,7 @@ from typing import (
     Iterable,
     Callable,
     TypeVar,
+    ClassVar,
 )
 
 from dataclasses import dataclass
@@ -20,41 +37,41 @@ from dataclasses import dataclass
 IMMUTABLE_EMPTY_DICT = MappingProxyType({})
 
 
+@dataclass
 class Line:
     """
     A line of text and its associated indentation level.
 
     This class allows not to constantly copy strings to add a new indentation
-    level at every scope of the AST.
+    level at every scope of the syntax tree.
+
+    .. attribute:: text
+
+       :any:`str` -- Text contained by this line.
+
+    .. attribute:: indent_level
+
+       :any:`int` -- Indentation level of :attr:`text` in the line.
     """
 
-    INDENT_UNIT: str = " " * 4
+    text: str
+    indent_level: int = 0
 
-    def __init__(self, text: str, indent_level: int = 0) -> None:
-        self.text = text
-        self.indent_level = indent_level
+    INDENT_UNIT: ClassVar[str] = " " * 4
 
     def __str__(self) -> str:
+        """
+        Textual representation of this line, with :attr:`text` indented
+        according to :attr:`indent_level`.
+        """
         return f"{self.INDENT_UNIT * self.indent_level}{self.text}"
-
-    def __repr__(self) -> str:
-        return "{}(text={!r}, indent_level={!r})".format(
-            self.__class__.__qualname__, self.text, self.indent_level
-        )
 
     def clone(self) -> "Line":
         """
         Creates an exact but disconnected copy of self.
         Useful in tests.
         """
-        return self.__class__(text=self.text, indent_level=self.indent_level)
-
-    def __eq__(self, o: object) -> bool:
-        return (
-            isinstance(o, self.__class__)
-            and self.text == cast(__class__, o).text
-            and self.indent_level == cast(__class__, o).indent_level
-        )
+        return type(self)(text=self.text, indent_level=self.indent_level)
 
 
 def _resplit(parts: Iterable[str]) -> List[str]:
@@ -81,15 +98,24 @@ class Statement:
     multiple lines (and not just for style), whereas all expressions can be
     expressed in a single line.
 
-    This class serves as abstract base for all implementors of lines() and
+    This class serves as abstract base for all implementors of :meth:`lines` and
     handles comment processing for them.
     """
 
     def __init__(self, comments: Sequence[str] = ()) -> None:
+        """
+        :param comments: Comment lines attached to this statement.
+        """
         self._comments = _resplit(comments)
 
     @property
     def comments(self) -> List[str]:
+        """
+        Comment lines attached to this statement.
+
+        This is a :class:`property` to ensure that modifications of this list
+        preserve the invariant "one element = one line".
+        """
         self._comments = _resplit(self._comments)
         return self._comments
 
@@ -104,20 +130,20 @@ class Statement:
 
         :param indent_level: How much indentation to apply to the least indented
             line of this statement.
-        :param comments: Whether existing comments attached to self should be
+        :param comments: Whether existing comments attached to *self* should be
             included in the result.
         """
         raise NotImplementedError
 
     def comment_lines(self, indent_level: int) -> List[Line]:
         """
-        Converts self.comments from str to Line with "#" prefixes.
+        Converts self.comments from str to Line with ``#`` prefixes.
         """
         return [Line(f"# {s}", indent_level) for s in self.comments]
 
     def attach_comment(self, line: Line) -> List[Line]:
         """
-        Attach a comment to line: inline if self.comments is just one line,
+        Attach a comment to *line*: inline if *self.comments* is just one line,
         on dedicated new lines above otherwise.
         """
         comments = self.comments
@@ -145,7 +171,8 @@ class OpaqueBlock(Statement):
     """
     A block of code already represented as a string.
     This helps moving existing code (e.g. in plugins) from our ad-hoc
-    "blocks of code" framework to the AST framework defined in this module.
+    "blocks of code" framework to the syntax tree framework defined in this
+    module.
     It also allows to express Python constructs that would otherwise not yet be
     representable with this AST framework.
     """
@@ -154,6 +181,9 @@ class OpaqueBlock(Statement):
     TAB_SIZE = 8
 
     def __init__(self, block: str, comments: Sequence[str] = ()) -> None:
+        """
+        :param block: String representing a block of Python code.
+        """
         super().__init__(comments)
         if not block.strip():
             raise ValueError(f"OpaqueBlock can't be empty but got {block!r}")
@@ -186,7 +216,7 @@ class OpaqueBlock(Statement):
 
 class Function(Statement):
     """
-    A function definition (def ...).
+    A function definition (``def ...``).
     """
 
     def __init__(
@@ -196,6 +226,11 @@ class Function(Statement):
         statements: Sequence[Statement],
         comments: Sequence[str] = (),
     ) -> None:
+        """
+        :param name: Name of this function.
+        :param params: Names of each parameter of this function.
+        :param statements: Body of this function.
+        """
         super().__init__(comments)
         self.name = name
         self.params = list(params)
@@ -234,12 +269,17 @@ class Function(Statement):
 class Decoration(Statement):
     """
     A function or class definition to which is applied a decorator
-    (e.g. @task).
+    (e.g. ``@task``).
     """
 
     def __init__(
         self, decorator: str, target: Statement, comments: Sequence[str] = ()
     ) -> None:
+        """
+        :param decorator: Name of the decorator applied to *target*.
+        :param target: Function or class definition to which is applied
+            *decorator*.
+        """
         super().__init__(comments)
         self.decorator = decorator
         self.target = target
@@ -276,6 +316,13 @@ class Class(Statement):
         superclasses: Sequence[str] = (),
         comments: Sequence[str] = (),
     ) -> None:
+        """
+        :param name: Name of this class.
+        :param statements: Fields of this class: methods, attributes, etc.
+        :param superclasses: Names of each superclass of this class.
+            In fact anything in the "function argument" format can be used here,
+            like keyword-arguments (but in a string!).
+        """
         super().__init__(comments)
         self.name = name
         self.statements = list(statements)
@@ -319,14 +366,17 @@ class Class(Statement):
 
 class Expression:
     """
-    See the documentation of Statement for why Expression is a separate class.
-    An expression is still a statement in Python (e.g. functions can be called
-    anywhere), but this Expression class is NOT a Statement because we can't
-    attach comments to arbitrary expressions (e.g. between braces).
-    If you need to use an Expression as a Statement, see the Standalone wrapper
+    See the documentation of :class:`Statement` for why Expression is a separate
     class.
+    An expression is still a statement in Python (e.g. functions can be called
+    anywhere), but this :class:`Expression` class is **not** a
+    :class:`Statement` because we can't attach comments to arbitrary expressions
+    (e.g. between braces).
+    If you need to use an :class:`Expression` as a :class:`Statement`,
+    see the :class:`Standalone` wrapper class.
 
-    This class serves as abstract base for all our implementors of __str__().
+    This class serves as abstract base for all our implementors of
+    :meth:`__str__`.
     """
 
     def __str__(self) -> str:
@@ -338,17 +388,20 @@ class Expression:
 
 class Standalone(Statement):
     """
-    Wraps an Expression so that it can be used as a Statement.
+    Wraps an :class:`Expression` so that it can be used as a :class:`Statement`.
     """
 
     def __init__(self, expr: Expression, comments: Sequence[str] = ()) -> None:
+        """
+        :param expr: The wrapped expression.
+        """
         super().__init__(comments)
         self.expr = expr
 
     def lines(self, indent_level: int = 0, comments: bool = True) -> List[Line]:
         """
-        An Expression E used as a Statement is serialized as the result of
-        str(E) on its own Line.
+        An :class:`Expression` E used as a :class:`Statement` is serialized as
+        the result of :samp:`str({E})` on its own :class:`Line`.
         """
         line = Line(str(self.expr), indent_level)
         if comments:
@@ -366,7 +419,7 @@ class Standalone(Statement):
 
 def _all_subclasses_of(cls: Type) -> Set[Type]:
     """
-    All subclasses of cls, including non-direct ones (child of child of ...).
+    All subclasses of *cls*, including non-direct ones (child of child of ...).
     """
     direct_subclasses = set(cls.__subclasses__())
     return direct_subclasses.union(
@@ -378,18 +431,23 @@ class Literal(Expression):
     """
     All literal Python expressions (integers, strings, lists, etc.).
 
-    Everything will be serialized using repr(), except Expression objects that
-    could be contained in a composite value like list: they will be serialized
-    with str(), as is probably expected.
+    Everything will be serialized using :func:`repr`, except :class:`Expression`
+    objects that could be contained in a composite value like ``list``:
+    they will be serialized with :func:`str`, as is probably expected.
     Thus:
 
     >>> str(Literal([1, {"a": FString("-{x}")}]))
     "[1, {'a': f'-{x}'}]"
 
-    instead of something like "[1, {'a': FString('-{x}')}]".
+    instead of something like ``[1, {'a': FString('-{x}')}]``.
+
+    .. seealso:: :class:`FString`
     """
 
     def __init__(self, value: Any) -> None:
+        """
+        :param value: The Python literal represented by this node.
+        """
         super().__init__()
         self.value = value
 
@@ -419,12 +477,22 @@ class Literal(Expression):
 
 class FString(Literal):
     """
-    f-strings cannot be handled like most literals because they are evaluated
-    first, so they lose their "f" prefix and their template is executed too
-    early.
+    f-strings_ are strings that capture values from their environment.
+
+    They cannot be handled in :class:`Literal` because they are a "trick" of the
+    Python parser: *before* the program runs, they lose their ``f`` prefix and
+    their template is evaluated, so when :class:`Literal` is instantiated, they
+    are only a normal string that tried to capture values from Transformer's
+    context (instead of *the locustfile's* context).
+
+    .. _f-strings: https://docs.python.org/3/whatsnew/3.6.html#whatsnew36-pep498
     """
 
     def __init__(self, s: str) -> None:
+        """
+        :param s: The template of this f-string,
+            for example ``a{x}b`` for the f-string ``f"a{x}b"``.
+        """
         if not isinstance(s, str):
             raise TypeError(
                 f"expecting a format string, got {s.__class__.__qualname__}: {s!r}"
@@ -438,19 +506,24 @@ class FString(Literal):
 class Symbol(Expression):
     """
     The name of something (variable, function, etc.).
-    Avoids any kind of text transformation that would happen with Literal.
+    Avoids any kind of string quoting and escaping that would happen with
+    :class:`Literal`.
 
     >>> str(Literal("x"))
     "'x'"
     >>> str(Symbol("x"))
     'x'
 
-    The provided argument's type is explicitly checked and a TypeError may be
-    raised to avoid confusion when a user expects e.g. Symbol(True) to work like
-    Symbol("True").
+    The provided argument's type is explicitly checked and a :class:`TypeError`
+    may be raised to avoid confusion when a user expects e.g. ``Symbol(True)``
+    to work like ``Symbol("True")``.
     """
 
     def __init__(self, name: str) -> None:
+        """
+        :param name: Textual representation of this symbol.
+            Will be forwarded without modification to the locustfile.
+        """
         super().__init__()
         if not isinstance(name, str):
             raise TypeError(
@@ -479,6 +552,12 @@ class FunctionCall(Expression):
         positional_args: Sequence[Expression] = (),
         named_args: Mapping[str, Expression] = IMMUTABLE_EMPTY_DICT,
     ) -> None:
+        """
+        :param name: Name of the function that is called.
+        :param positional_args: Positional arguments associated with this call,
+            if any.
+        :param named_args: Keyword-arguments associated with this call, if any.
+        """
         super().__init__()
         self.name = name
         self.positional_args = list(positional_args)
@@ -513,11 +592,16 @@ class BinaryOp(Expression):
 
     To avoid any precedence error in the generated code, operands that are also
     BinaryOps are always surrounded by braces (even when not necessary, as in
-    "1 + (2 + 3)", as a more subtle behavior has increased complexity of
-    implementation without much benefit.
+    "1 + (2 + 3)", as a more subtle behavior would increase the complexity of
+    the implementation without much benefit.
     """
 
     def __init__(self, lhs: Expression, op: str, rhs: Expression) -> None:
+        """
+        :param lhs: Left-hand side operand of this operation.
+        :param op: Name of the operator, like ``+``.
+        :param rhs: Right-hand side operand of this operation.
+        """
         super().__init__()
         self.lhs = lhs
         self.op = op
@@ -543,10 +627,14 @@ class Assignment(Statement):
     The assignment of a value to a variable.
 
     For our purposes, we don't treat multiple assignment via tuples differently.
-    We also don't support chained assignments such as "a = b = 1".
+    We also don't support chained assignments such as ``a = b = 1``.
     """
 
     def __init__(self, lhs: str, rhs: Expression, comments: Sequence[str] = ()) -> None:
+        """
+        :param lhs: Variable name (or names) the *rhs* is assigned to.
+        :param rhs: Expression which value is assigned to *lhs*.
+        """
         super().__init__(comments)
         self.lhs = lhs
         self.rhs = rhs
@@ -582,6 +670,16 @@ class IfElse(Statement):
         else_block: Optional[Sequence[Statement]] = None,
         comments: Sequence[str] = (),
     ) -> None:
+        """
+        :param condition_blocks: Pairs of condition and statements.
+            Each pair is composed of an expression representing a condition,
+            and a list of statements corresponding to that condition.
+            This represents an if/elif/.../elif sequence, where there is always
+            an "if" clause and an arbitrary number of "elif" clauses.
+        :param else_block: Statements representing the "else" clause, if any.
+        :raise ValueError: If there is not at least one element in
+            *condition_blocks*.
+        """
         super().__init__(comments)
         self.condition_blocks = [
             (cond, list(stmts)) for cond, stmts in condition_blocks
@@ -639,8 +737,10 @@ class IfElse(Statement):
 
 class Import(Statement):
     """
-    The import statement in all its forms: "import", "import X as A",
-    "from M import X", "from M import X as A", and "from M import X, Y".
+    The import statement in all its forms: ``import X``, ``import X as A``,
+    ``from M import X``, ``from M import X as A``, and ``from M import X, Y``.
+
+    Combined imports like ``from M import X, Y`` are split for simplicity.
     """
 
     def __init__(
@@ -650,6 +750,16 @@ class Import(Statement):
         alias: Optional[str] = None,
         comments: Sequence[str] = (),
     ) -> None:
+        """
+        :param targets: What is imported: *X* in :samp:`import {X}` and
+            :samp:`from M import {X}`.
+        :param source: From where *targets* are imported, if applicable: *M* in
+            :samp:`from {M} import X`.
+        :param alias: Alias for a single-element *targets*: *A* in
+            :samp:`import X as {A}` and :samp:`from M import X as {A}`.
+        :raise ValueError: If *targets* is empty, or if *alias* is specified
+            even though there are multiple *targets*.
+        """
         super().__init__(comments)
         self.targets = list(targets)
         self.source = source
@@ -698,35 +808,60 @@ _T = TypeVar("_T")
 @dataclass
 class ExpressionView(Expression):
     """
-    The promise of an Expression representing an object currently not in
-    Expression format.
+    A "proxy" for an object that is not an :class:`Expression`.
 
-    The ExpressionView allows to mix non-Expression objects in the syntax tree,
-    along with a function capable of transforming these objects into actual
-    Expression objects at any time.
-    This is useful when there is a simpler representation than Expression.
+    .. |Expr| replace:: :class:`Expression`
+    .. |EV| replace:: :class:`ExpressionView`
 
-    For instance, any Request object can be converted into an equivalent
-    Expression, but Request has a simpler API than Expression for all
-    request-oriented operations like accessing the URL, etc.
-    Embedding a Request in a ExpressionView allows to pretend that the Request is
-    already in Expression format (with all associated benefits) but still use
-    the Request API.
+    |EV| allows to mix non-|Expr| objects in the syntax tree, along with
+    a function capable of transforming these objects into actual |Expr| objects
+    at any time.
+    This is useful when these objects are easier to manipulate than their |Expr|
+    equivalent.
 
-    `target` is a callable returning the non-Expression object. That callable
-    allows to specify as target some mutable field of an object, rather than a
-    fixed reference to an object. See for example task.Task2, which contains a
-    ExpressionView to its own "request" field; if the value of that field is
-    changed, the ExpressionView will refer to the new value instead of keeping a
-    reference to the old value.
+    .. |Request| replace:: :class:`Request <transformer.request.Request>`
 
-    `name` is purely descriptive: it can make inspection of data structures
-    containing ExpressionView objects more comfortable.
+    For example: any |Request| object can be converted into an equivalent |Expr|,
+    but |Request| has a simpler API than |Expr| for request-oriented operations
+    like accessing the URL, etc.
+    |EV| can "wrap" a |Request| to pretend that the |Request| is an |Expr|
+    (with all associated benefits of being part of the syntax tree), but still
+    support the |Request| API.
+
+    .. attribute:: target
+
+        :any:`() → T <typing.Callable>` --
+        A function (without parameters) returning the wrapped, non-|Expr| object.
+
+        The benefit of :attr:`target` being a function (instead of a direct
+        reference to the wrapped object) is that it allows to specify some
+        mutable field of an object.
+        See for example :class:`Task2 <transformer.task.Task2>`, which contains
+        an |EV| wrapping its own :attr:`request <transformer.task.Task2.request>`
+        attribute.
+        If the value of that attribute changes, the |EV| will refer to the new
+        value (found by accessing the attribute via *self*),
+        not the old value (which would still be referenced by a non-callable
+        :attr:`target`).
+
+    .. attribute:: converter
+
+        :any:`T → <typing.Callable>` |Expr| --
+        A function capable of transforming the result of :attr:`target` into
+        an |Expr|.
+        The result of :attr:`converter` is computed each time this |EV| has to
+        behave like an |Expr|, for example when passed as argument to :any:`str`.
+
+    .. attribute:: name
+
+        :any:`str` --
+        Purely descriptive: makes the inspection of data structures containing
+        |EV| objects more comfortable.
     """
 
-    name: str
     target: Callable[[], _T]
     converter: Callable[[_T], Expression]
+    name: str
 
     def __str__(self) -> str:
         return str(self.converter(self.target()))

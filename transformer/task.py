@@ -1,6 +1,25 @@
-# -*- coding: utf-8 -*-
 """
-A representation of a Locust Task.
+:mod:`transformer.task` -- HTTP requests and related processing
+===============================================================
+
+Each HTTP request from a HAR file is seen by Transformer as a separate
+:term:`task` to be eventually converted into a :any:`locust.core.task` function:
+
+.. figure:: _static/basic-conversion.*
+   :align: center
+
+   *Transformer converts HAR requests into Locust tasks.*
+
+:class:`~transformer.request.Request` only represents an HTTP request, not the
+potential pre- and post-processing that could be desired in the same Locust task
+(e.g. before or after the ``requests.get`` call).
+Transformer's :term:`task` is an object encapsulating a
+:class:`~transformer.request.Request` *and* that additional processing code,
+in a one-to-one relationship with :any:`locust.core.task`-decorated functions.
+
+However, Transformer's tasks have no notion of :ref:`weight <specifying-weights>`
+or :ref:`grouping <hierarchical-scenarios>`: these come with
+:term:`scenarios <scenario>`.
 """
 import json
 from collections import OrderedDict
@@ -36,6 +55,10 @@ JSON_MIME_TYPE = "application/json"
 class LocustRequest(NamedTuple):
     """
     All parameters for the request performed by the Locust client object.
+
+    .. deprecated:: 1.0.2
+        Only used by :class:`Task`, which is itself deprecated.
+        Use :class:`Task2` instead of :class:`Task`.
     """
 
     method: HttpMethod
@@ -59,6 +82,58 @@ class LocustRequest(NamedTuple):
 
 @dataclass
 class Task2:
+    """
+    Represents a :term:`task`, i.e. an HTTP request along with some optional
+    pre- and post-processing code.
+
+    .. attribute:: name
+
+        :any:`str` --
+        Name of the corresponding :any:`locust.core.task` function in
+        the locustfile.
+
+    .. attribute:: request
+
+        :any:`transformer.request.Request` --
+        HTTP request executed by this task.
+
+    .. attribute:: statements
+
+        :any:`Sequence <typing.Sequence>` of |Statement| --
+        Body of the corresponding :any:`locust.core.task` function in the
+        locustfile.
+
+        One of these statements contains an |ExpressionView| pointing to
+        :attr:`request`.
+        The other statements (if any) represent pre- or post-processing code
+        for that request, depending on whether they appear before or after the
+        statement containing the |ExpressionView|.
+
+        .. warning::
+
+            Plugins should be careful if they replace the |ExpressionView|
+            object found in :attr:`statements`.
+            Other plugins should still be able to change :attr:`request` and
+            expect to see these changes reflected in :attr:`statements` via
+            |ExpressionView|.
+
+    .. attribute:: global_code_blocks
+
+        :any:`Mapping <typing.Mapping>` of
+        :any:`str` to |Statement|
+
+        .. deprecated:: 1.0.2
+
+            This attribute is only kept for backward compatibility purposes.
+            It exists because Transformer's first plugin system didn't have
+            :term:`OnPythonProgram`, so plugins had to specify the top-level
+            locustfile code blocks they needed (e.g. imports, global variables)
+            at the :class:`Task` level and let the plugin system percolate these
+            code blocks through the scenario tree.
+            This explains why scenarios have the similar
+            :any:`transformer.scenario.Scenario.global_code_blocks` field.
+    """
+
     name: str
     request: Request
     statements: Sequence[py.Statement] = ()
@@ -76,10 +151,13 @@ class Task2:
     def from_requests(cls, requests: Iterable[Request]) -> Iterator["Task2"]:
         """
         Generates a set of tasks from a given set of HTTP requests.
-        Each request will be turned into an unevaluated function call making
-        the actual request.
-        The returned tasks are ordered by increasing timestamp of the
-        corresponding request.
+
+        Each request will be turned into an unevaluated function call
+        (:class:`transformer.python.FunctionCall`)
+        making the actual request.
+
+        The returned tasks are ordered by increasing :any:`timestamp
+        <transformer.request.Request.timestamp>` of the corresponding request.
         """
         # TODO: Update me when merging Task with Task2: "statements" needs to
         #   contain a ExpressionView to Task2.request.
@@ -194,6 +272,13 @@ class Task(NamedTuple):
     """
     One step of "doing something" on a website.
     This basically represents a @task in Locust-speak.
+
+    .. deprecated:: 1.0.2
+        Use :class:`Task2` instead. :class:`Task` is kept for backward
+        compatibility with existing plugins that have not yet migrated to
+        :class:`Task2`.
+        Transformer will automatically convert :class:`Task` objects into
+        :class:`Task2` objects using :meth:`Task2.from_task`.
     """
 
     name: str
