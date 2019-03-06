@@ -20,10 +20,20 @@ For all available releases, see the `releases page`_.
 Release process
 ---------------
 
-.. warning::
+Since :issue:`28`, a new release of Transformer is created for each merge in
+the ``master`` branch.
+This means that every pull request needs to update the following files:
 
-   This section only describes the current process, which is planned to change
-   soon. See :issue:`28` for details.
+:file:`pyproject.toml`
+  Update the ``version`` field.
+
+:file:`docs/Changelog.rst`
+  Create a new section describing what changed in the new version.
+
+:file:`docs/conf.py`
+  Update the ``version`` and ``release`` fields.
+
+Each step is described in more details in the next sections.
 
 Choose the new version
 ''''''''''''''''''''''
@@ -71,59 +81,51 @@ In :file:`docs/conf.py`, update the ``version`` and ``release`` values:
 Update the changelog
 ''''''''''''''''''''
 
-Releasing a new version requires updating the :ref:`changelog` file.
+Releasing a new version requires updating the :ref:`changelog` file to tell
+users **what has changed** since the last version in **clear, concise and
+accessible** terms.
+The git history is often not suited for this.
+
 Assuming the current stable version is ``vA.B.C`` and new version is
-``vX.Y.Z``, you need to:
-
-- rename the current *Unreleased* section as "vX.Y.Z",
-
-- create a new, empty *Unreleased* section on top,
-
-- update the diff links accordingly.
+``vX.Y.Z``, you need to add a new "vX.Y.Z" section at the top of the file, just
+after the introduction.
+This new section should mention a release date and a GitHub link to observe
+the actual code changes since the last release.
 
 This is summarized by this patch:
 
 .. code-block:: diff
 
-     Unreleased
-     ==========
+    Unreleased
+    ==========
 
-     - Diff__.
+    - Diff__.
    +
-   + __ https://github.com/zalando-incubator/transformer/compare/vX.Y.Z...HEAD
+   +__ https://github.com/zalando-incubator/transformer/compare/vX.Y.Z...HEAD
    +
-   + .. _vX.Y.Z:
+   +.. _vX.Y.Z:
    +
-   + vX.Y.Z
-   + ======
+   +vX.Y.Z
+   +======
    +
-   + - Release date: YYYY-MM-DD HH:MM
-   + - Diff__.
+   +- Release date: YYYY-MM-DD HH:MM
+   +- Diff__.
 
-   - __ https://github.com/zalando-incubator/transformer/compare/vA.B.C...HEAD
-   + __ https://github.com/zalando-incubator/transformer/compare/vA.B.C...vX.Y.Z
+   -__ https://github.com/zalando-incubator/transformer/compare/vA.B.C...HEAD
+   +__ https://github.com/zalando-incubator/transformer/compare/vA.B.C...vX.Y.Z
 
 Don't forget to **update the release date!**
 
-You can then open a pull-request with these changes and get it merged before
-proceeding to the next step.
+Update the Sphinx configuration
+'''''''''''''''''''''''''''''''
 
-Trigger a release via Travis
-''''''''''''''''''''''''''''
+In :file:`docs/conf.py`, update the ``version`` and ``release`` fields:
 
-New releases of Transformer are automatically published to PyPI_ by Travis when
-one of the maintainers publishes a new version tag on the ``master`` branch::
+.. code-block:: diff
 
-   $ git checkout master     # Make sure you're not on a feature branch.
-   $ git pull origin master  # Make sure your repository is fresh.
-   $ git tag -s vX.Y.Z       # Open your editor to write the release note.
-   $ git push --tags         # Propagate the tag to GitHub.
-
-.. _PyPI: https://pypi.org/project/har-transformer/
-
-The contents of the release note should **include the most recent changelog
-section**.
-Do not use the output of ``git log`` for that purpose: it is usually much less
-readable than our curated changelog.
-However, you should strip all Sphinx-specific markup from the changelog section
-you reuse, as they will not be rendered properly outside of Sphinx.
+    # The short X.Y version
+   -version = '{old_short}'",
+   +version = '{new_short}'
+    # The full version, including alpha/beta/rc tags
+   -release = '{old_v}'
+   +release = '{new_v}'
