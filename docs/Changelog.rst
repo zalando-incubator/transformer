@@ -15,14 +15,14 @@ The format is based on `Keep a Changelog`_, and this project adheres to
    :local:
    :depth: 1
 
-.. _unreleased:
+.. _v1.0.3:
 
-Unreleased
-==========
+v1.0.3
+======
 
 - Diff__.
 
-__ https://github.com/zalando-incubator/transformer/compare/v1.0.2...HEAD
+__ https://github.com/zalando-incubator/transformer/compare/v1.0.2...v1.0.3
 
 Added
 -----
