@@ -164,16 +164,30 @@ Suggested workflow
 .. _project maintainers: https://github.com/zalando-incubator/Transformer/blob/master/MAINTAINERS
 .. _mention: https://github.blog/2011-03-23-mention-somebody-they-re-notified/
 
-9. When you are done, mark your draft pull request as `Ready for review`_.
-   This will automatically request a **code review** from all `project
-   maintainers`_.
+9. As explained in the :ref:`release-process` section, in Transformer, **each
+   pull request merged** in the ``master`` branch becomes a **new release** on
+   PyPI.
+   Therefore, a few files need to be updated with a **new version number**, and
+   :file:`docs/Changelog.rst` should probably contain a description of your
+   contributions.
+   **Everything is explained** in :ref:`release-process`, including the
+   ``make prepare`` command that should do most of the work for you.
 
-   Make sure your contribution respects :ref:`Transformer's conventions
-   <project-conventions>` before that!
+10. You are welcome to add your name in our :ref:`contributors` file
+    (:file:`docs/Contributors.rst`).
+    This is of course optional, but we would be happy to remember and showcase
+    the help you provided!
+
+11. When you are done, mark your draft pull request as `Ready for review`_.
+    This will automatically request a **code review** from all `project
+    maintainers`_.
+
+    Make sure your contributions respect :ref:`Transformer's conventions
+    <project-conventions>` before that!
 
 .. _ready for review: https://help.github.com/en/articles/changing-the-stage-of-a-pull-request
 
-10. Your pull request must be approved 👍 by two `project maintainers`_ before
+12. Your pull request must be approved 👍 by two `project maintainers`_ before
     it can be merged.
 
 **Thank you** for your contributions!
