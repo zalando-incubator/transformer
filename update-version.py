@@ -22,6 +22,7 @@ from typing import Sequence
 import dataclasses
 import packaging.version
 import pygments
+import pytest
 import tomlkit
 from dataclasses import dataclass
 from docopt import docopt
@@ -42,6 +43,25 @@ class Version:
 
     def __str__(self) -> str:
         return ".".join((str(self.major), str(self.minor), str(self.patch)))
+
+
+@pytest.mark.parametrize(
+    "argument,expected",
+    (
+        ("1.0.10", Version(1, 0, 10)),
+        ("12.345.0", Version(12, 345, 0)),
+        ("1.2.3.rc2", Version(1, 2, 3)),
+    ),
+)
+def test_version_parse(argument: str, expected: Version):
+    assert Version.parse(argument) == expected
+
+
+@pytest.mark.parametrize(
+    "v,expected", ((Version(1, 0, 9), "1.0.9"), (Version(12, 345, 0), "12.345.0"))
+)
+def test_version_str(v: Version, expected: str):
+    assert str(v) == expected
 
 
 @dataclass
@@ -145,6 +165,20 @@ def increment_version(v: Version, incr: Increment) -> Version:
     for i in range(incr.value + 1, max(Increment).value + 1):
         values[i] = 0
     return Version(*values)
+
+
+@pytest.mark.parametrize(
+    "incr,expected",
+    (
+        (Increment.PATCH, Version(1, 0, 10)),
+        (Increment.MINOR, Version(1, 1, 0)),
+        (Increment.MAJOR, Version(2, 0, 0)),
+    ),
+)
+def test_increment_version(incr: Increment, expected: Version):
+    current_version = Version(1, 0, 9)
+    assert increment_version(current_version, incr) == expected
+    assert current_version == Version(1, 0, 9), "argument should not change"
 
 
 def pyproject_version(pyproject_path: os.PathLike) -> Version:
