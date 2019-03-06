@@ -102,7 +102,7 @@ def changelog_patch(old_v: Version, new_v: Version) -> Patch:
     return Patch(
         target=Path("docs", "Changelog.rst"),
         lines=[
-            "@@ -17,2 +17,11 @@",
+            "@@ -17,2 +17,13 @@",
             " ",
             f"+.. _v{new_v}:",
             "+",
@@ -174,11 +174,20 @@ def run():
 
     # Show the patches, in case users want to reverse them later, and apply them.
     logging.info("Applying these patches:")
+    expected_successes = len(patches)
+    actual_successes = 0
     for patch in patches:
         print(patch.pretty())
-        patch.apply()
+        if patch.apply():
+            actual_successes += 1
         print()
+    logging.info(f"Patched {actual_successes}/{expected_successes} of expected files.")
+    if actual_successes < expected_successes:
+        raise RuntimeError()
 
 
 if __name__ == "__main__":
-    run()
+    try:
+        run()
+    except Exception:
+        exit(1)
