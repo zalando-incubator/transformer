@@ -15,14 +15,16 @@ The format is based on `Keep a Changelog`_, and this project adheres to
    :local:
    :depth: 1
 
-.. _v1.0.3:
+.. _v1.1.0:
 
-v1.0.3
+v1.1.0
 ======
+
+- Release date: 2019-03-06 17:06
 
 - Diff__.
 
-__ https://github.com/zalando-incubator/transformer/compare/v1.0.2...v1.0.3
+__ https://github.com/zalando-incubator/transformer/compare/v1.0.2...v1.1.0
 
 Added
 -----
@@ -67,6 +69,11 @@ Changed
 
 - The documentation is no longer accessible from the GitHub wiki, but is now
   hosted by Read The Docs at https://transformer.readthedocs.io. (:pr:`43`)
+
+- The release process has changed: A new PyPI release is now published for each
+  commit to the `master` branch.
+  This should prevent situations where the documentation advertises features
+  not yet released. (:pr:`46`)
 
 .. _Sphinx: http://www.sphinx-doc.org
 .. _reStructuredText: http://www.sphinx-doc.org/en/master/usage/restructuredtext
