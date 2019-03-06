@@ -11,3 +11,11 @@ black: configure
 .PHONY: doc
 doc:
 	poetry run $(MAKE) -C docs html
+
+.PHONY: prepare-patch prepare-minor prepare-major
+prepare-patch:
+	poetry run python update-version.py patch
+prepare-minor:
+	poetry run python update-version.py minor
+prepare-major:
+	poetry run python update-version.py major
