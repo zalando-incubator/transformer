@@ -35,6 +35,9 @@ Therefore, **every pull request** needs to **update the following files**:
 :file:`docs/conf.py`
   → Update the ``version`` and ``release`` fields.
 
+:file:`functional-tests/test_version.py`
+  → Update the ``expected`` value.
+
 Each step is described in more details in :ref:`manual-release-process`.
 We also provide a best-effort :ref:`assisted-release-process` to simplify the
 whole operation.
@@ -166,3 +169,15 @@ This is summarized by this patch:
     ======
 
 Don't forget to **update the release date!**
+
+Update the functional tests
+'''''''''''''''''''''''''''
+
+Update the expected version in the :file:`functional-tests/test_version.py`:
+
+.. code-block:: diff
+
+    def test_version():
+   -    expected = "1.0.2"
+   +    expected = "1.1.0"
+        actual = (
