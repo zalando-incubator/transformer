@@ -17,23 +17,69 @@ For all available releases, see the `releases page`_.
 
 .. _releases page: https://github.com/zalando-incubator/Transformer/releases
 
+.. _release-process:
+
 Release process
 ---------------
 
-Since :issue:`28`, a new release of Transformer is created for each merge in
-the ``master`` branch.
-This means that every pull request needs to update the following files:
+Since :issue:`28`, a **new release** of Transformer is created **for each
+merge** in the ``master`` branch.
+Therefore, **every pull request** needs to **update the following files**:
 
 :file:`pyproject.toml`
-  Update the ``version`` field.
+  → Update the ``version`` field.
 
 :file:`docs/Changelog.rst`
-  Create a new section describing what changed in the new version.
+  → Create a new section describing what changed in the new version.
 
 :file:`docs/conf.py`
-  Update the ``version`` and ``release`` fields.
+  → Update the ``version`` and ``release`` fields.
 
-Each step is described in more details in the next sections.
+Each step is described in more details in :ref:`manual-release-process`.
+We also provide a best-effort :ref:`assisted-release-process` to simplify the
+whole operation.
+
+.. _assisted-release-process:
+
+Assisted process
+~~~~~~~~~~~~~~~~
+
+To reduce the number of things you have to manually change, you can run **one
+of**:
+
+- ``make prepare-patch``
+
+- ``make prepare-minor``
+
+- ``make prepare-major``
+
+depending on whether the new release is a *patch*, *minor*, or *major* release
+(according to the SemVer_ model).
+This computes the new version number for you and tries to update the
+corresponding files.
+
+.. warning::
+
+   ``make prepare-...`` overwrites your files using patch_.
+   We recommend that you **commit your changes before running it**, so that you
+   can easily revert its effects if necessary.
+   This is particularly important if your own changes affect one of the files
+   mentioned in :ref:`release-process` (e.g. you already edited the changelog).
+
+.. note::
+
+   The ``make prepare-...`` script **may not always work**.
+   If some of the files listed in :ref:`release-process` have changed too much
+   since it was updated, it will not be able to patch them properly.
+   In that case, please proceed manually as described in
+   :ref:`manual-release-process`.
+
+.. _patch: https://en.wikipedia.org/wiki/Patch_(Unix)
+
+.. _manual-release-process:
+
+Manual process
+~~~~~~~~~~~~~~
 
 Choose the new version
 ''''''''''''''''''''''
@@ -67,7 +113,7 @@ In :file:`pyproject.toml`, update the ``version`` value to ``X.Y.Z``.
 Update the Sphinx config
 ''''''''''''''''''''''''
 
-In :file:`docs/conf.py`, update the ``version`` and ``release`` values:
+In :file:`docs/conf.py`, update the ``version`` and ``release`` fields:
 
 .. code-block:: diff
 
@@ -96,13 +142,6 @@ This is summarized by this patch:
 
 .. code-block:: diff
 
-    Unreleased
-    ==========
-
-    - Diff__.
-   +
-   +__ https://github.com/zalando-incubator/transformer/compare/vX.Y.Z...HEAD
-   +
    +.. _vX.Y.Z:
    +
    +vX.Y.Z
@@ -110,22 +149,12 @@ This is summarized by this patch:
    +
    +- Release date: YYYY-MM-DD HH:MM
    +- Diff__.
-
-   -__ https://github.com/zalando-incubator/transformer/compare/vA.B.C...HEAD
+   +
    +__ https://github.com/zalando-incubator/transformer/compare/vA.B.C...vX.Y.Z
+   +
+    .. _vA.B.C:
+
+    vA.B.C
+    ======
 
 Don't forget to **update the release date!**
-
-Update the Sphinx configuration
-'''''''''''''''''''''''''''''''
-
-In :file:`docs/conf.py`, update the ``version`` and ``release`` fields:
-
-.. code-block:: diff
-
-    # The short X.Y version
-   -version = '{old_short}'",
-   +version = '{new_short}'
-    # The full version, including alpha/beta/rc tags
-   -release = '{old_v}'
-   +release = '{new_v}'
