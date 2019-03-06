@@ -66,6 +66,8 @@ corresponding files.
    This is particularly important if your own changes affect one of the files
    mentioned in :ref:`release-process` (e.g. you already edited the changelog).
 
+.. _patch: https://en.wikipedia.org/wiki/Patch_(Unix)
+
 .. note::
 
    The ``make prepare-...`` script **may not always work**.
@@ -74,7 +76,13 @@ corresponding files.
    In that case, please proceed manually as described in
    :ref:`manual-release-process`.
 
-.. _patch: https://en.wikipedia.org/wiki/Patch_(Unix)
+.. warning::
+
+   Please remember to **document your actual contributions in the changelog**
+   yourself!
+   ``make prepare-...`` only creates the boilerplate (new section, date,
+   links).
+   It cannot explain your changes (yet 😉).
 
 .. _manual-release-process:
 
