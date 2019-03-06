@@ -120,11 +120,6 @@ def changelog_patch(old_v: Version, new_v: Version) -> Patch:
     )
 
 
-logging.basicConfig(
-    level=logging.INFO, format="%(asctime)s\t%(levelname)s\t%(message)s"
-)
-
-
 class Increment(enum.IntEnum):
     MAJOR = 0
     MINOR = 1
@@ -187,6 +182,9 @@ def run():
 
 
 if __name__ == "__main__":
+    logging.basicConfig(
+        level=logging.INFO, format="%(asctime)s\t%(levelname)s\t%(message)s"
+    )
     try:
         run()
     except Exception:
