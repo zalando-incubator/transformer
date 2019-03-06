@@ -15,6 +15,7 @@ import logging
 import os
 import subprocess
 import tempfile
+from datetime import datetime
 from pathlib import Path
 from typing import Sequence
 
@@ -97,6 +98,7 @@ def changelog_patch(old_v: Version, new_v: Version) -> Patch:
         "https://github.com/zalando-incubator/transformer/compare/"
         f"v{old_v}...v{new_v}"
     )
+    release_date = datetime.now().strftime("%Y-%m-%d %H:%M")
     return Patch(
         target=Path("docs", "Changelog.rst"),
         lines=[
@@ -106,6 +108,8 @@ def changelog_patch(old_v: Version, new_v: Version) -> Patch:
             "+",
             f"+v{new_v}",
             "+" + ("=" * (1 + len(str(new_v)))),
+            "+",
+            f"+- Release date: {release_date}",
             "+",
             "+- Diff__.",
             "+",
