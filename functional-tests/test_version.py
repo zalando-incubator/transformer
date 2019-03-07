@@ -1,11 +1,12 @@
+import re
 import subprocess
 
 
 def test_version():
-    expected = "1.1.0"
+    expected_pattern = re.compile(r"\b [0-9]+ \. [0-9]+ \. [0-9]+ \b", re.X)
     actual = (
         subprocess.run(["transformer", "--version"], check=True, stdout=subprocess.PIPE)
         .stdout.strip()
         .decode()
     )
-    assert actual == expected
+    assert expected_pattern.match(actual)

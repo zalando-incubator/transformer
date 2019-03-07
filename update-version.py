@@ -140,19 +140,6 @@ def changelog_patch(old_v: Version, new_v: Version) -> Patch:
     )
 
 
-def functional_test_patch(old_v: Version, new_v: Version) -> Patch:
-    return Patch(
-        target=Path("functional-tests", "test_version.py"),
-        lines=[
-            "@@ -4,3 +4,3 @@",
-            " def test_version():",
-            f'-    expected = "{old_v}"',
-            f'+    expected = "{new_v}"',
-            '     actual = ("""',
-        ],
-    )
-
-
 class Increment(enum.IntEnum):
     MAJOR = 0
     MINOR = 1
@@ -212,7 +199,6 @@ def run():
         pyproject_patch(old_version, new_version),
         changelog_patch(old_version, new_version),
         sphinx_patch(old_version, new_version),
-        functional_test_patch(old_version, new_version),
     ]
 
     # Show the patches, in case users want to reverse them later, and apply them.
