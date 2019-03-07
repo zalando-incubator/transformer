@@ -17,13 +17,77 @@ For all available releases, see the `releases page`_.
 
 .. _releases page: https://github.com/zalando-incubator/Transformer/releases
 
+.. _release-process:
+
 Release process
 ---------------
 
+Since :issue:`28`, a **new release** of Transformer is created **for each
+merge** in the ``master`` branch.
+Therefore, **every pull request** needs to **update the following files**:
+
+:file:`pyproject.toml`
+  → Update the ``version`` field.
+
+:file:`docs/Changelog.rst`
+  → Create a new section describing what changed in the new version.
+
+:file:`docs/conf.py`
+  → Update the ``version`` and ``release`` fields.
+
+Each step is described in more details in :ref:`manual-release-process`.
+We also provide a best-effort :ref:`assisted-release-process` to simplify the
+whole operation.
+
+.. _assisted-release-process:
+
+Assisted process
+~~~~~~~~~~~~~~~~
+
+To reduce the number of things you have to manually change, you can run **one
+of**:
+
+- ``make prepare-patch``
+
+- ``make prepare-minor``
+
+- ``make prepare-major``
+
+depending on whether the new release is a *patch*, *minor*, or *major* release
+(according to the SemVer_ model).
+This computes the new version number for you and tries to update the
+corresponding files.
+
 .. warning::
 
-   This section only describes the current process, which is planned to change
-   soon. See :issue:`28` for details.
+   ``make prepare-...`` overwrites your files using patch_.
+   We recommend that you **commit your changes before running it**, so that you
+   can easily revert its effects if necessary.
+   This is particularly important if your own changes affect one of the files
+   mentioned in :ref:`release-process` (e.g. you already edited the changelog).
+
+.. _patch: https://en.wikipedia.org/wiki/Patch_(Unix)
+
+.. note::
+
+   The ``make prepare-...`` script **may not always work**.
+   If some of the files listed in :ref:`release-process` have changed too much
+   since it was updated, it will not be able to patch them properly.
+   In that case, please proceed manually as described in
+   :ref:`manual-release-process`.
+
+.. warning::
+
+   Please remember to **document your actual contributions in the changelog**
+   yourself!
+   ``make prepare-...`` only creates the boilerplate (new section, date,
+   links).
+   It cannot explain your changes (yet 😉).
+
+.. _manual-release-process:
+
+Manual process
+~~~~~~~~~~~~~~
 
 Choose the new version
 ''''''''''''''''''''''
@@ -57,7 +121,7 @@ In :file:`pyproject.toml`, update the ``version`` value to ``X.Y.Z``.
 Update the Sphinx config
 ''''''''''''''''''''''''
 
-In :file:`docs/conf.py`, update the ``version`` and ``release`` values:
+In :file:`docs/conf.py`, update the ``version`` and ``release`` fields:
 
 .. code-block:: diff
 
@@ -71,59 +135,34 @@ In :file:`docs/conf.py`, update the ``version`` and ``release`` values:
 Update the changelog
 ''''''''''''''''''''
 
-Releasing a new version requires updating the :ref:`changelog` file.
+Releasing a new version requires updating the :ref:`changelog` file to tell
+users **what has changed** since the last version in **clear, concise and
+accessible** terms.
+The git history is often not suited for this.
+
 Assuming the current stable version is ``vA.B.C`` and new version is
-``vX.Y.Z``, you need to:
-
-- rename the current *Unreleased* section as "vX.Y.Z",
-
-- create a new, empty *Unreleased* section on top,
-
-- update the diff links accordingly.
+``vX.Y.Z``, you need to add a new "vX.Y.Z" section at the top of the file, just
+after the introduction.
+This new section should mention a release date and a GitHub link to observe
+the actual code changes since the last release.
 
 This is summarized by this patch:
 
 .. code-block:: diff
 
-     Unreleased
-     ==========
+   +.. _vX.Y.Z:
+   +
+   +vX.Y.Z
+   +======
+   +
+   +- Release date: YYYY-MM-DD HH:MM
+   +- Diff__.
+   +
+   +__ https://github.com/zalando-incubator/transformer/compare/vA.B.C...vX.Y.Z
+   +
+    .. _vA.B.C:
 
-     - Diff__.
-   +
-   + __ https://github.com/zalando-incubator/transformer/compare/vX.Y.Z...HEAD
-   +
-   + .. _vX.Y.Z:
-   +
-   + vX.Y.Z
-   + ======
-   +
-   + - Release date: YYYY-MM-DD HH:MM
-   + - Diff__.
-
-   - __ https://github.com/zalando-incubator/transformer/compare/vA.B.C...HEAD
-   + __ https://github.com/zalando-incubator/transformer/compare/vA.B.C...vX.Y.Z
+    vA.B.C
+    ======
 
 Don't forget to **update the release date!**
-
-You can then open a pull-request with these changes and get it merged before
-proceeding to the next step.
-
-Trigger a release via Travis
-''''''''''''''''''''''''''''
-
-New releases of Transformer are automatically published to PyPI_ by Travis when
-one of the maintainers publishes a new version tag on the ``master`` branch::
-
-   $ git checkout master     # Make sure you're not on a feature branch.
-   $ git pull origin master  # Make sure your repository is fresh.
-   $ git tag -s vX.Y.Z       # Open your editor to write the release note.
-   $ git push --tags         # Propagate the tag to GitHub.
-
-.. _PyPI: https://pypi.org/project/har-transformer/
-
-The contents of the release note should **include the most recent changelog
-section**.
-Do not use the output of ``git log`` for that purpose: it is usually much less
-readable than our curated changelog.
-However, you should strip all Sphinx-specific markup from the changelog section
-you reuse, as they will not be rendered properly outside of Sphinx.

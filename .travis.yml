@@ -18,17 +18,12 @@ deploy:
     script: poetry publish --build
     on:
       branch: master
-      tags: true
-    skip_existing: true
-  # Development releases: every merge into master
-  - provider: script
-    script: poetry run python make_dev_release.py
-    on:
-      branch: master
-      # Dev releases are timestamp-tagged; avoid publishing one for each python
-      # version we test with.
+      # We don't want to publish a release twice (once for each supported
+      # python version), but we also cannot use skip_existing because
+      # deployment should fail if not at least one release is published to PyPI
+      # successfully. This prevents the case where someone forgot to update the
+      # version number in a PR.
       python: '3.7'
-
 env:
   global:
   - secure: duPuFLBO/bAeEnBHEQ7EHX07rLa7RO69PKH3+vTBmFVIqpZEh+X5psXTHClpFAT39AsUVvwKl5ZPwxunTOA13h6/b34M9WvArNOmMgrFvtsy2uqS9l/EJKMhhRpdL0h9Hk08Po1gJ7hEbOmFtadWtYXhge0z6bC4ykDCdKyO02sMNVceu0c+Q4j8mlV55iUjR0k9XYTRXHPyCZvhQRlWRu2SpFu+bS+i46ckdTtcLlHi0jDCAIc3od+j0ZT1CMSRdg0Bg81C9U7zCcPSpFk4AMdUjXw1h8k+7iFzzknyMDyVRi9pocPk8WXEN8i0OTGIsYCPWhgqcNP1o37xCXQj/7qPjvVYbF32vS9Ab+0RGySjlwBS19c5DoU/46IK6YR9Gpy8jmbTGbKdsK2grmg5AHs+Xv5/a5zbFoHiLRMSvqT5S8ZiAoHDKuBAQKXnHJEVYxmr1GqeOz6xPyEQlzrlbkKQlkO+D4oo3EALkq43dPo/fyKwgGVrOCyoEAfpRh/R448mVZKkuOb+IKnQCsRILpPeD8ZxQfQriVHeS4pMvZHmWA4hogZdGWe1a8xwDD2/RVclmaofyoT2HPPFgkY0wBDNlPC/RYvyXTSmAQ8XEk0CfzYh8IPsLys6v1E8MZqWG7s2xrbXQCz5jPGmmZ7MTuA20vUXGvyJCoPC6AJ/+xE=

@@ -1,3 +1,5 @@
+.. _contributors:
+
 ✌ Project Contributors
 =======================
 

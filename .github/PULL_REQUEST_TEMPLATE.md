@@ -1,11 +1,10 @@
-# One-line summary
+One-line summary.
 
-> Issue : #1234 (only if appropriate)
+Closes #123 (number of the corresponding issue, only if appropriate).
 
 ## Description
 
-A few sentences describing the overall goals of the pull request's
-commits.
+A few sentences describing the overall goals of this pull request.
 
 ## Types of Changes
 
@@ -17,22 +16,25 @@ _What types of changes does your code introduce? Keep the ones that apply:_
 - Refactor/improvements
 - Documentation / non-code
 
-## Tasks
+## TODO
 
 _List of tasks you will do to complete the PR:_
 
-- [ ] Created Task 1
-- [ ] Created Task 2
-- [ ] To-do Task 3
+- [ ] TODO 1
 
 ## Review
 
-_List of tasks the reviewer must do to review the PR:_
+_Reviewers' checklist:_
 
-- [ ] Tests
-- [ ] Documentation
-- [ ] CHANGELOG
+- If this PR _implements_ new flows or _changes_ existing ones, are there
+  **good tests** for these flows?
+  If this PR rather _removes_ flows, are the obsolete tests removed as well?
+- Is the documentation still up-to-date and exhaustive? This covers both
+  _technical_ (in source files) and _functional_ (under `docs/`) documentation.
+- Is the **changelog** updated?
+- Does the **new version number** correspond to the actual changes from this PR?
+  In doubt, refer to https://semver.org.
 
-## Deployment Notes
+## After this PR
 
-These should highlight any db migrations, feature toggles, etc.
+Any follow-up action necessary?

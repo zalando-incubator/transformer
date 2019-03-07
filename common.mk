@@ -15,6 +15,7 @@ configure: .make/configure
 .PHONY: unittest
 unittest: configure
 	poetry run pytest --failed-first --cov-config .coveragerc --cov-report xml --cov=. transformer/
+	poetry run pytest --failed-first update-version.py
 
 .PHONY: functest
 functest: configure
