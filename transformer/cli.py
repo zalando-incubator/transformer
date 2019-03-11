@@ -22,7 +22,8 @@ from typing import Sequence, cast, Tuple
 import ecological
 from docopt import docopt
 
-from transformer import __version__, dump
+from transformer import dump
+from ._version import __version__
 
 
 class Config(ecological.AutoConfig, prefix="transformer"):
