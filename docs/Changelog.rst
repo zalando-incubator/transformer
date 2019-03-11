@@ -15,6 +15,22 @@ The format is based on `Keep a Changelog`_, and this project adheres to
    :local:
    :depth: 1
 
+.. _v1.1.1:
+
+v1.1.1
+======
+
+- Release date: 2019-03-11 16:03
+
+- Diff__.
+
+__ https://github.com/zalando-incubator/transformer/compare/v1.1.0...v1.1.1
+
+Changed
+-------
+
+A header in all generated HAR files now contains the version of Transformer and its new repository's URL.
+
 .. _v1.1.0:
 
 v1.1.0
