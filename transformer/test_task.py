@@ -219,6 +219,7 @@ class TestReqToExpr:
             timestamp=MagicMock(),
             method=HttpMethod.GET,
             url=urlparse(url),
+            har_entry={"entry": "data"},
             headers=[Header("a", "b")],
             query=[QueryPair("x", "y")],  # query is currently ignored for GET
         )
@@ -239,6 +240,7 @@ class TestReqToExpr:
             timestamp=MagicMock(),
             method=HttpMethod.POST,
             url=urlparse(url),
+            har_entry={"entry": "data"},
             headers=[Header("a", "b")],
             post_data={
                 "mimeType": "application/x-www-form-urlencoded",
@@ -265,6 +267,7 @@ class TestReqToExpr:
             timestamp=MagicMock(),
             method=HttpMethod.POST,
             url=urlparse(url),
+            har_entry={"entry": "data"},
             headers=[Header("a", "b")],
             post_data={
                 "mimeType": "application/json",
@@ -291,6 +294,7 @@ class TestReqToExpr:
             timestamp=MagicMock(),
             method=HttpMethod.POST,
             url=urlparse(url),
+            har_entry={"entry": "data"},
             headers=[Header("a", "b")],
             post_data=None,
         )
@@ -311,6 +315,7 @@ class TestReqToExpr:
             timestamp=MagicMock(),
             method=HttpMethod.PUT,
             url=urlparse(url),
+            har_entry={"entry": "data"},
             headers=[Header("a", "b")],
             query=[QueryPair("c", "d")],
             post_data={
@@ -338,6 +343,7 @@ class TestReqToExpr:
             timestamp=MagicMock(),
             method=HttpMethod.PUT,
             url=urlparse(url),
+            har_entry={"entry": "data"},
             headers=[Header("a", "b")],
             query=[QueryPair("c", "d")],
             post_data=None,
@@ -358,7 +364,7 @@ class TestReqToExpr:
         url = "http://abc.de"
         name = "my-req"
         r = Request(
-            name=name, timestamp=MagicMock(), method=HttpMethod.GET, url=urlparse(url)
+            name=name, timestamp=MagicMock(), method=HttpMethod.GET, url=urlparse(url), har_entry={"entry": "data"}
         )
         assert req_to_expr(r) == py.FunctionCall(
             name="self.client.get",
@@ -379,6 +385,7 @@ class TestLreqToExpr:
                 timestamp=MagicMock(),
                 method=HttpMethod.GET,
                 url=urlparse(url),
+                har_entry={"entry": "data"},
                 headers=[Header("a", "b")],
                 query=[QueryPair("x", "y")],  # query is currently ignored for GET
             )
@@ -415,6 +422,7 @@ class TestLreqToExpr:
                 timestamp=MagicMock(),
                 method=HttpMethod.POST,
                 url=urlparse(url),
+                har_entry={"entry": "data"},
                 headers=[Header("a", "b")],
                 post_data={
                     "mimeType": "application/x-www-form-urlencoded",
@@ -443,6 +451,7 @@ class TestLreqToExpr:
                 timestamp=MagicMock(),
                 method=HttpMethod.POST,
                 url=urlparse(url),
+                har_entry={"entry": "data"},
                 headers=[Header("a", "b")],
                 post_data={
                     "mimeType": "application/json",
@@ -471,6 +480,7 @@ class TestLreqToExpr:
                 timestamp=MagicMock(),
                 method=HttpMethod.POST,
                 url=urlparse(url),
+                har_entry={"entry": "data"},
                 headers=[Header("a", "b")],
                 post_data=None,
             )
@@ -493,6 +503,7 @@ class TestLreqToExpr:
                 timestamp=MagicMock(),
                 method=HttpMethod.PUT,
                 url=urlparse(url),
+                har_entry={"entry": "data"},
                 headers=[Header("a", "b")],
                 query=[QueryPair("c", "d")],
                 post_data={
@@ -522,6 +533,7 @@ class TestLreqToExpr:
                 timestamp=MagicMock(),
                 method=HttpMethod.PUT,
                 url=urlparse(url),
+                har_entry={"entry": "data"},
                 headers=[Header("a", "b")],
                 query=[QueryPair("c", "d")],
                 post_data=None,
@@ -548,6 +560,7 @@ class TestLreqToExpr:
                 timestamp=MagicMock(),
                 method=HttpMethod.GET,
                 url=urlparse(url),
+                har_entry={"entry": "data"}
             )
         )
         assert lreq_to_expr(r) == py.FunctionCall(

@@ -22,6 +22,7 @@ def task_with_header(name: str, value: str) -> Task2:
             timestamp=TS,
             method=HttpMethod.GET,
             url=urlparse("https://example.com"),
+            har_entry={"entry": "data"},
             name="task_name",
             headers=[Header(name=name, value=value)],
             post_data={},

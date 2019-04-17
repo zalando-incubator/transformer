@@ -115,6 +115,7 @@ class Request:
     timestamp: datetime
     method: HttpMethod
     url: SplitResult
+    har_entry: dict
     headers: List[Header] = ()
     post_data: Optional[dict] = None
     query: List[QueryPair] = ()
@@ -141,6 +142,7 @@ class Request:
             timestamp=pendulum.parse(entry["startedDateTime"]),
             method=HttpMethod[request["method"]],
             url=urlparse(request["url"]),
+            har_entry=entry,
             name=None,
             headers=[
                 Header(name=d["name"], value=d["value"])
