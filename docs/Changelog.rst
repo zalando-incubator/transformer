@@ -15,6 +15,25 @@ The format is based on `Keep a Changelog`_, and this project adheres to
    :local:
    :depth: 1
 
+.. _v1.1.2:
+
+v1.1.2
+======
+
+- Release date: 2019-04-25 14:49
+
+- Diff__.
+
+__ https://github.com/zalando-incubator/transformer/compare/v1.1.1...v1.1.2
+
+Added
+-----
+
+:attr:`transformer.request.Request.har_entry`
+   This new read-only property contains the entry as recorded in a HAR file,
+   corresponding to the specific :class:`Request <transformer.request.Request>` object.
+   As requested by :user:`xinke2411` (:issue:`35`)
+
 .. _v1.1.1:
 
 v1.1.1

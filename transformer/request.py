@@ -83,7 +83,8 @@ class Request:
     .. attribute:: har_entry
 
         :any:`dict` --
-        A single record from entries as recorded in a HAR file (http://www.softwareishard.com/blog/har-12-spec/#entries)
+        A single record from entries as recorded in a HAR file
+        (http://www.softwareishard.com/blog/har-12-spec/#entries)
         corresponding to the request, provided for read-only access.
 
     .. attribute:: headers
