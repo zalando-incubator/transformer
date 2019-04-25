@@ -67,18 +67,24 @@ class Request:
 
     .. attribute:: timestamp
 
-       :class:`~datetime.datetime` --
-       Time at which the request was recorded.
+        :class:`~datetime.datetime` --
+        Time at which the request was recorded.
 
     .. attribute:: method
 
-       :class:`HttpMethod` --
-       HTTP method of the request.
+        :class:`HttpMethod` --
+        HTTP method of the request.
 
     .. attribute:: url
 
-       :class:`urllib.parse.SplitResult` --
-       URL targeted by the request.
+        :class:`urllib.parse.SplitResult` --
+        URL targeted by the request.
+
+    .. attribute:: har_entry
+
+        :any:`dict` --
+        A single record from entries as recorded in a HAR file (http://www.softwareishard.com/blog/har-12-spec/#entries)
+        corresponding to the request, provided for read-only access.
 
     .. attribute:: headers
        :annotation: = []
