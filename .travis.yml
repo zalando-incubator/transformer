@@ -4,6 +4,8 @@ python:
 - '3.6'
 - '3.7'
 install:
+# workaround for backward compatibility to Poetry: https://github.com/sdispater/poetry/issues/1049
+- pip install --upgrade pip==18.1
 - pip install poetry codacy-coverage
 - poetry install
 script:

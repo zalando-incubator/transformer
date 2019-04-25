@@ -67,18 +67,25 @@ class Request:
 
     .. attribute:: timestamp
 
-       :class:`~datetime.datetime` --
-       Time at which the request was recorded.
+        :class:`~datetime.datetime` --
+        Time at which the request was recorded.
 
     .. attribute:: method
 
-       :class:`HttpMethod` --
-       HTTP method of the request.
+        :class:`HttpMethod` --
+        HTTP method of the request.
 
     .. attribute:: url
 
-       :class:`urllib.parse.SplitResult` --
-       URL targeted by the request.
+        :class:`urllib.parse.SplitResult` --
+        URL targeted by the request.
+
+    .. attribute:: har_entry
+
+        :any:`dict` --
+        A single record from entries as recorded in a HAR file
+        (http://www.softwareishard.com/blog/har-12-spec/#entries)
+        corresponding to the request, provided for read-only access.
 
     .. attribute:: headers
        :annotation: = []
@@ -115,6 +122,7 @@ class Request:
     timestamp: datetime
     method: HttpMethod
     url: SplitResult
+    har_entry: dict
     headers: List[Header] = ()
     post_data: Optional[dict] = None
     query: List[QueryPair] = ()
@@ -141,6 +149,7 @@ class Request:
             timestamp=pendulum.parse(entry["startedDateTime"]),
             method=HttpMethod[request["method"]],
             url=urlparse(request["url"]),
+            har_entry=entry,
             name=None,
             headers=[
                 Header(name=d["name"], value=d["value"])

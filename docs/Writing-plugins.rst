@@ -67,6 +67,14 @@ that make requests to a specific URL.
 It would not need to modify :term:`scenario` objects or the :term:`syntax tree`
 directly.
 
+.. warning::
+
+   Modifying :any:`har_entry <transformer.request.Request.har_entry>` property
+   of a :class:`Request <transformer.request.Request>` object will not have any effect on the resulting
+   :term:`task`. The field serves the purpose of exposing all data recorded in a HAR file corresponding
+   to the specific :class:`Request <transformer.request.Request>`, that might have otherwise not been reflected
+   in the intermediate representation.
+
 To let Transformer know that this authentication plugin must be executed with
 :term:`task` objects passed as input (and not, say, :term:`scenario` objects),
 the plugin's author must announce that **the plugin satisfies a specific
