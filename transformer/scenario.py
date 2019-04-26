@@ -28,6 +28,8 @@ import dataclasses
 from dataclasses import dataclass
 
 import transformer.plugins as plug
+from transformer import blacklist
+from transformer.blacklist import Blacklist
 from transformer.naming import to_identifier
 from transformer.plugins.contracts import Plugin
 from transformer.request import Request
@@ -123,6 +125,7 @@ class Scenario:
         plugins: Sequence[Plugin] = (),
         ts_plugins: Sequence[Plugin] = (),
         short_name: bool = False,
+        blacklist: Optional[Blacklist] = None
     ) -> "Scenario":
         """
         Makes a :class:`Scenario` (possibly containing sub-scenarios) out of
@@ -145,14 +148,15 @@ class Scenario:
             but *True* when generating sub-scenarios (:attr:`children`) from
             a directory *path* (because then the names are "scoped" by
             the parent directory).
+        :param blacklist: a sequence of urls to be blacklisted
         """
         if path.is_dir():
             return cls.from_dir(
-                path, plugins, ts_plugins=ts_plugins, short_name=short_name
+                path, plugins, ts_plugins=ts_plugins, short_name=short_name, blacklist=blacklist
             )
         else:
             return cls.from_har_file(
-                path, plugins, ts_plugins=ts_plugins, short_name=short_name
+                path, plugins, ts_plugins=ts_plugins, short_name=short_name, blacklist=blacklist
             )
 
     @classmethod
@@ -162,6 +166,7 @@ class Scenario:
         plugins: Sequence[Plugin],
         ts_plugins: Sequence[Plugin],
         short_name: bool,
+        blacklist: Optional[Blacklist] = None
     ) -> "Scenario":
         """
         Makes a :class:`Scenario` out of the provided directory *path*.
@@ -200,6 +205,7 @@ class Scenario:
             that class name is guaranteed to be unique across all TaskSets of the
             locustfile, but this is generally not necessary and results in less
             readable class names.
+        :param blacklist: a sequence of urls to be blacklisted
         :raise SkippableScenarioError: if the directory contains dangling weight
             files or no sub-scenarios.
         """
@@ -218,7 +224,7 @@ class Scenario:
                 continue
             try:
                 scenario = cls.from_path(
-                    child, plugins, ts_plugins=ts_plugins, short_name=True
+                    child, plugins, ts_plugins=ts_plugins, short_name=True, blacklist=blacklist
                 )
             except SkippableScenarioError as err:
                 logging.warning(
@@ -284,6 +290,7 @@ class Scenario:
         plugins: Sequence[Plugin],
         ts_plugins: Sequence[Plugin],
         short_name: bool,
+        blacklist: Optional[Blacklist] = None
     ) -> "Scenario":
         """
         Creates a Scenario given a HAR file.
@@ -294,7 +301,7 @@ class Scenario:
             with path.open() as file:
                 har = json.load(file)
             requests = Request.all_from_har(har)
-            tasks = Task.from_requests(requests)
+            tasks = Task.from_requests(requests, blacklist)
 
             # TODO: Remove this when Contract.OnTaskSequence is removed.
             tasks = plug.apply(ts_plugins, tasks)

@@ -9,7 +9,7 @@ import pytest
 from hypothesis import given
 from hypothesis.strategies import composite, sampled_from, booleans
 
-from transformer import python as py
+from transformer import python as py, blacklist
 from transformer.request import Header, QueryPair
 from transformer.task import (
     Task,
@@ -45,7 +45,7 @@ class TestTask:
             request = MagicMock()
             request.url = MagicMock()
             request.url.netloc = "www.amazon.com"
-            task = Task.from_requests([request])
+            task = Task.from_requests([request], blacklist=blacklist.from_file())
             assert len(list(task)) == 0
 
         @patch("builtins.open")
