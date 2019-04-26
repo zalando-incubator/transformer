@@ -15,6 +15,23 @@ The format is based on `Keep a Changelog`_, and this project adheres to
    :local:
    :depth: 1
 
+.. _v1.1.3:
+
+v1.1.3
+======
+
+- Release date: 2019-04-26 16:44
+
+- Diff__.
+
+__ https://github.com/zalando-incubator/transformer/compare/v1.1.2...v1.1.3
+
+Changed
+-------
+
+Blacklisting mechanism now opens the `.urlignore` file once per execution of the program,
+instead of once per :class:`Request <transformer.request.Request>`.
+
 .. _v1.1.2:
 
 v1.1.2
