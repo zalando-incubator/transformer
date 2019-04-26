@@ -37,7 +37,13 @@ def transform(
     warnings.warn(DeprecationWarning("transform: use dump or dumps instead"))
     if with_default_plugins:
         plugins = (*DEFAULT_PLUGINS, *plugins)
-    return locustfile([Scenario.from_path(Path(scenarios_path), plugins, blacklist=blacklist.from_file())])
+    return locustfile(
+        [
+            Scenario.from_path(
+                Path(scenarios_path), plugins, blacklist=blacklist.from_file()
+            )
+        ]
+    )
 
 
 LaxPath = Union[str, Path]
@@ -99,7 +105,10 @@ def _dump_as_lines(
     plugins_for = plug.group_by_contract(plugins)
     scenarios = [
         Scenario.from_path(
-            path, plugins_for[Contract.OnTask], plugins_for[Contract.OnTaskSequence], blacklist=blacklist.from_file()
+            path,
+            plugins_for[Contract.OnTask],
+            plugins_for[Contract.OnTaskSequence],
+            blacklist=blacklist.from_file(),
         ).apply_plugins(plugins_for[Contract.OnScenario])
         for path in scenario_paths
     ]

@@ -293,7 +293,9 @@ class Task(NamedTuple):
     global_code_blocks: Mapping[str, Sequence[str]] = MappingProxyType({})
 
     @classmethod
-    def from_requests(cls, requests: Iterable[Request], blacklist: Optional[Blacklist] = None) -> Iterator["Task"]:
+    def from_requests(
+        cls, requests: Iterable[Request], blacklist: Optional[Blacklist] = None
+    ) -> Iterator["Task"]:
         """
         Generates a set of Tasks from a given set of Requests.
         """

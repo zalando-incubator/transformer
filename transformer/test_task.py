@@ -364,7 +364,11 @@ class TestReqToExpr:
         url = "http://abc.de"
         name = "my-req"
         r = Request(
-            name=name, timestamp=MagicMock(), method=HttpMethod.GET, url=urlparse(url), har_entry={"entry": "data"}
+            name=name,
+            timestamp=MagicMock(),
+            method=HttpMethod.GET,
+            url=urlparse(url),
+            har_entry={"entry": "data"},
         )
         assert req_to_expr(r) == py.FunctionCall(
             name="self.client.get",
@@ -560,7 +564,7 @@ class TestLreqToExpr:
                 timestamp=MagicMock(),
                 method=HttpMethod.GET,
                 url=urlparse(url),
-                har_entry={"entry": "data"}
+                har_entry={"entry": "data"},
             )
         )
         assert lreq_to_expr(r) == py.FunctionCall(

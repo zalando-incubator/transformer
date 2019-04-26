@@ -86,24 +86,14 @@ class TestFromHarEntry:
 
     def test_it_records_har_entry(self):
         entry = {
-            "request": {
-                "method": "GET",
-                "url": "localhost"
-            },
-            "response": {
-                "status": 200,
-                "statusText": "OK",
-            },
+            "request": {"method": "GET", "url": "localhost"},
+            "response": {"status": 200, "statusText": "OK"},
             "cache": {},
-            "timings": {
-              "connect": 22,
-              "wait": 46,
-              "receive": 0
-            },
+            "timings": {"connect": 22, "wait": 46, "receive": 0},
             "startedDateTime": "2018-01-01",
             "time": 116,
             "_securityState": "secure",
-            "connection": "443"
+            "connection": "443",
         }
         request = Request.from_har_entry(entry)
         assert isinstance(request, Request)

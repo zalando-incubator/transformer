@@ -10,7 +10,6 @@ from transformer.blacklist import on_blacklist, from_file as read_blacklist
 
 
 class TestBlacklist:
-
     @patch("builtins.open")
     def test_it_returns_false_and_logs_error_if_the_blacklist_does_not_exist(
         self, mock_open, caplog

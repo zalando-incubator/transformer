@@ -125,7 +125,7 @@ class Scenario:
         plugins: Sequence[Plugin] = (),
         ts_plugins: Sequence[Plugin] = (),
         short_name: bool = False,
-        blacklist: Optional[Blacklist] = None
+        blacklist: Optional[Blacklist] = None,
     ) -> "Scenario":
         """
         Makes a :class:`Scenario` (possibly containing sub-scenarios) out of
@@ -152,11 +152,19 @@ class Scenario:
         """
         if path.is_dir():
             return cls.from_dir(
-                path, plugins, ts_plugins=ts_plugins, short_name=short_name, blacklist=blacklist
+                path,
+                plugins,
+                ts_plugins=ts_plugins,
+                short_name=short_name,
+                blacklist=blacklist,
             )
         else:
             return cls.from_har_file(
-                path, plugins, ts_plugins=ts_plugins, short_name=short_name, blacklist=blacklist
+                path,
+                plugins,
+                ts_plugins=ts_plugins,
+                short_name=short_name,
+                blacklist=blacklist,
             )
 
     @classmethod
@@ -166,7 +174,7 @@ class Scenario:
         plugins: Sequence[Plugin],
         ts_plugins: Sequence[Plugin],
         short_name: bool,
-        blacklist: Optional[Blacklist] = None
+        blacklist: Optional[Blacklist] = None,
     ) -> "Scenario":
         """
         Makes a :class:`Scenario` out of the provided directory *path*.
@@ -224,7 +232,11 @@ class Scenario:
                 continue
             try:
                 scenario = cls.from_path(
-                    child, plugins, ts_plugins=ts_plugins, short_name=True, blacklist=blacklist
+                    child,
+                    plugins,
+                    ts_plugins=ts_plugins,
+                    short_name=True,
+                    blacklist=blacklist,
                 )
             except SkippableScenarioError as err:
                 logging.warning(
@@ -290,7 +302,7 @@ class Scenario:
         plugins: Sequence[Plugin],
         ts_plugins: Sequence[Plugin],
         short_name: bool,
-        blacklist: Optional[Blacklist] = None
+        blacklist: Optional[Blacklist] = None,
     ) -> "Scenario":
         """
         Creates a Scenario given a HAR file.
