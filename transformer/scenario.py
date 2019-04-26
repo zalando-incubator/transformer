@@ -28,7 +28,6 @@ import dataclasses
 from dataclasses import dataclass
 
 import transformer.plugins as plug
-from transformer import blacklist
 from transformer.blacklist import Blacklist
 from transformer.naming import to_identifier
 from transformer.plugins.contracts import Plugin
