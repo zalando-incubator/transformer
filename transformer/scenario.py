@@ -124,7 +124,7 @@ class Scenario:
         plugins: Sequence[Plugin] = (),
         ts_plugins: Sequence[Plugin] = (),
         short_name: bool = False,
-        blacklist: Optional[Blacklist] = None,
+        blacklist: Blacklist = set(),
     ) -> "Scenario":
         """
         Makes a :class:`Scenario` (possibly containing sub-scenarios) out of
@@ -147,12 +147,12 @@ class Scenario:
             but *True* when generating sub-scenarios (:attr:`children`) from
             a directory *path* (because then the names are "scoped" by
             the parent directory).
-        :param blacklist: a sequence of urls to be blacklisted
+        :param blacklist: a set of urls to be blacklisted
         """
         if path.is_dir():
             return cls.from_dir(
                 path,
-                plugins,
+                plugins=plugins,
                 ts_plugins=ts_plugins,
                 short_name=short_name,
                 blacklist=blacklist,
@@ -173,7 +173,7 @@ class Scenario:
         plugins: Sequence[Plugin],
         ts_plugins: Sequence[Plugin],
         short_name: bool,
-        blacklist: Optional[Blacklist] = None,
+        blacklist: Blacklist,
     ) -> "Scenario":
         """
         Makes a :class:`Scenario` out of the provided directory *path*.
@@ -301,7 +301,7 @@ class Scenario:
         plugins: Sequence[Plugin],
         ts_plugins: Sequence[Plugin],
         short_name: bool,
-        blacklist: Optional[Blacklist] = None,
+        blacklist: Blacklist,
     ) -> "Scenario":
         """
         Creates a Scenario given a HAR file.

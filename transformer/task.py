@@ -294,7 +294,7 @@ class Task(NamedTuple):
 
     @classmethod
     def from_requests(
-        cls, requests: Iterable[Request], blacklist: Optional[Blacklist] = None
+        cls, requests: Iterable[Request], blacklist: Blacklist = set()
     ) -> Iterator["Task"]:
         """
         Generates a set of Tasks from a given set of Requests.
