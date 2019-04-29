@@ -28,7 +28,7 @@ import dataclasses
 from dataclasses import dataclass
 
 import transformer.plugins as plug
-from transformer.blacklist import Blacklist
+from transformer.blacklist import Blacklist, get_empty
 from transformer.naming import to_identifier
 from transformer.plugins.contracts import Plugin
 from transformer.request import Request
@@ -124,7 +124,7 @@ class Scenario:
         plugins: Sequence[Plugin] = (),
         ts_plugins: Sequence[Plugin] = (),
         short_name: bool = False,
-        blacklist: Blacklist = set(),
+        blacklist: Optional[Blacklist] = None,
     ) -> "Scenario":
         """
         Makes a :class:`Scenario` (possibly containing sub-scenarios) out of
@@ -149,6 +149,9 @@ class Scenario:
             the parent directory).
         :param blacklist: a set of urls to be blacklisted
         """
+        if blacklist is None:
+            blacklist = get_empty()
+
         if path.is_dir():
             return cls.from_dir(
                 path,

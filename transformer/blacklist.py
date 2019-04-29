@@ -5,6 +5,10 @@ from typing import Set
 Blacklist = Set[str]
 
 
+def get_empty() -> Blacklist:
+    return set()
+
+
 def from_file() -> Blacklist:
     blacklist_file = f"{os.getcwd()}/.urlignore"
     try:
@@ -14,7 +18,7 @@ def from_file() -> Blacklist:
         logging.debug(
             "Could not read blacklist file %s. Reason: %s", blacklist_file, err
         )
-        return set()
+        return get_empty()
 
 
 def on_blacklist(blacklist: Blacklist, url: str) -> bool:
