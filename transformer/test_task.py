@@ -9,7 +9,7 @@ import pytest
 from hypothesis import given
 from hypothesis.strategies import composite, sampled_from, booleans
 
-from transformer import python as py
+from transformer import python as py, blacklist
 from transformer.request import Header, QueryPair
 from transformer.task import (
     Task,
@@ -45,7 +45,7 @@ class TestTask:
             request = MagicMock()
             request.url = MagicMock()
             request.url.netloc = "www.amazon.com"
-            task = Task.from_requests([request])
+            task = Task.from_requests([request], blacklist=blacklist.from_file())
             assert len(list(task)) == 0
 
         @patch("builtins.open")
@@ -364,7 +364,11 @@ class TestReqToExpr:
         url = "http://abc.de"
         name = "my-req"
         r = Request(
-            name=name, timestamp=MagicMock(), method=HttpMethod.GET, url=urlparse(url), har_entry={"entry": "data"}
+            name=name,
+            timestamp=MagicMock(),
+            method=HttpMethod.GET,
+            url=urlparse(url),
+            har_entry={"entry": "data"},
         )
         assert req_to_expr(r) == py.FunctionCall(
             name="self.client.get",
@@ -560,7 +564,7 @@ class TestLreqToExpr:
                 timestamp=MagicMock(),
                 method=HttpMethod.GET,
                 url=urlparse(url),
-                har_entry={"entry": "data"}
+                har_entry={"entry": "data"},
             )
         )
         assert lreq_to_expr(r) == py.FunctionCall(

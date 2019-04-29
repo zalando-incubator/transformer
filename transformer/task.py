@@ -42,7 +42,7 @@ import dataclasses
 from dataclasses import dataclass
 
 import transformer.python as py
-from transformer.blacklist import on_blacklist
+from transformer.blacklist import on_blacklist, Blacklist, get_empty
 from transformer.helpers import zip_kv_pairs
 from transformer.request import HttpMethod, Request, QueryPair
 
@@ -293,13 +293,17 @@ class Task(NamedTuple):
     global_code_blocks: Mapping[str, Sequence[str]] = MappingProxyType({})
 
     @classmethod
-    def from_requests(cls, requests: Iterable[Request]) -> Iterator["Task"]:
+    def from_requests(
+        cls, requests: Iterable[Request], blacklist: Optional[Blacklist] = None
+    ) -> Iterator["Task"]:
         """
         Generates a set of Tasks from a given set of Requests.
         """
+        if blacklist is None:
+            blacklist = get_empty()
 
         for req in sorted(requests, key=lambda r: r.timestamp):
-            if on_blacklist(req.url.netloc):
+            if on_blacklist(blacklist, req.url.netloc):
                 continue
             else:
                 yield cls(name=req.task_name(), request=req)
