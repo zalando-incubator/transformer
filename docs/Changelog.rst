@@ -15,6 +15,24 @@ The format is based on `Keep a Changelog`_, and this project adheres to
    :local:
    :depth: 1
 
+.. _v1.1.4:
+
+v1.1.4
+======
+
+- Release date: 2019-04-30 16:30
+
+- Diff__.
+
+__ https://github.com/zalando-incubator/transformer/compare/v1.1.3...v1.1.4
+
+Changed
+-------
+
+:class:`Request <transformer.request.Request>`'s :attr:`headers <transformer.request.Request.headers>`
+are now stored in a case-insensitive dictionary, making the implementation compatible
+with the :mod:`requests` library (used by Locust).
+
 .. _v1.1.3:
 
 v1.1.3
