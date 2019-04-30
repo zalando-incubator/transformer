@@ -10,7 +10,7 @@ from hypothesis import given
 from hypothesis.strategies import composite, sampled_from, booleans
 
 from transformer import python as py, blacklist
-from transformer.request import Header, QueryPair
+from transformer.request import QueryPair, CaseInsensitiveDict
 from transformer.task import (
     Task,
     Request,
@@ -220,7 +220,7 @@ class TestReqToExpr:
             method=HttpMethod.GET,
             url=urlparse(url),
             har_entry={"entry": "data"},
-            headers=[Header("a", "b")],
+            headers={"a": "b"},
             query=[QueryPair("x", "y")],  # query is currently ignored for GET
         )
         assert req_to_expr(r) == py.FunctionCall(
@@ -241,7 +241,7 @@ class TestReqToExpr:
             method=HttpMethod.POST,
             url=urlparse(url),
             har_entry={"entry": "data"},
-            headers=[Header("a", "b")],
+            headers={"a": "b"},
             post_data={
                 "mimeType": "application/x-www-form-urlencoded",
                 "params": [{"name": "x", "value": "y"}],
@@ -268,7 +268,7 @@ class TestReqToExpr:
             method=HttpMethod.POST,
             url=urlparse(url),
             har_entry={"entry": "data"},
-            headers=[Header("a", "b")],
+            headers={"a": "b"},
             post_data={
                 "mimeType": "application/json",
                 "params": [{"name": "x", "value": "y"}],
@@ -295,7 +295,7 @@ class TestReqToExpr:
             method=HttpMethod.POST,
             url=urlparse(url),
             har_entry={"entry": "data"},
-            headers=[Header("a", "b")],
+            headers={"a": "b"},
             post_data=None,
         )
         assert req_to_expr(r) == py.FunctionCall(
@@ -316,7 +316,7 @@ class TestReqToExpr:
             method=HttpMethod.PUT,
             url=urlparse(url),
             har_entry={"entry": "data"},
-            headers=[Header("a", "b")],
+            headers={"a": "b"},
             query=[QueryPair("c", "d")],
             post_data={
                 "mimeType": "application/json",
@@ -344,7 +344,7 @@ class TestReqToExpr:
             method=HttpMethod.PUT,
             url=urlparse(url),
             har_entry={"entry": "data"},
-            headers=[Header("a", "b")],
+            headers={"a": "b"},
             query=[QueryPair("c", "d")],
             post_data=None,
         )
@@ -390,7 +390,7 @@ class TestLreqToExpr:
                 method=HttpMethod.GET,
                 url=urlparse(url),
                 har_entry={"entry": "data"},
-                headers=[Header("a", "b")],
+                headers={"a": "b"},
                 query=[QueryPair("x", "y")],  # query is currently ignored for GET
             )
         )
@@ -427,7 +427,7 @@ class TestLreqToExpr:
                 method=HttpMethod.POST,
                 url=urlparse(url),
                 har_entry={"entry": "data"},
-                headers=[Header("a", "b")],
+                headers={"a": "b"},
                 post_data={
                     "mimeType": "application/x-www-form-urlencoded",
                     "params": [{"name": "x", "value": "y"}],
@@ -456,7 +456,7 @@ class TestLreqToExpr:
                 method=HttpMethod.POST,
                 url=urlparse(url),
                 har_entry={"entry": "data"},
-                headers=[Header("a", "b")],
+                headers={"a": "b"},
                 post_data={
                     "mimeType": "application/json",
                     "params": [{"name": "x", "value": "y"}],
@@ -485,7 +485,7 @@ class TestLreqToExpr:
                 method=HttpMethod.POST,
                 url=urlparse(url),
                 har_entry={"entry": "data"},
-                headers=[Header("a", "b")],
+                headers={"a": "b"},
                 post_data=None,
             )
         )
@@ -508,7 +508,7 @@ class TestLreqToExpr:
                 method=HttpMethod.PUT,
                 url=urlparse(url),
                 har_entry={"entry": "data"},
-                headers=[Header("a", "b")],
+                headers={"a": "b"},
                 query=[QueryPair("c", "d")],
                 post_data={
                     "mimeType": "application/json",
@@ -538,7 +538,7 @@ class TestLreqToExpr:
                 method=HttpMethod.PUT,
                 url=urlparse(url),
                 har_entry={"entry": "data"},
-                headers=[Header("a", "b")],
+                headers=CaseInsensitiveDict({"a": "b"}),
                 query=[QueryPair("c", "d")],
                 post_data=None,
             )

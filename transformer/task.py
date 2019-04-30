@@ -40,10 +40,10 @@ from typing import (
 
 import dataclasses
 from dataclasses import dataclass
+from requests.structures import CaseInsensitiveDict
 
 import transformer.python as py
 from transformer.blacklist import on_blacklist, Blacklist, get_empty
-from transformer.helpers import zip_kv_pairs
 from transformer.request import HttpMethod, Request, QueryPair
 
 IMMUTABLE_EMPTY_DICT = MappingProxyType({})
@@ -63,7 +63,7 @@ class LocustRequest(NamedTuple):
 
     method: HttpMethod
     url: str
-    headers: Mapping[str, str]
+    headers: CaseInsensitiveDict = MappingProxyType({})
     post_data: dict = MappingProxyType({})
     query: Sequence[QueryPair] = ()
     name: Optional[str] = None
@@ -73,7 +73,7 @@ class LocustRequest(NamedTuple):
         return LocustRequest(
             method=r.method,
             url=repr(r.url.geturl()),
-            headers=zip_kv_pairs(r.headers),
+            headers=r.headers,
             post_data=r.post_data,
             query=r.query,
             name=repr(r.name or r.url.geturl()),
@@ -198,15 +198,14 @@ NOOP_HTTP_METHODS = {HttpMethod.GET, HttpMethod.OPTIONS, HttpMethod.DELETE}
 
 def req_to_expr(r: Request) -> py.FunctionCall:
     url = py.Literal(str(r.url.geturl()))
-    headers = zip_kv_pairs(r.headers)
     args: Dict[str, py.Expression] = OrderedDict(
         url=url,
         name=py.Literal(r.name) if r.name else url,
         timeout=py.Literal(TIMEOUT),
         allow_redirects=py.Literal(False),
     )
-    if headers:
-        args["headers"] = py.Literal(headers)
+    if r.headers:
+        args["headers"] = py.Literal(r.headers)
 
     if r.method is HttpMethod.POST:
         if r.post_data:
@@ -242,7 +241,6 @@ def lreq_to_expr(lr: LocustRequest) -> py.FunctionCall:
     )
     if lr.headers:
         args["headers"] = py.Literal(lr.headers)
-
     if lr.method is HttpMethod.POST:
         if lr.post_data:
             rpd = RequestsPostData.from_har_post_data(lr.post_data)

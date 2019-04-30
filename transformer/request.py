@@ -7,8 +7,10 @@ Representation of HAR Request objects.
 
 import enum
 from datetime import datetime
+from types import MappingProxyType
 from typing import Iterator, List, Optional
 from urllib.parse import urlparse, SplitResult
+from requests.structures import CaseInsensitiveDict
 
 import pendulum
 from dataclasses import dataclass
@@ -123,13 +125,12 @@ class Request:
     method: HttpMethod
     url: SplitResult
     har_entry: dict
-    headers: List[Header] = ()
+    headers: CaseInsensitiveDict = MappingProxyType({})
     post_data: Optional[dict] = None
     query: List[QueryPair] = ()
     name: Optional[str] = None
 
     def __post_init__(self):
-        self.headers = list(self.headers)
         self.query = list(self.query)
 
     @classmethod
@@ -151,10 +152,9 @@ class Request:
             url=urlparse(request["url"]),
             har_entry=entry,
             name=None,
-            headers=[
-                Header(name=d["name"], value=d["value"])
-                for d in request.get("headers", [])
-            ],
+            headers=CaseInsensitiveDict(
+                {d["name"]: d["value"] for d in request.get("headers", [])}
+            ),
             post_data=request.get("postData"),
             query=[
                 QueryPair(name=d["name"], value=d["value"])

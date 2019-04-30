@@ -1,9 +1,4 @@
 import json
-from typing import Iterable
-
-
-def zip_kv_pairs(pairs: Iterable) -> dict:
-    return {pair.name: pair.value for pair in pairs}
 
 
 """

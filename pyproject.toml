@@ -36,6 +36,7 @@ dataclasses = "^0.6.0"
 sphinx = { version = "^1.8", optional = true }
 sphinx-autodoc-typehints = { version = "^1.6", optional = true }
 sphinx-issues = { version = "^1.2", optional = true }
+requests = "^2.21"
 
 [tool.poetry.extras]
 docs = ["sphinx", "sphinx-autodoc-typehints", "sphinx-issues"]
