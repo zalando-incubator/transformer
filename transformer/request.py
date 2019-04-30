@@ -31,18 +31,6 @@ class HttpMethod(enum.Enum):
 
 
 @dataclass(frozen=True)
-class Header:
-    """
-    An HTTP header, as recorded in a HAR file (headers__).
-
-    __ http://www.softwareishard.com/blog/har-12-spec/#headers
-    """
-
-    name: str
-    value: str
-
-
-@dataclass(frozen=True)
 class QueryPair:
     """
     A pair of query parameters, as recorded in a HAR file (queryString__).
@@ -90,32 +78,34 @@ class Request:
         corresponding to the request, provided for read-only access.
 
     .. attribute:: headers
-       :annotation: = []
 
-       :class:`~typing.List` of :class:`Header` --
-       HTTP headers sent with the request.
+        :class:`CaseInsensitiveDict`__ --
+        HTTP headers sent with the request.
+
+        __ https://github.com/kennethreitz/requests/blob/
+        7e297ed95bdbd1018657f5d6000379ecdfa54423/requests/structures.py#L13
 
     .. attribute:: post_data
-       :annotation: = None
+        :annotation: = None
 
-       :data:`~typing.Optional` :any:`dict` --
-       If :attr:`method` is ``POST``, the corresponding data payload.
+        :data:`~typing.Optional` :any:`dict` --
+        If :attr:`method` is ``POST``, the corresponding data payload.
 
     .. attribute:: query
-       :annotation: = []
+        :annotation: = []
 
-       :class:`~typing.List` of :class:`QueryPair` --
-       Key-value arguments sent as part of the :attr:`url`'s `query string`__.
+        :class:`~typing.List` of :class:`QueryPair` --
+        Key-value arguments sent as part of the :attr:`url`'s `query string`__.
 
-       __ https://en.wikipedia.org/wiki/Query_string
+        __ https://en.wikipedia.org/wiki/Query_string
 
     .. attribute:: name
-       :annotation: = None
+        :annotation: = None
 
-       :data:`~typing.Optional` :any:`str` --
-       Value provided for :class:`locust.clients.HttpSession`'s "dynamic"
-       ``name`` parameter.
-       See `Grouping requests to URLs with dynamic parameters`__ for details.
+        :data:`~typing.Optional` :any:`str` --
+        Value provided for :class:`locust.clients.HttpSession`'s "dynamic"
+        ``name`` parameter.
+        See `Grouping requests to URLs with dynamic parameters`__ for details.
 
        __ https://docs.locust.io/en/stable/writing-a-locustfile.html
           #grouping-requests-to-urls-with-dynamic-parameters

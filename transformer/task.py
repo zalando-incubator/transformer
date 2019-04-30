@@ -313,7 +313,7 @@ class Task(NamedTuple):
             original_locust_request = self.locust_request
 
         new_locust_request = original_locust_request._replace(
-            headers={**original_locust_request.headers, **headers}
+            headers=CaseInsensitiveDict({**original_locust_request.headers, **headers})
         )
         task = self._replace(locust_request=new_locust_request)
 

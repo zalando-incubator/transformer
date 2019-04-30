@@ -99,6 +99,22 @@ class TestFromHarEntry:
         assert str(request.url.geturl()) == request.har_entry["request"]["url"]
         assert request.har_entry["_securityState"] == "secure"
 
+    def test_it_uses_case_insensitive_dictionary(self):
+        entry = {
+            "request": {
+                "method": "GET",
+                "url": "",
+                "headers": [
+                    {"name": "Host", "value": "www.zalando.de"},
+                    {"name": "Cookie", "value": "omnomnom"},
+                ],
+            },
+            "startedDateTime": "2018-01-01",
+        }
+        request = Request.from_har_entry(entry)
+        assert "cookie" in request.headers
+        assert "HOST" in request.headers
+
 
 class TestAllFromHar:
     @pytest.mark.skip(reason="Doesn't raise AssertionError; to be investigated.")
