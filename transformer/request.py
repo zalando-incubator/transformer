@@ -73,17 +73,18 @@ class Request:
     .. attribute:: har_entry
 
         :any:`dict` --
-        A single record from entries as recorded in a HAR file
-        (http://www.softwareishard.com/blog/har-12-spec/#entries)
+        A single record from entries `as recorded in a HAR file`__
         corresponding to the request, provided for read-only access.
+
+        __ http://www.softwareishard.com/blog/har-12-spec/#entries
 
     .. attribute:: headers
 
-        :class:`CaseInsensitiveDict`__ --
+        :any:`requests.structures.CaseInsensitiveDict` (reference__) --
         HTTP headers sent with the request.
 
-        __ https://github.com/kennethreitz/requests/blob/
-        7e297ed95bdbd1018657f5d6000379ecdfa54423/requests/structures.py#L13
+        __ https://github.com/kennethreitz/requests/blob\
+        /7e297ed95bdbd1018657f5d6000379ecdfa54423/requests/structures.py#L13
 
     .. attribute:: post_data
         :annotation: = None
@@ -107,8 +108,9 @@ class Request:
         ``name`` parameter.
         See `Grouping requests to URLs with dynamic parameters`__ for details.
 
-       __ https://docs.locust.io/en/stable/writing-a-locustfile.html
-          #grouping-requests-to-urls-with-dynamic-parameters
+        __ https://docs.locust.io/en/stable/writing-a-locustfile.html#grouping-\
+requests-to-urls-with-dynamic-parameters
+
     """
 
     timestamp: datetime
