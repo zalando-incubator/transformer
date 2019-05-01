@@ -212,7 +212,7 @@ def req_to_expr(r: Request) -> py.FunctionCall:
         if r.post_data:
             rpd = RequestsPostData.from_har_post_data(r.post_data)
             args.update(rpd.as_kwargs())
-    elif r.method is HttpMethod.PUT:
+    elif r.method in (HttpMethod.PUT, HttpMethod.PATCH):
         if r.post_data:
             rpd = RequestsPostData.from_har_post_data(r.post_data)
             args.update(rpd.as_kwargs())

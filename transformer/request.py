@@ -26,6 +26,7 @@ class HttpMethod(enum.Enum):
     PUT = enum.auto()  #: PUT
     OPTIONS = enum.auto()  #: OPTIONS
     DELETE = enum.auto()  #: DELETE
+    PATCH = enum.auto()  #: DELETE
 
 
 @dataclass(frozen=True)
