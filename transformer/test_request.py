@@ -80,9 +80,7 @@ class TestFromHarEntry:
         request = Request.from_har_entry(options_request)
         assert isinstance(request, Request)
         assert request.method == HttpMethod.OPTIONS
-        assert request.headers == [
-            Header(name="Access-Control-Request-Method", value="POST")
-        ]
+        assert request.headers == {"Access-Control-Request-Method": "POST"}
 
     def test_it_returns_a_request_with_a_query_given_a_delete_request_with_a_query(
         self
@@ -116,6 +114,22 @@ class TestFromHarEntry:
         assert request.har_entry
         assert str(request.url.geturl()) == request.har_entry["request"]["url"]
         assert request.har_entry["_securityState"] == "secure"
+
+    def test_it_uses_case_insensitive_dictionary(self):
+        entry = {
+            "request": {
+                "method": "GET",
+                "url": "",
+                "headers": [
+                    {"name": "Host", "value": "www.zalando.de"},
+                    {"name": "Cookie", "value": "omnomnom"},
+                ],
+            },
+            "startedDateTime": "2018-01-01",
+        }
+        request = Request.from_har_entry(entry)
+        assert "cookie" in request.headers
+        assert "HOST" in request.headers
 
 
 class TestAllFromHar:
