@@ -15,6 +15,22 @@ The format is based on `Keep a Changelog`_, and this project adheres to
    :local:
    :depth: 1
 
+.. _v1.1.4:
+
+v1.1.4
+======
+
+- Release date: 2019-05-02 13:42
+
+- Diff__.
+
+__ https://github.com/zalando-incubator/transformer/compare/v1.1.3...v1.1.4
+
+Changed
+-------
+
+Added support for http PATCH method.
+
 .. _v1.1.3:
 
 v1.1.3
