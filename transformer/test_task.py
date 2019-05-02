@@ -367,7 +367,7 @@ class TestReqToExpr:
             method=HttpMethod.PATCH,
             url=urlparse(url),
             har_entry={"entry": "data"},
-            headers=[Header("a", "b")],
+            headers={"a": "b"},
             query=[QueryPair("c", "d")],
             post_data={
                 "mimeType": "application/json",
@@ -395,7 +395,7 @@ class TestReqToExpr:
             method=HttpMethod.PATCH,
             url=urlparse(url),
             har_entry={"entry": "data"},
-            headers=[Header("a", "b")],
+            headers={"a": "b"},
             query=[QueryPair("c", "d")],
             post_data=None,
         )
@@ -614,7 +614,7 @@ class TestLreqToExpr:
                 method=HttpMethod.PATCH,
                 url=urlparse(url),
                 har_entry={"entry": "data"},
-                headers=[Header("a", "b")],
+                headers={"a": "b"},
                 query=[QueryPair("c", "d")],
                 post_data={
                     "mimeType": "application/json",
@@ -644,7 +644,7 @@ class TestLreqToExpr:
                 method=HttpMethod.PATCH,
                 url=urlparse(url),
                 har_entry={"entry": "data"},
-                headers=[Header("a", "b")],
+                headers={"a": "b"},
                 query=[QueryPair("c", "d")],
                 post_data=None,
             )

@@ -20,7 +20,7 @@ The format is based on `Keep a Changelog`_, and this project adheres to
 v1.2.1
 ======
 
-- Release date: 2019-05-02 13:42
+- Release date: 2019-05-02 17:02
 
 - Diff__.
 
