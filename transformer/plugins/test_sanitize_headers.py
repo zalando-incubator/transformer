@@ -1,7 +1,7 @@
 from datetime import datetime
 from urllib.parse import urlparse
 
-from transformer.request import HttpMethod, Header, Request
+from transformer.request import HttpMethod, Request, CaseInsensitiveDict
 from transformer.task import Task2
 from .sanitize_headers import plugin
 
@@ -24,7 +24,7 @@ def task_with_header(name: str, value: str) -> Task2:
             url=urlparse("https://example.com"),
             har_entry={"entry": "data"},
             name="task_name",
-            headers=[Header(name=name, value=value)],
+            headers=CaseInsensitiveDict({name: value}),
             post_data={},
             query=[],
         ),
@@ -35,13 +35,6 @@ def test_it_removes_headers_beginning_with_a_colon():
     task = task_with_header(":non-rfc-header", "some value")
     sanitized_headers = plugin(task).request.headers
     assert len(sanitized_headers) == 0
-
-
-def test_it_downcases_header_names():
-    task = task_with_header("Some Name", "some value")
-    sanitized_headers = plugin(task).request.headers
-    header_names = {h.name for h in sanitized_headers}
-    assert "some name" in header_names
 
 
 def test_it_removes_cookies():

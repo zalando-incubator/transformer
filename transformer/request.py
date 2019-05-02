@@ -7,8 +7,10 @@ Representation of HAR Request objects.
 
 import enum
 from datetime import datetime
+from types import MappingProxyType
 from typing import Iterator, List, Optional
 from urllib.parse import urlparse, SplitResult
+from requests.structures import CaseInsensitiveDict
 
 import pendulum
 from dataclasses import dataclass
@@ -26,18 +28,6 @@ class HttpMethod(enum.Enum):
     PUT = enum.auto()  #: PUT
     OPTIONS = enum.auto()  #: OPTIONS
     DELETE = enum.auto()  #: DELETE
-
-
-@dataclass(frozen=True)
-class Header:
-    """
-    An HTTP header, as recorded in a HAR file (headers__).
-
-    __ http://www.softwareishard.com/blog/har-12-spec/#headers
-    """
-
-    name: str
-    value: str
 
 
 @dataclass(frozen=True)
@@ -83,53 +73,56 @@ class Request:
     .. attribute:: har_entry
 
         :any:`dict` --
-        A single record from entries as recorded in a HAR file
-        (http://www.softwareishard.com/blog/har-12-spec/#entries)
+        A single record from entries `as recorded in a HAR file`__
         corresponding to the request, provided for read-only access.
 
-    .. attribute:: headers
-       :annotation: = []
+        __ http://www.softwareishard.com/blog/har-12-spec/#entries
 
-       :class:`~typing.List` of :class:`Header` --
-       HTTP headers sent with the request.
+    .. attribute:: headers
+
+        :any:`requests.structures.CaseInsensitiveDict` (reference__) --
+        HTTP headers sent with the request.
+
+        __ https://github.com/kennethreitz/requests/blob\
+        /7e297ed95bdbd1018657f5d6000379ecdfa54423/requests/structures.py#L13
 
     .. attribute:: post_data
-       :annotation: = None
+        :annotation: = None
 
-       :data:`~typing.Optional` :any:`dict` --
-       If :attr:`method` is ``POST``, the corresponding data payload.
+        :data:`~typing.Optional` :any:`dict` --
+        If :attr:`method` is ``POST``, the corresponding data payload.
 
     .. attribute:: query
-       :annotation: = []
+        :annotation: = []
 
-       :class:`~typing.List` of :class:`QueryPair` --
-       Key-value arguments sent as part of the :attr:`url`'s `query string`__.
+        :class:`~typing.List` of :class:`QueryPair` --
+        Key-value arguments sent as part of the :attr:`url`'s `query string`__.
 
-       __ https://en.wikipedia.org/wiki/Query_string
+        __ https://en.wikipedia.org/wiki/Query_string
 
     .. attribute:: name
-       :annotation: = None
+        :annotation: = None
 
-       :data:`~typing.Optional` :any:`str` --
-       Value provided for :class:`locust.clients.HttpSession`'s "dynamic"
-       ``name`` parameter.
-       See `Grouping requests to URLs with dynamic parameters`__ for details.
+        :data:`~typing.Optional` :any:`str` --
+        Value provided for :class:`locust.clients.HttpSession`'s "dynamic"
+        ``name`` parameter.
+        See `Grouping requests to URLs with dynamic parameters`__ for details.
 
-       __ https://docs.locust.io/en/stable/writing-a-locustfile.html
-          #grouping-requests-to-urls-with-dynamic-parameters
+        __ https://docs.locust.io/en/stable/writing-a-locustfile.html#grouping-\
+requests-to-urls-with-dynamic-parameters
+
     """
 
     timestamp: datetime
     method: HttpMethod
     url: SplitResult
     har_entry: dict
-    headers: List[Header] = ()
+    headers: CaseInsensitiveDict = MappingProxyType({})
     post_data: Optional[dict] = None
     query: List[QueryPair] = ()
     name: Optional[str] = None
 
     def __post_init__(self):
-        self.headers = list(self.headers)
         self.query = list(self.query)
 
     @classmethod
@@ -151,10 +144,9 @@ class Request:
             url=urlparse(request["url"]),
             har_entry=entry,
             name=None,
-            headers=[
-                Header(name=d["name"], value=d["value"])
-                for d in request.get("headers", [])
-            ],
+            headers=CaseInsensitiveDict(
+                {d["name"]: d["value"] for d in request.get("headers", [])}
+            ),
             post_data=request.get("postData"),
             query=[
                 QueryPair(name=d["name"], value=d["value"])

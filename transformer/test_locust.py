@@ -6,7 +6,7 @@ import pytest
 import transformer.plugins as plug
 
 from transformer.locust import locustfile, locust_taskset
-from transformer.request import HttpMethod
+from transformer.request import HttpMethod, Request, SplitResult
 from transformer.scenario import Scenario
 from transformer.task import Task, TIMEOUT
 from transformer.plugins import plugin, Contract
@@ -17,13 +17,15 @@ from ._version import __version__
 class TestLocustfile:
     def test_it_renders_a_locustfile_template(self):
         a_name = "some_task"
-        a_request = MagicMock()
+        a_request = MagicMock(spec=Request)
         a_request.method = HttpMethod.GET
+        a_request.url = MagicMock(spec=SplitResult)
         a_request.url.scheme = "some_scheme"
         a_request.url.hostname = "some_hostname"
         a_request.url.path = "some_path"
         a_request.url.geturl()
         a_request.url.geturl.return_value = "some_url"
+        a_request.headers = {"a": "b"}
         a_request.name = None
         task = Task(a_name, a_request)
         scenario = Scenario(name="SomeScenario", children=[task], origin=None)
@@ -46,7 +48,7 @@ class ScenarioGroup(TaskSet):
     class SomeScenario(TaskSequence):
         @seq_task(1)
         def some_task(self):
-            response = self.client.get(url='some_url', name='some_url', timeout=$TIMEOUT, allow_redirects=False)
+            response = self.client.get(url='some_url', name='some_url', timeout=$TIMEOUT, allow_redirects=False, headers={{'a': 'b'}})
 class LocustForScenarioGroup(HttpLocust):
     task_set = ScenarioGroup
     weight = 2
@@ -63,13 +65,15 @@ class LocustForScenarioGroup(HttpLocust):
             return t
 
         a_name = "some_task"
-        a_request = MagicMock()
+        a_request = MagicMock(spec=Request)
         a_request.method = HttpMethod.GET
+        a_request.url = MagicMock(spec=SplitResult)
         a_request.url.scheme = "some_scheme"
         a_request.url.hostname = "some_hostname"
         a_request.url.path = "some_path"
         a_request.url.geturl()
         a_request.url.geturl.return_value = "some_url"
+        a_request.headers = {"a": "b"}
         a_request.name = None
         task = plug.apply((plugin_change_task_name,), Task(a_name, a_request))
         scenario = Scenario(name="SomeScenario", children=[task], origin=None)
@@ -92,7 +96,7 @@ class ScenarioGroup(TaskSet):
     class SomeScenario(TaskSequence):
         @seq_task(1)
         def some_task(self):
-            response = self.client.get(url='some_url', name='changed_name', timeout=$TIMEOUT, allow_redirects=False)
+            response = self.client.get(url='some_url', name='changed_name', timeout=$TIMEOUT, allow_redirects=False, headers={{'a': 'b'}})
 class LocustForScenarioGroup(HttpLocust):
     task_set = ScenarioGroup
     weight = 2
