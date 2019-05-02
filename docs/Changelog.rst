@@ -24,7 +24,7 @@ v1.2.0
 
 - Diff__.
 
-__ https://github.com/zalando-incubator/transformer/compare/v1.1.4...v1.2.0
+__ https://github.com/zalando-incubator/transformer/compare/v1.1.3...v1.2.0
 
 Changed
 
