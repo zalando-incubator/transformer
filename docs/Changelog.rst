@@ -43,8 +43,8 @@ v1.2.0
 __ https://github.com/zalando-incubator/transformer/compare/v1.1.3...v1.2.0
 
 Changed
-
 -------
+
 :class:`Request <transformer.request.Request>`'s :attr:`headers <transformer.request.Request.headers>`
 are now stored in a case-insensitive dictionary, making the implementation compatible
 with the :mod:`requests` library (used by Locust).
