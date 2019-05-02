@@ -10,7 +10,7 @@ from hypothesis import given
 from hypothesis.strategies import composite, sampled_from, booleans
 
 from transformer import python as py, blacklist
-from transformer.request import QueryPair, CaseInsensitiveDict
+from transformer.request import QueryPair
 from transformer.task import (
     Task,
     Request,
@@ -538,7 +538,7 @@ class TestLreqToExpr:
                 method=HttpMethod.PUT,
                 url=urlparse(url),
                 har_entry={"entry": "data"},
-                headers=CaseInsensitiveDict({"a": "b"}),
+                headers={"a": "b"},
                 query=[QueryPair("c", "d")],
                 post_data=None,
             )
