@@ -15,6 +15,23 @@ The format is based on `Keep a Changelog`_, and this project adheres to
    :local:
    :depth: 1
 
+.. _v1.2.2:
+
+v1.2.2
+======
+
+- Release date: 2019-05-03 10:45
+
+- Diff__.
+
+__ https://github.com/zalando-incubator/transformer/compare/v1.2.1...v1.2.2
+
+Changed
+-------
+
+No functional changes in Transformer! Fixed the formatting of this Changelog and configured Travis to automatically
+push tagged releases to GitHub.
+
 .. _v1.2.1:
 
 v1.2.1
