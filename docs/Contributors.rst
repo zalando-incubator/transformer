@@ -13,6 +13,10 @@ Current maintainers are listed in the MAINTAINERS_ file.
 
 **Here are our contributors**, sorted alphabetically:
 
+:user:`jredrejo`
+   :pr:`53`
+      Add support for http PATCH method.
+
 :user:`xinke2411`
    :pr:`34`
       Add attribute name in :class:`~transformer.request.Request`.

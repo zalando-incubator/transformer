@@ -51,6 +51,22 @@ class TestFromHarEntry:
         assert request.post_data == "{'some name': 'some value'}"
         assert request.query == [QueryPair(name="some name", value="some value")]
 
+    def test_it_returns_a_request_given_a_patch_request(self):
+        patch_request = {
+            "request": {
+                "method": "PATCH",
+                "url": "",
+                "postData": "{'some name': 'some value'}",
+                "queryString": [{"name": "some name", "value": "some value"}],
+            },
+            "startedDateTime": "2018-01-01",
+        }
+        request = Request.from_har_entry(patch_request)
+        assert isinstance(request, Request)
+        assert request.method == HttpMethod.PATCH
+        assert request.post_data == "{'some name': 'some value'}"
+        assert request.query == [QueryPair(name="some name", value="some value")]
+
     def test_it_returns_a_request_with_headers_given_an_options_request(self):
         options_request = {
             "request": {

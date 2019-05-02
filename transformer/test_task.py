@@ -360,6 +360,57 @@ class TestReqToExpr:
             },
         )
 
+    def test_it_supports_patch_requests_with_payload(self):
+        url = "http://abc.de"
+        r = Request(
+            timestamp=MagicMock(),
+            method=HttpMethod.PATCH,
+            url=urlparse(url),
+            har_entry={"entry": "data"},
+            headers={"a": "b"},
+            query=[QueryPair("c", "d")],
+            post_data={
+                "mimeType": "application/json",
+                "params": [{"name": "x", "value": "y"}],
+                "text": """{"z": 7}""",
+            },
+        )
+        assert req_to_expr(r) == py.FunctionCall(
+            name="self.client.patch",
+            named_args={
+                "url": py.Literal(url),
+                "name": py.Literal(url),
+                "headers": py.Literal({"a": "b"}),
+                "timeout": py.Literal(TIMEOUT),
+                "allow_redirects": py.Literal(False),
+                "json": py.Literal({"z": 7}),
+                "params": py.Literal([(b"x", b"y"), (b"c", b"d")]),
+            },
+        )
+
+    def test_it_supports_patch_requests_without_payload(self):
+        url = "http://abc.de"
+        r = Request(
+            timestamp=MagicMock(),
+            method=HttpMethod.PATCH,
+            url=urlparse(url),
+            har_entry={"entry": "data"},
+            headers={"a": "b"},
+            query=[QueryPair("c", "d")],
+            post_data=None,
+        )
+        assert req_to_expr(r) == py.FunctionCall(
+            name="self.client.patch",
+            named_args={
+                "url": py.Literal(url),
+                "name": py.Literal(url),
+                "headers": py.Literal({"a": "b"}),
+                "timeout": py.Literal(TIMEOUT),
+                "allow_redirects": py.Literal(False),
+                "params": py.Literal([(b"c", b"d")]),
+            },
+        )
+
     def test_it_uses_the_custom_name_if_provided(self):
         url = "http://abc.de"
         name = "my-req"
@@ -545,6 +596,61 @@ class TestLreqToExpr:
         )
         assert lreq_to_expr(r) == py.FunctionCall(
             name="self.client.put",
+            named_args={
+                "url": py.Literal(url),
+                "name": py.Literal(url),
+                "headers": py.Literal({"a": "b"}),
+                "timeout": py.Literal(TIMEOUT),
+                "allow_redirects": py.Literal(False),
+                "params": py.Literal([(b"c", b"d")]),
+            },
+        )
+
+    def test_it_supports_patch_requests_with_payload(self):
+        url = "http://abc.de"
+        r = LocustRequest.from_request(
+            Request(
+                timestamp=MagicMock(),
+                method=HttpMethod.PATCH,
+                url=urlparse(url),
+                har_entry={"entry": "data"},
+                headers={"a": "b"},
+                query=[QueryPair("c", "d")],
+                post_data={
+                    "mimeType": "application/json",
+                    "params": [{"name": "x", "value": "y"}],
+                    "text": """{"z": 7}""",
+                },
+            )
+        )
+        assert lreq_to_expr(r) == py.FunctionCall(
+            name="self.client.patch",
+            named_args={
+                "url": py.Literal(url),
+                "name": py.Literal(url),
+                "headers": py.Literal({"a": "b"}),
+                "timeout": py.Literal(TIMEOUT),
+                "allow_redirects": py.Literal(False),
+                "json": py.Literal({"z": 7}),
+                "params": py.Literal([(b"x", b"y"), (b"c", b"d")]),
+            },
+        )
+
+    def test_it_supports_patch_requests_without_payload(self):
+        url = "http://abc.de"
+        r = LocustRequest.from_request(
+            Request(
+                timestamp=MagicMock(),
+                method=HttpMethod.PATCH,
+                url=urlparse(url),
+                har_entry={"entry": "data"},
+                headers={"a": "b"},
+                query=[QueryPair("c", "d")],
+                post_data=None,
+            )
+        )
+        assert lreq_to_expr(r) == py.FunctionCall(
+            name="self.client.patch",
             named_args={
                 "url": py.Literal(url),
                 "name": py.Literal(url),

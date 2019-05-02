@@ -211,7 +211,7 @@ def req_to_expr(r: Request) -> py.FunctionCall:
         if r.post_data:
             rpd = RequestsPostData.from_har_post_data(r.post_data)
             args.update(rpd.as_kwargs())
-    elif r.method is HttpMethod.PUT:
+    elif r.method in (HttpMethod.PUT, HttpMethod.PATCH):
         if r.post_data:
             rpd = RequestsPostData.from_har_post_data(r.post_data)
             args.update(rpd.as_kwargs())
@@ -245,7 +245,7 @@ def lreq_to_expr(lr: LocustRequest) -> py.FunctionCall:
         if lr.post_data:
             rpd = RequestsPostData.from_har_post_data(lr.post_data)
             args.update(rpd.as_kwargs())
-    elif lr.method is HttpMethod.PUT:
+    elif lr.method in (HttpMethod.PUT, HttpMethod.PATCH):
         if lr.post_data:
             rpd = RequestsPostData.from_har_post_data(lr.post_data)
             args.update(rpd.as_kwargs())
