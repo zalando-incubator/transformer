@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "har-transformer"
-version = "1.2.1"
+version = "1.2.2"
 description = "A tool to convert HAR files into a locustfile."
 authors = [
     "Serhii Cherniavskyi <serhii.cherniavskyi@zalando.de>",
