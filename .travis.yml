@@ -18,7 +18,7 @@ before_deploy:
 - git config --local user.name "$GITHUB_USERNAME"
 - git config --local user.email "$GITHUB_EMAIL"
 - export TRAVIS_TAG=v$(poetry run transformer --version)
-- git tag $TRAVIS_TAG
+- git tag --force $TRAVIS_TAG
 deploy:
   # Main releases: tags set on master
   - provider: script
