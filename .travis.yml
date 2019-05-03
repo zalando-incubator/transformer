@@ -17,7 +17,7 @@ before_deploy:
 # Set up git user and tag this commit
 - git config --local user.name "$GITHUB_USERNAME"
 - git config --local user.email "$GITHUB_EMAIL"
-- export TRAVIS_TAG=$(poetry run transformer --version)
+- export TRAVIS_TAG=v$(poetry run transformer --version)
 - git tag $TRAVIS_TAG
 deploy:
   # Main releases: tags set on master
