@@ -3,7 +3,7 @@ from hypothesis import given
 from hypothesis.strategies import from_type
 
 from transformer.plugins import apply, group_by_contract
-from .contracts import (
+from transformer.plugins.contracts import (
     Contract,
     plugin,
     contract,

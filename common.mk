@@ -14,12 +14,13 @@ configure: .make/configure
 # Runs pytest with coverage reporting.
 .PHONY: unittest
 unittest: configure
-	poetry run pytest --failed-first --cov-config .coveragerc --cov-report xml --cov=. transformer/
+	poetry run pytest --failed-first --cov-config .coveragerc --cov-report xml --cov=. tests/transformer/
+	poetry run pytest --failed-first --cov-config .coveragerc --cov-report xml --cov=. tests/plugins/
 	poetry run pytest --failed-first update-version.py
 
 .PHONY: functest
 functest: configure
-	$(MAKE) -C functional-tests/
+	$(MAKE) -C tests/functional/
 
 .PHONY: functest
 test: unittest functest

@@ -10,7 +10,7 @@ from hypothesis import given
 from hypothesis._strategies import permutations
 
 from transformer.plugins.contracts import plugin, Contract
-from .resolve import load_plugins_from_module, resolve, NoPluginError
+from transformer.plugins.resolve import load_plugins_from_module, resolve, NoPluginError
 
 
 @pytest.fixture()

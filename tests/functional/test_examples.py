@@ -3,7 +3,7 @@ from pathlib import Path
 
 
 def run_example(example_name: str) -> subprocess.CompletedProcess:
-    har_path = Path(__file__).parent.parent.joinpath("examples", example_name)
+    har_path = Path(__file__).parent.parent.parent.joinpath("examples", example_name)
     return subprocess.run(
         ["transformer", str(har_path)], timeout=2, check=True, stdout=subprocess.PIPE
     )
