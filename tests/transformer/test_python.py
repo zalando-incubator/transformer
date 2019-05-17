@@ -1,7 +1,6 @@
 import pprint
 import string
 from typing import List
-from unittest.mock import patch
 
 import pytest
 from hypothesis import given
@@ -143,6 +142,10 @@ class TestOpaqueBlock:
 
     X = py.Line.INDENT_UNIT
 
+    @pytest.fixture
+    def indent_unit(self, mocker):
+        return mocker.patch("transformer.python.Line.INDENT_UNIT", " ")
+
     @pytest.mark.parametrize(
         "input_block, indent_level, expected",
         [
@@ -169,13 +172,12 @@ class TestOpaqueBlock:
         ],
     )
     def test_lines_indents_correctly(
-        self, input_block: str, indent_level: int, expected: str
+        self, input_block: str, indent_level: int, expected: str, indent_unit
     ):
         lines = py.OpaqueBlock(input_block).lines(indent_level)
         print("lines =")
         pprint.pprint(lines)
-        with patch("transformer.python.Line.INDENT_UNIT", " "):
-            assert "\n".join(str(line) for line in lines) == expected
+        assert "\n".join(str(line) for line in lines) == expected
 
     @given(opaque_blocks, indent_levels, ascii_inline_text(min_size=1))
     def test_lines_displays_comment_always_above(

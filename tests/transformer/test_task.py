@@ -2,7 +2,6 @@
 import enum
 import io
 from unittest.mock import MagicMock, Mock
-from unittest.mock import patch
 from urllib.parse import urlparse
 
 import pytest
@@ -37,7 +36,6 @@ class TestTask:
                 for t in Task.from_requests([request, second_request])
             )
 
-        @patch("builtins.open")
         def test_it_doesnt_create_a_task_if_the_url_is_on_the_blacklist(
             self, mock_open
         ):
@@ -48,7 +46,6 @@ class TestTask:
             task = Task.from_requests([request], blacklist=blacklist.from_file())
             assert len(list(task)) == 0
 
-        @patch("builtins.open")
         def test_it_creates_a_task_if_the_path_not_host_is_on_the_blacklist(
             self, mock_open
         ):

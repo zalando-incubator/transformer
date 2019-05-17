@@ -3,13 +3,12 @@ import re
 import string
 from pathlib import Path
 from typing import List
-from unittest.mock import MagicMock, patch
+from unittest.mock import MagicMock
 
 import pytest
 from hypothesis import given
 from hypothesis.strategies import lists, text, recursive, tuples
 
-from transformer.helpers import DUMMY_HAR_STRING, _DUMMY_HAR_DICT
 from transformer.scenario import Scenario, SkippableScenarioError, WeightValueError
 from transformer.task import Task
 
@@ -23,24 +22,21 @@ paths = recursive(
 
 
 class TestScenario:
-    @patch("transformer.scenario.Path.is_dir", MagicMock(return_value=False))
-    @patch("transformer.scenario.Path.iterdir", MagicMock(return_value=()))
-    @patch("transformer.scenario.Path.open")
-    @patch("transformer.scenario.json.load", MagicMock(return_value=_DUMMY_HAR_DICT))
+
     @given(paths=lists(paths, unique=True, min_size=2))
-    def test_names_are_unique(*_, paths: List[Path]):
+    def test_names_are_unique(self, paths: List[Path], mocked_har, mock_paths):
         scenario_names = [Scenario.from_path(path).name for path in paths]
         assert sorted(set(scenario_names)) == sorted(scenario_names)
         assert len(paths) == len(scenario_names)
 
-    def test_creation_from_scenario_directory_with_weight_file(self, tmp_path: Path):
+    def test_creation_from_scenario_directory_with_weight_file(self, tmp_path: Path, dummy_har_string):
         root_path = tmp_path / "some-path"
         root_path.mkdir()
         expected_weight = 7
         root_path.with_suffix(".weight").write_text(str(expected_weight))
         nb_har_files = 2
         for i in range(nb_har_files):
-            root_path.joinpath(f"{i}.har").write_text(DUMMY_HAR_STRING)
+            root_path.joinpath(f"{i}.har").write_text(dummy_har_string)
 
         result = Scenario.from_path(root_path)
         assert len(result.children) == nb_har_files
@@ -54,11 +50,11 @@ class TestScenario:
             with pytest.raises(SkippableScenarioError):
                 Scenario.from_path(not_har_path)
 
-        def test_on_dir_ignores_some_incorrect_hars(self, tmp_path: Path):
+        def test_on_dir_ignores_some_incorrect_hars(self, tmp_path: Path, dummy_har_string):
             not_har_path = tmp_path / "not.har"
             not_har_path.write_text("not JSON!")
             har_path = tmp_path / "good.har"
-            har_path.write_text(DUMMY_HAR_STRING)
+            har_path.write_text(dummy_har_string)
 
             scenario = Scenario.from_path(tmp_path)
             assert len(scenario.children) == 1
@@ -72,9 +68,9 @@ class TestScenario:
                 Scenario.from_path(tmp_path)
 
         def test_on_dir_with_dangling_weights_raises_error(
-            self, tmp_path: Path, caplog
+            self, tmp_path: Path, dummy_har_string, caplog
         ):
-            (tmp_path / "ok.har").write_text(DUMMY_HAR_STRING)
+            (tmp_path / "ok.har").write_text(dummy_har_string)
             (tmp_path / "fail.weight").write_text("7")
             caplog.set_level(logging.INFO)
 
@@ -127,31 +123,31 @@ class TestScenario:
                 "t2b": ["xyz"],
             }
 
-        def test_without_weight_file_has_weight_1(self, tmp_path: Path):
+        def test_without_weight_file_has_weight_1(self, tmp_path: Path, dummy_har_string):
             har_path = tmp_path / "test.har"
-            har_path.write_text(DUMMY_HAR_STRING)
+            har_path.write_text(dummy_har_string)
             assert Scenario.from_path(har_path).weight == 1
 
-        def test_with_weight_file_has_corresponding_weight(self, tmp_path: Path):
+        def test_with_weight_file_has_corresponding_weight(self, tmp_path: Path, dummy_har_string):
             weight_path = tmp_path / "test.weight"
             weight_path.write_text("74")
 
             har_path = tmp_path / "test.har"
-            har_path.write_text(DUMMY_HAR_STRING)
+            har_path.write_text(dummy_har_string)
             assert Scenario.from_path(har_path).weight == 74
 
         @pytest.mark.parametrize("weight", [0, -2, 2.1, -2.1, "NaN", "abc", " "])
         def test_with_invalid_weight_raises_error_and_never_skips(
-            self, tmp_path: Path, weight
+            self, tmp_path: Path, dummy_har_string, weight
         ):
             legit_har_path = tmp_path / "legit.har"
-            legit_har_path.write_text(DUMMY_HAR_STRING)
+            legit_har_path.write_text(dummy_har_string)
 
             bad_weight_path = tmp_path / "test.weight"
             bad_weight_path.write_text(str(weight))
 
             bad_weight_har_path = tmp_path / "test.har"
-            bad_weight_har_path.write_text(DUMMY_HAR_STRING)
+            bad_weight_har_path.write_text(dummy_har_string)
 
             with pytest.raises(WeightValueError):
                 # If from_path was skipping the bad scenario/weight pair, it
@@ -160,7 +156,7 @@ class TestScenario:
                 Scenario.from_path(tmp_path)
 
         def test_with_many_weight_files_selects_weight_based_on_name(
-            self, tmp_path: Path
+            self, tmp_path: Path, dummy_har_string
         ):
             expected_weight_path = tmp_path / "test.weight"
             expected_weight_path.write_text("7")
@@ -172,14 +168,14 @@ class TestScenario:
             second_wrong_weight_path.write_text("4")
 
             har_path = tmp_path / "test.har"
-            har_path.write_text(DUMMY_HAR_STRING)
+            har_path.write_text(dummy_har_string)
 
             assert Scenario.from_path(har_path).weight == 7
 
-        def test_uses_full_path_for_scenario_name(self, tmp_path: Path):
+        def test_uses_full_path_for_scenario_name(self, tmp_path: Path, dummy_har_string):
             har_basename = "e3ee4a1ef0817cde0a0a78c056e7cb35"
             har_path = tmp_path / har_basename
-            har_path.write_text(DUMMY_HAR_STRING)
+            har_path.write_text(dummy_har_string)
 
             scenario = Scenario.from_path(har_path)
 
@@ -199,13 +195,13 @@ class TestScenario:
             ), "all components of the parent path must be in the scenario name"
 
         def test_uses_full_path_for_parents_and_basename_for_children(
-            self, tmp_path: Path
+            self, tmp_path: Path, dummy_har_string
         ):
             root_basename = "615010a656a5bb29d1898f163619611f"
             root = tmp_path / root_basename
             root.mkdir()
             for i in range(2):
-                (root / f"s{i}.har").write_text(DUMMY_HAR_STRING)
+                (root / f"s{i}.har").write_text(dummy_har_string)
 
             root_scenario = Scenario.from_path(root)
 
@@ -227,11 +223,11 @@ class TestScenario:
             }, "child scenarios have short names"
 
         def test_raises_error_for_colliding_scenario_names_from_har_files(
-            self, tmp_path: Path, caplog
+            self, tmp_path: Path, dummy_har_string, caplog
         ):
-            (tmp_path / "good.har").write_text(DUMMY_HAR_STRING)
-            (tmp_path / "bad.har").write_text(DUMMY_HAR_STRING)
-            (tmp_path / "bad.json").write_text(DUMMY_HAR_STRING)
+            (tmp_path / "good.har").write_text(dummy_har_string)
+            (tmp_path / "bad.har").write_text(dummy_har_string)
+            (tmp_path / "bad.json").write_text(dummy_har_string)
 
             caplog.set_level(logging.ERROR)
 
@@ -243,15 +239,15 @@ class TestScenario:
             assert "bad.json" in caplog.text
 
         def test_raises_error_for_colliding_scenario_names_from_directory_and_file(
-            self, tmp_path: Path, caplog
+            self, tmp_path: Path, dummy_har_string, caplog
         ):
             directory = tmp_path / "x"
             directory.mkdir()
             # directory needs to contain a HAR file, otherwise Transformer will
             # not consider it a scenario.
-            (directory / "a.har").write_text(DUMMY_HAR_STRING)
+            (directory / "a.har").write_text(dummy_har_string)
 
-            (tmp_path / "x.har").write_text(DUMMY_HAR_STRING)
+            (tmp_path / "x.har").write_text(dummy_har_string)
 
             caplog.set_level(logging.ERROR)
 

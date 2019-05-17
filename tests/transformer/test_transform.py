@@ -6,24 +6,23 @@ import pytest
 
 import transformer
 import transformer.transform as tt
-from transformer.helpers import DUMMY_HAR_STRING
 from transformer.locust import locustfile_lines
 from transformer.plugins import plugin, Contract
 
 
 class TestTransform:
-    def test_it_returns_a_locustfile_program_given_scenario_path(self, tmp_path: Path):
+    def test_it_returns_a_locustfile_program_given_scenario_path(self, tmp_path: Path, dummy_har_string):
         har_path = tmp_path / "some.har"
-        har_path.write_text(DUMMY_HAR_STRING)
+        har_path.write_text(dummy_har_string)
         locustfile_contents = str(tt.transform(har_path))
         try:
             compile(locustfile_contents, "locustfile.py", "exec")
         except Exception as exception:
             pytest.fail(f"Compiling locustfile failed. [{exception}].")
 
-    def test_it_uses_default_plugins(self, tmp_path: Path, monkeypatch):
+    def test_it_uses_default_plugins(self, tmp_path: Path, dummy_har_string, monkeypatch):
         har_path = tmp_path / "some.har"
-        har_path.write_text(DUMMY_HAR_STRING)
+        har_path.write_text(dummy_har_string)
 
         times_plugin_called = 0
 
@@ -61,9 +60,9 @@ class TestDumpAndDumps:
         )
         assert f([]) == expected_empty_locustfile
 
-    def test_dump_and_dumps_have_same_output_for_simple_har(self, tmp_path):
+    def test_dump_and_dumps_have_same_output_for_simple_har(self, tmp_path, dummy_har_string):
         har_path = tmp_path / "some.har"
-        har_path.write_text(DUMMY_HAR_STRING)
+        har_path.write_text(dummy_har_string)
 
         assert transformer.dumps([tmp_path]) == dump_as_str([tmp_path])
 
@@ -76,10 +75,10 @@ class TestDumpAndDumps:
         ),
     )
     def test_it_uses_default_plugins(
-        self, tmp_path: Path, monkeypatch, f, with_default, expected_times_called
+        self, tmp_path: Path, monkeypatch, f, with_default, expected_times_called, dummy_har_string
     ):
         har_path = tmp_path / "some.har"
-        har_path.write_text(DUMMY_HAR_STRING)
+        har_path.write_text(dummy_har_string)
 
         times_plugin_called = 0
 

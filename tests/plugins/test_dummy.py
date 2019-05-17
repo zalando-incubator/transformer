@@ -3,12 +3,11 @@ import os
 from pathlib import Path
 
 import transformer
-from transformer.helpers import DUMMY_HAR_STRING
 
 
-def test_dummy_plugin_works(tmp_path: Path, caplog):
+def test_dummy_plugin_works(tmp_path: Path, caplog, dummy_har_string):
     har_path = tmp_path / "test.har"
-    har_path.write_text(DUMMY_HAR_STRING)
+    har_path.write_text(dummy_har_string)
 
     caplog.set_level(logging.INFO)
 
