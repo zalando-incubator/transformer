@@ -25,7 +25,7 @@ author = "the Zalando maintainers"
 # The short X.Y version
 version = "1.2"
 # The full version, including alpha/beta/rc tags
-release = "1.2.3"
+release = "1.2.4"
 
 
 # -- General configuration ---------------------------------------------------

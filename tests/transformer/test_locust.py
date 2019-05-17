@@ -11,7 +11,7 @@ from transformer.scenario import Scenario
 from transformer.task import Task, TIMEOUT
 from transformer.plugins import plugin, Contract
 from transformer.task import Task2
-from ._version import __version__
+from transformer._version import __version__
 
 
 class TestLocustfile:

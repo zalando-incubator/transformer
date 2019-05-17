@@ -1,6 +1,6 @@
 from pathlib import Path
 
-from .cli import read_config
+from transformer.cli import read_config
 
 
 class TestReadConfig:

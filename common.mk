@@ -1,6 +1,6 @@
 # This file is included in both Makefile.local & Makefile.ci.
 
-SRC := $(shell find transformer/ -name '*.py' ! -name 'test_*' ! -name 'builders_*' )
+SRC := $(shell find transformer/ -name '*.py' ! -name 'test_*' ! -name 'builders_*' ! -name 'conftest.py')
 DIST := pyproject.toml poetry.lock
 
 # Runs "poetry install" if pyproject.toml or poetry.lock have changed.
@@ -14,12 +14,12 @@ configure: .make/configure
 # Runs pytest with coverage reporting.
 .PHONY: unittest
 unittest: configure
-	poetry run pytest --failed-first --cov-config .coveragerc --cov-report xml --cov=. transformer/
+	poetry run pytest --failed-first --cov-config .coveragerc --cov-report xml --cov=. tests/transformer/ tests/plugins/
 	poetry run pytest --failed-first update-version.py
 
 .PHONY: functest
 functest: configure
-	$(MAKE) -C functional-tests/
+	$(MAKE) -C tests/functional/
 
 .PHONY: functest
 test: unittest functest

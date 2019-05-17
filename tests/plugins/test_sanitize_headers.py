@@ -3,7 +3,7 @@ from urllib.parse import urlparse
 
 from transformer.request import HttpMethod, Request, CaseInsensitiveDict
 from transformer.task import Task2
-from .sanitize_headers import plugin
+from transformer.plugins.sanitize_headers import plugin
 
 
 def test_its_name_is_resolvable():
