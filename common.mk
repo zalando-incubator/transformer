@@ -25,7 +25,7 @@ functest: configure
 test: unittest functest
 
 .PHONY: lint
-lint: black flake8
+lint: black flake8 check-readme
 
 .PHONY: flake8
 flake8: configure
@@ -34,3 +34,7 @@ flake8: configure
 .PHONY: clean
 clean:
 	rm -rf .make .pytest_cache __pycache__ dist .hypothesis har_transformer.egg-info
+
+.PHONY: check-readme
+check-readme: configure
+	poetry run python -m readme_renderer README.rst -o /dev/null

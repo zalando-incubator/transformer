@@ -1,14 +1,9 @@
-.. raw:: html
-
-   <div align="center">
 
 .. image:: docs/_static/transformer.png
    :alt: Transformer logo
    :align: center
 
-.. raw:: html
-
-   <br>
+|
 
 .. image:: https://travis-ci.org/zalando-incubator/Transformer.svg?branch=master
    :alt: travis-ci status badge
@@ -30,9 +25,6 @@
    :alt: Code style: Black
    :target: https://github.com/ambv/black
 
-.. raw:: html
-
-   </div>
 
 Transformer
 ***********
