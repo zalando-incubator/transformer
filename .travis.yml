@@ -22,7 +22,7 @@ before_deploy:
 deploy:
   # Main releases: tags set on master
   - provider: script
-    script: poetry publish --build
+    script: make clean && poetry publish --build
     on:
       branch: master
       # We don't want to publish a release twice (once for each supported

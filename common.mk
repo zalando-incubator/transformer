@@ -30,3 +30,7 @@ lint: black flake8
 .PHONY: flake8
 flake8: configure
 	poetry run flake8 $(SRC)
+
+.PHONY: clean
+clean:
+	rm -rf .make .pytest_cache __pycache__ dist .hypothesis har_transformer.egg-info
