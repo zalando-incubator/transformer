@@ -1,6 +1,6 @@
 # This file is included in both Makefile.local & Makefile.ci.
 
-SRC := $(shell find transformer/ -name '*.py' ! -name 'test_*' ! -name 'builders_*' )
+SRC := $(shell find transformer/ -name '*.py' ! -name 'test_*' ! -name 'builders_*' ! -name 'conftest.py')
 DIST := pyproject.toml poetry.lock
 
 # Runs "poetry install" if pyproject.toml or poetry.lock have changed.

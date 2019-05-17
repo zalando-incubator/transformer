@@ -16,9 +16,9 @@ venv: $(VENV_DIR)/bin
 
 .PHONY: wheel
 wheel:
-	cd .. && rm -rf dist/ && poetry build
+	cd ../.. && rm -rf dist/ && poetry build
 
-WHEEL = $(shell find ../dist/ -name "*.whl" -print)
+WHEEL = $(shell find ../../dist/ -name "*.whl" -print)
 
 .PHONY: wheel-in-venv
 wheel-in-venv: venv wheel
