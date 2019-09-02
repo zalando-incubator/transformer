@@ -15,6 +15,25 @@ The format is based on `Keep a Changelog`_, and this project adheres to
    :local:
    :depth: 1
 
+.. _v1.2.5:
+
+v1.2.5
+======
+
+- Release date: 2019-09-02 12:00
+
+- Diff__.
+
+__ https://github.com/zalando-incubator/transformer/compare/v1.2.4...v1.2.5
+
+Fixed
+-----
+
+The generated scenario classes always inherit from
+:class:`~locust.TaskSequence` (instead of a :class:`~locust.TaskSet`) when they
+use the `@seq_task` decorator.
+Thank you :user:`kbrowns` for reporting this! (:pr:`62`)
+
 .. _v1.2.4:
 
 v1.2.4
