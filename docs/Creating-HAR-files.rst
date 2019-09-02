@@ -27,7 +27,7 @@ Record a scenario
 -----------------
 
 #. **Prepare your scenario** by thinking through the steps you want to execute.
-#. Open Chrome in either **Gest** or **Incognito** mode (it's important to have
+#. Open Chrome in either **Guest** or **Incognito** mode (it's important to have
    no cookies prior to starting).
 #. Open the `Developer Tools`_.
 #. Open the **Network** panel.

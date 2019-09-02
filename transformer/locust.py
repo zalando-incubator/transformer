@@ -45,7 +45,7 @@ def locust_taskset(scenario: Scenario) -> py.Class:
     Transforms a scenario (potentially containing other scenarios) into a Locust
     TaskSet definition.
     """
-    if any(isinstance(child, Task) for child in scenario.children):
+    if any(isinstance(child, (Task, Task2)) for child in scenario.children):
         ts_type = TaskSetType.Sequence
     else:
         ts_type = TaskSetType.Set
