@@ -1,6 +1,8 @@
 import importlib
 import inspect
 import logging
+import sys
+from os import getcwd
 from types import ModuleType
 from typing import Iterator
 
@@ -27,6 +29,7 @@ def resolve(name: str) -> Iterator[Plugin]:
     :raise InvalidContractError: from load_load_plugins_from_module.
     :raise NoPluginError: from load_load_plugins_from_module.
     """
+    sys.path.append(getcwd())
     module = importlib.import_module(name)
 
     yield from load_plugins_from_module(module)
