@@ -15,6 +15,20 @@ The format is based on `Keep a Changelog`_, and this project adheres to
    :local:
    :depth: 1
 
+.. _v1.2.6:
+
+v1.2.6
+======
+
+- Release date: 2019-10-18 14:09
+
+- Diff__.
+
+__ https://github.com/zalando-incubator/transformer/compare/v1.2.5...v1.2.6
+
+Any valid plugins that are in a current directory can be used by Transformer without previous installation.
+Thank you :user:`jredrejo` for your contribution! (:pr:`63`)
+
 .. _v1.2.5:
 
 v1.2.5

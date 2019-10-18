@@ -16,6 +16,8 @@ Current maintainers are listed in the MAINTAINERS_ file.
 :user:`jredrejo`
    :pr:`53`
       Add support for http PATCH method.
+  :pr:`63`
+      Append current directory to the Python sys.path
 
 :user:`xinke2411`
    :pr:`34`
