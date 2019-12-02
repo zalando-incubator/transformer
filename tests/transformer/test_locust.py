@@ -43,6 +43,7 @@ from locust import TaskSequence
 from locust import TaskSet
 from locust import seq_task
 from locust import task
+from locust import between
 class ScenarioGroup(TaskSet):
     @task(1)
     class SomeScenario(TaskSequence):
@@ -52,8 +53,7 @@ class ScenarioGroup(TaskSet):
 class LocustForScenarioGroup(HttpLocust):
     task_set = ScenarioGroup
     weight = 2
-    min_wait = 0
-    max_wait = 10
+    wait_time = between(0, 10)
 """
         ).safe_substitute({"TIMEOUT": TIMEOUT})
         assert expected.strip() == script.strip()
@@ -91,6 +91,7 @@ from locust import TaskSequence
 from locust import TaskSet
 from locust import seq_task
 from locust import task
+from locust import between
 class ScenarioGroup(TaskSet):
     @task(1)
     class SomeScenario(TaskSequence):
@@ -100,8 +101,7 @@ class ScenarioGroup(TaskSet):
 class LocustForScenarioGroup(HttpLocust):
     task_set = ScenarioGroup
     weight = 2
-    min_wait = 0
-    max_wait = 10
+    wait_time = between(0, 10)
 """
         ).safe_substitute({"TIMEOUT": TIMEOUT})
         assert expected.strip() == script.strip()
