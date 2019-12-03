@@ -9,7 +9,7 @@ from transformer.scenario import Scenario
 from transformer.task import Task, Task2
 from ._version import __version__
 
-LOCUST_MAX_WAIT_DELAY = 10
+LOCUST_MAX_WAIT_DELAY = 10/1000
 
 LOCUST_MIN_WAIT_DELAY = 0
 
