@@ -48,6 +48,13 @@ Install from PyPI::
 
    pip install har-transformer
 
+Note that the new major version of Locust (1.0 and up) is not yet supported.
+Please make sure you have a compatible Locust to run your locustfiles::
+
+   pip install locustio==0.14.6
+
+We hope to lift this restriction very soon!
+
 Usage
 =====
 
