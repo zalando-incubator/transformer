@@ -43,10 +43,8 @@ docs = ["sphinx", "sphinx-autodoc-typehints", "sphinx-issues"]
 
 [tool.poetry.dev-dependencies]
 locustio = "^0.14.6"
-pytest = "^3.9"
 pytest-cov = "*"
 pytest-mock = "^1.10"
-hypothesis = "^4.4"
 black = {version = "*",allow-prereleases = true}
 flake8 = "^3.7"
 flake8-bugbear = "^18.8"
@@ -54,6 +52,8 @@ flake8-docstrings = "^1.3"
 flake8-tidy-imports = "^2.0"
 tomlkit = "^0.5.3"
 readme_renderer = "^24.0"
+pytest = "^5.4.3"
+hypothesis = "^5.16.0"
 
 [build-system]
 requires = ["poetry>=0.12"]

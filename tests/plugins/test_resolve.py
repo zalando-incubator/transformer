@@ -7,7 +7,7 @@ from types import ModuleType
 
 import pytest
 from hypothesis import given
-from hypothesis._strategies import permutations
+from hypothesis.strategies import permutations
 
 from transformer.plugins.contracts import plugin, Contract
 from transformer.plugins.resolve import load_plugins_from_module, resolve, NoPluginError
