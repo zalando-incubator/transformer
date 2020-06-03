@@ -9,7 +9,7 @@ from transformer.scenario import Scenario
 from transformer.task import Task, Task2
 from ._version import __version__
 
-LOCUST_MAX_WAIT_DELAY = 10
+LOCUST_MAX_WAIT_DELAY = 10/1000
 
 LOCUST_MIN_WAIT_DELAY = 0
 
@@ -90,8 +90,7 @@ def locust_classes(scenarios: Sequence[Scenario]) -> List[py.Class]:
             statements=[
                 py.Assignment("task_set", py.Symbol(taskset.name)),
                 py.Assignment("weight", py.Literal(scenario.weight)),
-                py.Assignment("min_wait", py.Literal(LOCUST_MIN_WAIT_DELAY)),
-                py.Assignment("max_wait", py.Literal(LOCUST_MAX_WAIT_DELAY)),
+                py.Assignment("wait_time", py.FunctionCall( name = "between", positional_args = [py.Literal(LOCUST_MIN_WAIT_DELAY), py.Literal(LOCUST_MAX_WAIT_DELAY)])),
             ],
         )
         classes.append(taskset)
@@ -141,7 +140,7 @@ def locust_program(scenarios: Sequence[Scenario]) -> py.Program:
         py.Import(["re"], comments=[LOCUSTFILE_COMMENT]),
         *locust_version_guard(),
         py.Import(
-            ["HttpLocust", "TaskSequence", "TaskSet", "seq_task", "task"],
+            ["HttpLocust", "TaskSequence", "TaskSet", "seq_task", "task", "between"],
             source="locust",
         ),
         *locust_classes(scenarios),
