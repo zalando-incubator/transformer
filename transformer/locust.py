@@ -108,12 +108,10 @@ def locust_version_guard() -> py.Program:
     print_call = py.FunctionCall(
         "print",
         [
-            py.FString(
-                "Sorry! You have locust=={__version__}, but Transformer doesn't support locust>=0.99 yet."
-            ),
-            py.Literal(
-                """Please try again with a less recent Locust version (e.g. "pip install 'locustio==0.14.6'")"""
-            ),
+            py.FString("Sorry! You have locust=={__version__},"),
+            py.Literal("but Transformer doesn't support locust>=0.99 yet."),
+            py.Literal("Please try again with a less recent Locust version"),
+            py.Literal("""(e.g. "pip install 'locustio==0.14.6'")"""),
             py.Literal("while we are working on a long-term solution. 😊"),
         ],
         {"file": py.Symbol("sys.stderr")},
