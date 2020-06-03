@@ -190,7 +190,7 @@ class OpaqueBlock(Statement):
         self.block = block
 
     def lines(self, indent_level: int = 0, comments: bool = True) -> List[Line]:
-        raw_lines = [l.expandtabs(self.TAB_SIZE) for l in self.block.splitlines()]
+        raw_lines = [line.expandtabs(self.TAB_SIZE) for line in self.block.splitlines()]
 
         first_nonempty_line = next(i for i, l in enumerate(raw_lines) if l.strip())
         after_last_nonempty_line = next(
@@ -198,9 +198,9 @@ class OpaqueBlock(Statement):
         )
         raw_lines = raw_lines[first_nonempty_line:after_last_nonempty_line]
 
-        indents = [self.PREFIX_RX.match(l) for l in raw_lines]
+        indents = [self.PREFIX_RX.match(line) for line in raw_lines]
         shortest_indent = min(len(p.group()) if p else 0 for p in indents)
-        block_lines = [Line(l[shortest_indent:], indent_level) for l in raw_lines]
+        block_lines = [Line(line[shortest_indent:], indent_level) for line in raw_lines]
         if comments:
             return [*self.comment_lines(indent_level), *block_lines]
         return block_lines

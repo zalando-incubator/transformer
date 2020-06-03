@@ -357,7 +357,7 @@ class Scenario:
 
         if not weight.isdecimal() or int(weight) == 0:
             logging.error(
-                f"invalid weight file %s: weights must be positive integers, got %r",
+                "invalid weight file %s: weights must be positive integers, got %r",
                 weight_path,
                 weight,
             )

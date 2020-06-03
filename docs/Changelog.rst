@@ -15,6 +15,27 @@ The format is based on `Keep a Changelog`_, and this project adheres to
    :local:
    :depth: 1
 
+.. _v1.2.7:
+
+v1.2.7
+======
+
+- Release date: 2020-06-03 10:42
+
+- Diff__.
+
+__ https://github.com/zalando-incubator/transformer/compare/v1.2.6...v1.2.7
+
+Fixed
+-----
+
+Feeding a Transformer-generated locustfile to a version of Locust more recent
+than `0.99` (May 16, 2020) now displays a more helpful error message suggesting
+to use a supported version of Locust.
+Previously, users only saw Locust crash on a now-invalid `import` from the
+locustfile.
+Thank you :user:`TimSC` for reporting this issue! (:pr:`70`)
+
 .. _v1.2.6:
 
 v1.2.6

@@ -99,6 +99,32 @@ def locust_classes(scenarios: Sequence[Scenario]) -> List[py.Class]:
     return classes
 
 
+def locust_version_guard() -> py.Program:
+    cond = py.BinaryOp(
+        py.FunctionCall("LooseVersion", [py.Symbol("__version__")]),
+        ">=",
+        py.FunctionCall("LooseVersion", [py.Literal("1.0.0")]),
+    )
+    print_call = py.FunctionCall(
+        "print",
+        [
+            py.FString("Sorry! You have locust=={__version__},"),
+            py.Literal("but Transformer doesn't support locust>=0.99 yet."),
+            py.Literal("Please try again with a less recent Locust version"),
+            py.Literal("""(e.g. "pip install 'locustio==0.14.6'")"""),
+            py.Literal("while we are working on a long-term solution. 😊"),
+        ],
+        {"file": py.Symbol("sys.stderr")},
+    )
+    abort_call = py.FunctionCall("exit", [py.Literal(1)])
+    return [
+        py.Import(["sys"]),
+        py.Import(["LooseVersion"], source="distutils.version"),
+        py.Import(["__version__"], source="locust"),
+        py.IfElse([(cond, [py.Standalone(print_call), py.Standalone(abort_call)])]),
+    ]
+
+
 def locust_program(scenarios: Sequence[Scenario]) -> py.Program:
     """
     Converts a ScenarioGroup into a Locust File.
@@ -113,6 +139,7 @@ def locust_program(scenarios: Sequence[Scenario]) -> py.Program:
 
     return [
         py.Import(["re"], comments=[LOCUSTFILE_COMMENT]),
+        *locust_version_guard(),
         py.Import(
             ["HttpLocust", "TaskSequence", "TaskSet", "seq_task", "task"],
             source="locust",

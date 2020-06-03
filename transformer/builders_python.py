@@ -5,7 +5,6 @@ import re
 import string
 from typing import Optional
 
-from hypothesis.searchstrategy import SearchStrategy
 from hypothesis.strategies import (
     integers,
     text,
@@ -20,6 +19,7 @@ from hypothesis.strategies import (
     floats,
     tuples,
     dictionaries,
+    SearchStrategy,
 )
 
 from transformer import python as py
