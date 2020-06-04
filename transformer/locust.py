@@ -84,11 +84,21 @@ def locust_classes(scenarios: Sequence[Scenario]) -> List[py.Class]:
     classes = []
     for scenario in scenarios:
         taskset = locust_taskset(scenario)
+        is_post_1 = py.BinaryOp(py.Symbol("LOCUST_MAJOR_VERSION"), ">=", py.Literal(1))
+        tasks = py.IfElse(
+            [
+                (
+                    is_post_1,
+                    [py.Assignment("tasks", py.Literal([py.Symbol(taskset.name)]))],
+                )
+            ],
+            [py.Assignment("task_set", py.Symbol(taskset.name))],
+        )
         locust_class = py.Class(
             name=f"LocustFor{taskset.name}",
             superclasses=["HttpLocust"],
             statements=[
-                py.Assignment("task_set", py.Symbol(taskset.name)),
+                tasks,
                 py.Assignment("weight", py.Literal(scenario.weight)),
                 py.Assignment("min_wait", py.Literal(LOCUST_MIN_WAIT_DELAY)),
                 py.Assignment("max_wait", py.Literal(LOCUST_MAX_WAIT_DELAY)),
@@ -99,29 +109,32 @@ def locust_classes(scenarios: Sequence[Scenario]) -> List[py.Class]:
     return classes
 
 
-def locust_version_guard() -> py.Program:
-    cond = py.BinaryOp(
-        py.FunctionCall("LooseVersion", [py.Symbol("__version__")]),
-        ">=",
-        py.FunctionCall("LooseVersion", [py.Literal("1.0.0")]),
-    )
-    print_call = py.FunctionCall(
-        "print",
-        [
-            py.FString("Sorry! You have locust=={__version__},"),
-            py.Literal("but Transformer doesn't support locust>=0.99 yet."),
-            py.Literal("Please try again with a less recent Locust version"),
-            py.Literal("""(e.g. "pip install 'locustio==0.14.6'")"""),
-            py.Literal("while we are working on a long-term solution. 😊"),
-        ],
-        {"file": py.Symbol("sys.stderr")},
-    )
-    abort_call = py.FunctionCall("exit", [py.Literal(1)])
+def locust_detected_version() -> py.Program:
     return [
-        py.Import(["sys"]),
         py.Import(["LooseVersion"], source="distutils.version"),
         py.Import(["__version__"], source="locust"),
-        py.IfElse([(cond, [py.Standalone(print_call), py.Standalone(abort_call)])]),
+        py.OpaqueBlock("LOCUST_MAJOR_VERSION = LooseVersion(__version__).version[0]"),
+    ]
+
+
+def locust_imports() -> py.Program:
+    is_post_1 = py.BinaryOp(py.Symbol("LOCUST_MAJOR_VERSION"), ">=", py.Literal(1),)
+    imports_pre_1 = [
+        py.Import(
+            ["HttpLocust", "TaskSequence", "TaskSet", "seq_task", "task"],
+            source="locust",
+        )
+    ]
+    imports_post_1 = [
+        py.Import(
+            ["HttpUser", "SequentialTaskSet", "TaskSet", "task"], source="locust",
+        ),
+        py.Assignment("HttpLocust", py.Symbol("HttpUser")),
+        py.Assignment("TaskSequence", py.Symbol("SequentialTaskSet")),
+        py.Function("seq_task", ["_"], [py.Return(py.Symbol("task"))]),
+    ]
+    return [
+        py.IfElse([(is_post_1, imports_post_1)], imports_pre_1),
     ]
 
 
@@ -139,11 +152,8 @@ def locust_program(scenarios: Sequence[Scenario]) -> py.Program:
 
     return [
         py.Import(["re"], comments=[LOCUSTFILE_COMMENT]),
-        *locust_version_guard(),
-        py.Import(
-            ["HttpLocust", "TaskSequence", "TaskSet", "seq_task", "task"],
-            source="locust",
-        ),
+        *locust_detected_version(),
+        *locust_imports(),
         *locust_classes(scenarios),
         *global_code_blocks.values(),
     ]
