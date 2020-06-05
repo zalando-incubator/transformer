@@ -42,7 +42,7 @@ requests = "^2.21"
 docs = ["sphinx", "sphinx-autodoc-typehints", "sphinx-issues"]
 
 [tool.poetry.dev-dependencies]
-locustio = "^0.14.6"
+locust = "^1.0.2"
 pytest-cov = "*"
 pytest-mock = "^1.10"
 black = {version = "*",allow-prereleases = true}
