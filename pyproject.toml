@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "har-transformer"
-version = "1.2.7"
+version = "1.3.0"
 description = "A tool to convert HAR files into a locustfile."
 authors = [
     "Serhii Cherniavskyi <serhii.cherniavskyi@zalando.de>",
@@ -42,7 +42,7 @@ requests = "^2.21"
 docs = ["sphinx", "sphinx-autodoc-typehints", "sphinx-issues"]
 
 [tool.poetry.dev-dependencies]
-locustio = "^0.14.6"
+locust = "^1.0.2"
 pytest-cov = "*"
 pytest-mock = "^1.10"
 black = {version = "*",allow-prereleases = true}

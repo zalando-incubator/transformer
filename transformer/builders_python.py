@@ -43,7 +43,7 @@ _ascii_inline = re.sub(r"[\r\n\v\f]", "", string.printable)
 
 
 def ascii_inline_text(
-    min_size: int = 0, max_size: Optional[int] = 5
+    min_size: int = 0, max_size: Optional[int] = 3
 ) -> SearchStrategy[str]:
     """Similar to ascii_text, but does not generate multiline strings."""
     return text(_ascii_inline, min_size=min_size, max_size=max_size)

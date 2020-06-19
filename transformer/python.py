@@ -802,6 +802,28 @@ class Import(Statement):
         )
 
 
+class Return(Statement):
+    """The return statement."""
+
+    def __init__(self, value: Expression, comments: Sequence[str] = ()) -> None:
+        super().__init__(comments)
+        self.value = value
+
+    def lines(self, indent_level: int = 0, comments: bool = True) -> List[Line]:
+        line = Line(f"return {self.value}", indent_level)
+        if comments:
+            return self.attach_comment(line)
+        return [line]
+
+    def __eq__(self, o: object) -> bool:
+        return super().__eq__(o) and self.value == cast(self.__class__, o).value
+
+    def __repr__(self) -> str:
+        return "{}(value={!r}, comments={!r})".format(
+            self.__class__.__qualname__, self.value, self.comments
+        )
+
+
 _T = TypeVar("_T")
 
 

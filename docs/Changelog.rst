@@ -15,6 +15,37 @@ The format is based on `Keep a Changelog`_, and this project adheres to
    :local:
    :depth: 1
 
+.. _v1.3.0:
+
+v1.3.0
+======
+
+- Release date: 2020-06-18 10:00
+
+- Diff__.
+
+__ https://github.com/zalando-incubator/transformer/compare/v1.2.7...v1.3.0
+
+Added
+-----
+
+Generated locustfiles now support both current major versions of Locust
+(``<1`` and ``~1``).
+
+.. note::
+
+   Please note that this support will most likely be *only temporary*, so all
+   users of Transformer are kindly encouraged to upgrade their Locust (or tell us
+   what's blocking them from upgrading).
+
+   Since Transformer follows `semantic versioning`_, dropping support for some
+   versions of Locust will only be done in a major Transformer version, most
+   likely 2.0 (not yet planned).
+   If you rely on a pre-1.0 Locust, you can therefore continue upgrading
+   Transformer by following its *minor* updates
+   (e.g. ``pip install -U har-transformer=~1``).
+
+
 .. _v1.2.7:
 
 v1.2.7
