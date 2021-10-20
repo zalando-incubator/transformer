@@ -24,9 +24,13 @@ jobs:
           python-version: '3.x'
 
       - name: Configure packaging environment
+        env:
+          PYPI_UPLOAD_TOKEN: ${{ secrets.PYPI_UPLOAD_TOKEN }}
+          GITHUB_USERNAME: ${{ secrets.GITHUB_USERNAME }}
+          GITHUB_EMAIL: ${{ secrets.GITHUB_EMAIL }}
         run: |
           pip install poetry
-          poetry config http-basic.pypi thilp "$PYPI_PASSWORD"
+          poetry config http-basic.pypi __token__ "$PYPI_UPLOAD_TOKEN"
           git config --local user.name "$GITHUB_USERNAME"
           git config --local user.email "$GITHUB_EMAIL"
 
