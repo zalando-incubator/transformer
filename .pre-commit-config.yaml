@@ -1,13 +1,16 @@
 repos:
   - repo: https://github.com/ambv/black
-    rev: stable
+    rev: 911470a610e47d9da5ea938b0887c3df62819b85  # frozen: 21.9b0
     hooks:
       - id: black
   - repo: git://github.com/pre-commit/pre-commit-hooks
-    rev: v1.2.3
+    rev: 38b88246ccc552bffaaf54259d064beeee434539  # frozen: v4.0.1
     hooks:
       - id: trailing-whitespace
       - id: check-yaml
+  - repo: https://github.com/PyCQA/flake8
+    rev: 'cbeb4c9c4137cff1568659fcc48e8b85cddd0c8d'  # frozen: 4.0.1
+    hooks:
       - id: flake8
         args:
           - "--max-line-length=100"
