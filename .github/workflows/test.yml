@@ -32,3 +32,15 @@ jobs:
         
       - name: Check the package builds correctly
         run: make clean && poetry build
+
+      - name: Export sdist as artifact
+        uses: actions/upload-artifact@v2
+        with:
+          name: sdist
+          path: har-transformer-*.tar.gz
+
+      - name: Export wheel as artifact
+        uses: actions/upload-artifact@v2
+        with:
+          name: wheel
+          path: har_transformer-*.whl
