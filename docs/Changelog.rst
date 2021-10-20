@@ -15,6 +15,25 @@ The format is based on `Keep a Changelog`_, and this project adheres to
    :local:
    :depth: 1
 
+.. _v1.3.1:
+
+v1.3.1
+======
+
+- Release date: 2021-10-20 21:00
+
+- Diff__.
+
+__ https://github.com/zalando-incubator/transformer/compare/v1.3.0...v1.3.1
+
+Fixed
+-----
+
+- When used as a library (e.g. ``transformer.dumps``), Transformer accepts input HAR files specified as string paths,
+  as already documented in type signatures. Previously, an oversight caused Transformer to only accept paths of type
+  ``pathlib.Path``, crashing with a stacktrace when provided with strings.
+  Thank you :user:`naveenmandepudi` for reporting this issue! (:issue:`75`)
+
 .. _v1.3.0:
 
 v1.3.0
