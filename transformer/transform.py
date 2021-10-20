@@ -105,7 +105,7 @@ def _dump_as_lines(
     plugins_for = plug.group_by_contract(plugins)
     scenarios = [
         Scenario.from_path(
-            path,
+            Path(path),
             plugins_for[Contract.OnTask],
             plugins_for[Contract.OnTaskSequence],
             blacklist=blacklist.from_file(),

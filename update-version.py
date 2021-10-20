@@ -221,5 +221,6 @@ if __name__ == "__main__":
     )
     try:
         run()
-    except Exception:
+    except Exception as e:
+        logging.fatal(f"Fatal error: {e}")
         exit(1)
