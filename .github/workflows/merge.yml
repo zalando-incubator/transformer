@@ -38,7 +38,10 @@ jobs:
         run: |
           TAG=v$(poetry run transformer --version)
           git tag --force $TAG
-          
-      - name: Build & publish package
+
+      - name: Retrieve artifacts built earlier
+        uses: actions/download-artifact@v2
+
+      - name: Publish package
         run: |
-          poetry publish --build
+          poetry publish
