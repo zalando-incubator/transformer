@@ -1,0 +1,40 @@
+# This is a basic workflow to help you get started with Actions
+
+name: Merge
+
+# Controls when the workflow will run
+on:
+  push:
+    branches: [ master ]
+
+# A workflow run is made up of one or more jobs that can run sequentially or in parallel
+jobs:
+  build:
+    uses: zalando-incubator/transformer/.github/workflows/test.yml@master
+
+  publish:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Set up Python 3.x
+        uses: actions/setup-python@v2
+        with:
+          python-version: '3.x'
+
+      - name: Configure packaging environment
+        run: |
+          pip install poetry
+          poetry config http-basic.pypi thilp "$PYPI_PASSWORD"
+          git config --local user.name "$GITHUB_USERNAME"
+          git config --local user.email "$GITHUB_EMAIL"
+
+      - name: Create git tag
+        run: |
+          TAG=v$(poetry run transformer --version)
+          git tag --force $TAG
+          
+      - name: Build & publish package
+        run: |
+          poetry publish --build
