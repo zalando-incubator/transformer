@@ -1,0 +1,68 @@
+name: Check
+
+on:
+  pull_request:
+    branches: [master]
+
+jobs:
+  build:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version:
+          - '3.6'
+          - '3.7'
+          - '3.8'
+          - '3.9'
+          - '3.10'
+        os:
+          - ubuntu-latest
+          - macOS-latest
+          - windows-latest
+        include:
+          # https://python-poetry.org/docs/configuration#cache-dir
+          - os: ubuntu-latest
+            pip-cache-path: ~/.cache/pip
+            poetry-cache-path: ~/.cache/pypoetry
+          - os: windows-latest
+            pip-cache-path: '%LOCALAPPDATA%\pip\Cache'
+            poetry-cache-path: '%LOCALAPPDATA%\pypoetry\Cache'
+          - os: macOS-latest
+            pip-cache-path: ~/Library/Caches/pip
+            poetry-cache-path: ~/Library/Caches/pypoetry
+    steps:
+      - uses: actions/checkout@v2
+      
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v2
+        with:
+          python-version: ${{ matrix.python-version }}
+          
+      - name: Set up cache
+        uses: actions/cache@v2
+        with:
+          path: |
+            ${{ matrix.pip-cache-path }}
+            ${{ matrix.poetry-cache-path }}
+          key: ${{ runner.os }}-python-${{ matrix.python-version }}-poetry-${{ hashFiles('poetry.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-python-${{ matrix.python-version }}-poetry-
+
+      - name: Install CI dependencies
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install poetry
+          poetry install
+          
+      - name: Execute Makefile.ci
+        run: make -f Makefile.ci
+        
+      - name: Check the package builds correctly
+        run: make clean && poetry build
+
+      - name: Export sdist as artifact
+        uses: actions/upload-artifact@v2
+        with:
+          name: sdist
+          path: dist/har-transformer-*.tar.gz

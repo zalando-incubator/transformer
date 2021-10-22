@@ -141,7 +141,9 @@ class Task2:
     #   See https://github.com/zalando-incubator/Transformer/issues/11.
     global_code_blocks: Mapping[str, Sequence[str]] = IMMUTABLE_EMPTY_DICT
 
-    def __post_init__(self,) -> None:
+    def __post_init__(
+        self,
+    ) -> None:
         self.statements = list(self.statements)
         self.global_code_blocks = {
             k: list(v) for k, v in self.global_code_blocks.items()

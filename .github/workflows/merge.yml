@@ -1,0 +1,43 @@
+name: Draft release
+
+on:
+  push:
+    branches: [master]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      
+      - name: Set up Python 3.x
+        uses: actions/setup-python@v2
+        with:
+          python-version: '3.x'
+
+      - name: Install CI dependencies
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install poetry
+          poetry install
+          
+      - name: Test & lint
+        run: make -f Makefile.ci
+
+      - name: Create git tag
+        run: |
+          TAG=v$(poetry run transformer --version)
+          git tag --force $TAG
+          git push --tags
+          
+      - name: Build package
+        run: poetry build
+
+      - name: Prepare draft GitHub Release
+        uses: softprops/action-gh-release@v1
+        with:
+          draft: true
+          files: |
+            dist/har-transformer-*.tar.gz
+            dist/har_transformer-*.whl
+          fail_on_unmatched_files: true
