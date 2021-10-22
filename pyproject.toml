@@ -27,7 +27,7 @@ transformer = "transformer.cli:script_entrypoint"
 
 [tool.poetry.dependencies]
 python = "^3.6"
-pendulum = "^2.0"
+pendulum = "^2.1.2"
 chevron = "^0.13"
 docopt = "^0.6.2"
 ecological = "^1.6"
@@ -42,7 +42,6 @@ requests = "^2.21"
 docs = ["sphinx", "sphinx-autodoc-typehints", "sphinx-issues"]
 
 [tool.poetry.dev-dependencies]
-locust = "^1.0.2"
 pytest-cov = "*"
 pytest-mock = "^1.10"
 black = {version = "*",allow-prereleases = true}
