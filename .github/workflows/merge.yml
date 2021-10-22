@@ -2,14 +2,12 @@ name: Draft release
 
 on:
   push:
-    branches: [ master ]
+    branches: [master]
 
 jobs:
   build:
     runs-on: ubuntu-latest
-
     steps:
-      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - uses: actions/checkout@v2
       
       - name: Set up Python 3.x
@@ -40,6 +38,6 @@ jobs:
         with:
           draft: true
           files: |
-            har-transformer-*.tar.gz
-            har_transformer-*.whl
+            dist/har-transformer-*.tar.gz
+            dist/har_transformer-*.whl
           fail_on_unmatched_files: true
