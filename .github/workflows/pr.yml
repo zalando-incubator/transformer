@@ -6,7 +6,6 @@ on:
 
 jobs:
   build:
-    runs-on: ubuntu-latest
     strategy:
       fail-fast: false
       matrix:
@@ -16,6 +15,22 @@ jobs:
           - '3.8'
           - '3.9'
           - '3.10'
+        os:
+          - ubuntu-latest
+          - macOS-latest
+          - windows-latest
+        include:
+          # https://python-poetry.org/docs/configuration#cache-dir
+          - os: ubuntu-latest
+            pip-cache-path: ~/.cache/pip
+            poetry-cache-path: ~/.cache/pypoetry
+          - os: windows-latest
+            pip-cache-path: '%LOCALAPPDATA%\pip\Cache'
+            poetry-cache-path: '%LOCALAPPDATA%\pypoetry\Cache'
+          - os: macOS-latest
+            pip-cache-path: ~/Library/Caches/pip
+            poetry-cache-path: ~/Library/Caches/pypoetry
+      runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v2
       
@@ -27,10 +42,9 @@ jobs:
       - name: Set up cache
         uses: actions/cache@v2
         with:
-          # https://python-poetry.org/docs/configuration#cache-dir
           path: |
-            ~/.cache/pip
-            ~/.cache/pypoetry
+            ${{ matrix.pip-cache-path }}
+            ${{ matrix.poetry-cache-path }}
           key: ${{ runner.os }}-python-${{ steps.setup-python.outputs.python-version }}-poetry-${{ hashFiles('poetry.lock') }}
           restore-keys: |
             ${{ runner.os }}-python-${{ steps.setup-python.outputs.python-version }}-poetry-
