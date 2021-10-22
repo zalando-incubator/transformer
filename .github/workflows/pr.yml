@@ -6,6 +6,7 @@ on:
 
 jobs:
   build:
+    runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
       matrix:
@@ -30,7 +31,6 @@ jobs:
           - os: macOS-latest
             pip-cache-path: ~/Library/Caches/pip
             poetry-cache-path: ~/Library/Caches/pypoetry
-      runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v2
       
