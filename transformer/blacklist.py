@@ -12,7 +12,7 @@ def get_empty() -> Blacklist:
 def from_file() -> Blacklist:
     blacklist_file = f"{os.getcwd()}/.urlignore"
     try:
-        with open(blacklist_file) as file:
+        with open(blacklist_file, encoding="utf-8") as file:
             return set(filter(None, [line.rstrip() for line in file]))
     except OSError as err:
         logging.debug(

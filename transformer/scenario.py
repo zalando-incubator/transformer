@@ -312,7 +312,7 @@ class Scenario:
         :raise SkippableScenarioError: if path is unreadable or not a HAR file
         """
         try:
-            with path.open() as file:
+            with path.open(encoding="utf-8") as file:
                 har = json.load(file)
             requests = Request.all_from_har(har)
             tasks = Task.from_requests(requests, blacklist)
