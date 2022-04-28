@@ -15,6 +15,24 @@ The format is based on `Keep a Changelog`_, and this project adheres to
    :local:
    :depth: 1
 
+.. _v1.3.1:
+
+v1.3.1
+======
+
+- Release date: 2022-04-28 21:48
+
+- Diff__.
+
+__ https://github.com/zalando-incubator/transformer/compare/v1.3.0...v1.3.1
+
+Fixed
+-----
+
+UTF-8-encoded locustfiles are properly opened on Windows.
+Thank you :user:`rishisharma108`, :user:`akshamat`, :user:`JustinRoll`, and :user:`bascr`,
+for reporting this issue! (:pr:`74`)
+
 .. _v1.3.0:
 
 v1.3.0
