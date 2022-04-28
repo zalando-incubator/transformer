@@ -15,9 +15,7 @@ def from_file() -> Denylist:
         with open(denylist_file, encoding="utf-8") as file:
             return set(filter(None, [line.rstrip() for line in file]))
     except OSError as err:
-        logging.debug(
-            "Could not read denylist file %s. Reason: %s", denylist_file, err
-        )
+        logging.debug("Could not read denylist file %s. Reason: %s", denylist_file, err)
         return get_empty()
 
 

@@ -118,7 +118,11 @@ def locust_detected_version() -> py.Program:
 
 
 def locust_imports() -> py.Program:
-    is_post_1 = py.BinaryOp(py.Symbol("LOCUST_MAJOR_VERSION"), ">=", py.Literal(1),)
+    is_post_1 = py.BinaryOp(
+        py.Symbol("LOCUST_MAJOR_VERSION"),
+        ">=",
+        py.Literal(1),
+    )
     imports_pre_1 = [
         py.Import(
             ["HttpLocust", "TaskSequence", "TaskSet", "seq_task", "task"],
@@ -127,7 +131,8 @@ def locust_imports() -> py.Program:
     ]
     imports_post_1 = [
         py.Import(
-            ["HttpUser", "SequentialTaskSet", "TaskSet", "task"], source="locust",
+            ["HttpUser", "SequentialTaskSet", "TaskSet", "task"],
+            source="locust",
         ),
         py.Assignment("HttpLocust", py.Symbol("HttpUser")),
         py.Assignment("TaskSequence", py.Symbol("SequentialTaskSet")),
