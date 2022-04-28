@@ -199,7 +199,7 @@ __ https://github.com/zalando-incubator/transformer/compare/v1.1.2...v1.1.3
 Changed
 -------
 
-Blacklisting mechanism now opens the `.urlignore` file once per execution of the program,
+Denylisting mechanism now opens the `.urlignore` file once per execution of the program,
 instead of once per :class:`Request <transformer.request.Request>`.
 
 .. _v1.1.2:

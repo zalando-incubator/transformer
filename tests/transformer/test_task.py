@@ -8,7 +8,7 @@ import pytest
 from hypothesis import given
 from hypothesis.strategies import composite, sampled_from, booleans
 
-from transformer import python as py, blacklist
+from transformer import python as py, denylist
 from transformer.request import QueryPair
 from transformer.task import (
     Task,
@@ -36,17 +36,17 @@ class TestTask:
                 for t in Task.from_requests([request, second_request])
             )
 
-        def test_it_doesnt_create_a_task_if_the_url_is_on_the_blacklist(
+        def test_it_doesnt_create_a_task_if_the_url_is_on_the_denylist(
             self, mock_open
         ):
             mock_open.return_value = io.StringIO("amazon")
             request = MagicMock()
             request.url = MagicMock()
             request.url.netloc = "www.amazon.com"
-            task = Task.from_requests([request], blacklist=blacklist.from_file())
+            task = Task.from_requests([request], denylist=denylist.from_file())
             assert len(list(task)) == 0
 
-        def test_it_creates_a_task_if_the_path_not_host_is_on_the_blacklist(
+        def test_it_creates_a_task_if_the_path_not_host_is_on_the_denylist(
             self, mock_open
         ):
             mock_open.return_value = io.StringIO("search\namazon")
