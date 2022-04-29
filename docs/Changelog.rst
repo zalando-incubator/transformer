@@ -15,6 +15,28 @@ The format is based on `Keep a Changelog`_, and this project adheres to
    :local:
    :depth: 1
 
+.. _v2.0.0:
+
+v2.0.0
+======
+
+- Release date: 2022-04-29 16:07
+
+- Diff__.
+
+__ https://github.com/zalando-incubator/transformer/compare/v1.3.0...v2.0.0
+
+Fixed
+-----
+
+UTF-8-encoded locustfiles are properly opened on Windows.
+Thank you :user:`rishisharma108`, :user:`akshamat`, :user:`JustinRoll`, and :user:`bascr`,
+for reporting this issue! (:pr:`74`)
+
+All usages of the word "blacklist" have been replaced with a modern equivalent,
+which is a breaking change (hence the new major version) because of some of
+these usages were part of the public API (typically keyword argument names).
+
 .. _v1.3.0:
 
 v1.3.0
@@ -199,7 +221,7 @@ __ https://github.com/zalando-incubator/transformer/compare/v1.1.2...v1.1.3
 Changed
 -------
 
-Blacklisting mechanism now opens the `.urlignore` file once per execution of the program,
+Denylisting mechanism now opens the `.urlignore` file once per execution of the program,
 instead of once per :class:`Request <transformer.request.Request>`.
 
 .. _v1.1.2:

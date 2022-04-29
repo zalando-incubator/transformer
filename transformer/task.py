@@ -43,7 +43,7 @@ from dataclasses import dataclass
 from requests.structures import CaseInsensitiveDict
 
 import transformer.python as py
-from transformer.blacklist import on_blacklist, Blacklist, get_empty
+from transformer.denylist import on_denylist, Denylist, get_empty
 from transformer.request import HttpMethod, Request, QueryPair
 
 IMMUTABLE_EMPTY_DICT = MappingProxyType({})
@@ -141,7 +141,7 @@ class Task2:
     #   See https://github.com/zalando-incubator/Transformer/issues/11.
     global_code_blocks: Mapping[str, Sequence[str]] = IMMUTABLE_EMPTY_DICT
 
-    def __post_init__(self,) -> None:
+    def __post_init__(self) -> None:
         self.statements = list(self.statements)
         self.global_code_blocks = {
             k: list(v) for k, v in self.global_code_blocks.items()
@@ -164,7 +164,7 @@ class Task2:
         #   See what is done in from_task (but without the LocustRequest part).
         #   See https://github.com/zalando-incubator/Transformer/issues/11.
         for req in sorted(requests, key=lambda r: r.timestamp):
-            if not on_blacklist(req.url.netloc):
+            if not on_denylist(req.url.netloc):
                 yield cls(name=req.task_name(), request=req, statements=...)
 
     @classmethod
@@ -292,16 +292,16 @@ class Task(NamedTuple):
 
     @classmethod
     def from_requests(
-        cls, requests: Iterable[Request], blacklist: Optional[Blacklist] = None
+        cls, requests: Iterable[Request], denylist: Optional[Denylist] = None
     ) -> Iterator["Task"]:
         """
         Generates a set of Tasks from a given set of Requests.
         """
-        if blacklist is None:
-            blacklist = get_empty()
+        if denylist is None:
+            denylist = get_empty()
 
         for req in sorted(requests, key=lambda r: r.timestamp):
-            if on_blacklist(blacklist, req.url.netloc):
+            if on_denylist(denylist, req.url.netloc):
                 continue
             else:
                 yield cls(name=req.task_name(), request=req)

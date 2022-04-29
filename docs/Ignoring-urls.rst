@@ -5,7 +5,7 @@
 
 By default, Transformer converts *all* requests found in the HAR files you
 provide.
-However, you can **blacklist** (i.e. ignore) certain URLs by creating a
+However, you can **ignore** certain URLs by creating a
 ``.urlignore`` file in the directory in which Transformer is executed.
 
 Example
@@ -24,7 +24,7 @@ A ``.urlignore`` containing::
 - ``https://mosaic01-abc.js``,
 - ... and more following the same patterns.
 
-We provide an example blacklist file called `.urlignore_example`_ that you can
+We provide an example denylist file called `.urlignore_example`_ that you can
 use as a base.
 Note that it needs to be **renamed** ``.urlignore`` for Transformer to take it
 into account.

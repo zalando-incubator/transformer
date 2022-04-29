@@ -14,7 +14,7 @@ from transformer.locust import locustfile, locustfile_lines
 from transformer.plugins import sanitize_headers, Contract
 from transformer.plugins.contracts import Plugin
 from transformer.scenario import Scenario
-from transformer import blacklist
+from transformer import denylist
 
 DEFAULT_PLUGINS = (sanitize_headers.plugin,)
 
@@ -40,7 +40,7 @@ def transform(
     return locustfile(
         [
             Scenario.from_path(
-                Path(scenarios_path), plugins, blacklist=blacklist.from_file()
+                Path(scenarios_path), plugins, denylist=denylist.from_file()
             )
         ]
     )
@@ -108,7 +108,7 @@ def _dump_as_lines(
             path,
             plugins_for[Contract.OnTask],
             plugins_for[Contract.OnTaskSequence],
-            blacklist=blacklist.from_file(),
+            denylist=denylist.from_file(),
         ).apply_plugins(plugins_for[Contract.OnScenario])
         for path in scenario_paths
     ]

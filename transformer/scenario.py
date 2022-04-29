@@ -28,7 +28,7 @@ import dataclasses
 from dataclasses import dataclass
 
 import transformer.plugins as plug
-from transformer.blacklist import Blacklist, get_empty
+from transformer.denylist import Denylist, get_empty
 from transformer.naming import to_identifier
 from transformer.plugins.contracts import Plugin
 from transformer.request import Request
@@ -124,7 +124,7 @@ class Scenario:
         plugins: Sequence[Plugin] = (),
         ts_plugins: Sequence[Plugin] = (),
         short_name: bool = False,
-        blacklist: Optional[Blacklist] = None,
+        denylist: Optional[Denylist] = None,
     ) -> "Scenario":
         """
         Makes a :class:`Scenario` (possibly containing sub-scenarios) out of
@@ -147,10 +147,10 @@ class Scenario:
             but *True* when generating sub-scenarios (:attr:`children`) from
             a directory *path* (because then the names are "scoped" by
             the parent directory).
-        :param blacklist: a set of urls to be blacklisted
+        :param denylist: a set of urls to be excluded
         """
-        if blacklist is None:
-            blacklist = get_empty()
+        if denylist is None:
+            denylist = get_empty()
 
         if path.is_dir():
             return cls.from_dir(
@@ -158,7 +158,7 @@ class Scenario:
                 plugins=plugins,
                 ts_plugins=ts_plugins,
                 short_name=short_name,
-                blacklist=blacklist,
+                denylist=denylist,
             )
         else:
             return cls.from_har_file(
@@ -166,7 +166,7 @@ class Scenario:
                 plugins,
                 ts_plugins=ts_plugins,
                 short_name=short_name,
-                blacklist=blacklist,
+                denylist=denylist,
             )
 
     @classmethod
@@ -176,7 +176,7 @@ class Scenario:
         plugins: Sequence[Plugin],
         ts_plugins: Sequence[Plugin],
         short_name: bool,
-        blacklist: Blacklist,
+        denylist: Denylist,
     ) -> "Scenario":
         """
         Makes a :class:`Scenario` out of the provided directory *path*.
@@ -215,7 +215,7 @@ class Scenario:
             that class name is guaranteed to be unique across all TaskSets of the
             locustfile, but this is generally not necessary and results in less
             readable class names.
-        :param blacklist: a sequence of urls to be blacklisted
+        :param denylist: a sequence of urls to be excluded
         :raise SkippableScenarioError: if the directory contains dangling weight
             files or no sub-scenarios.
         """
@@ -238,7 +238,7 @@ class Scenario:
                     plugins,
                     ts_plugins=ts_plugins,
                     short_name=True,
-                    blacklist=blacklist,
+                    denylist=denylist,
                 )
             except SkippableScenarioError as err:
                 logging.warning(
@@ -304,7 +304,7 @@ class Scenario:
         plugins: Sequence[Plugin],
         ts_plugins: Sequence[Plugin],
         short_name: bool,
-        blacklist: Blacklist,
+        denylist: Denylist,
     ) -> "Scenario":
         """
         Creates a Scenario given a HAR file.
@@ -312,10 +312,10 @@ class Scenario:
         :raise SkippableScenarioError: if path is unreadable or not a HAR file
         """
         try:
-            with path.open() as file:
+            with path.open(encoding="utf-8") as file:
                 har = json.load(file)
             requests = Request.all_from_har(har)
-            tasks = Task.from_requests(requests, blacklist)
+            tasks = Task.from_requests(requests, denylist)
 
             # TODO: Remove this when Contract.OnTaskSequence is removed.
             tasks = plug.apply(ts_plugins, tasks)

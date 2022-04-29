@@ -23,9 +23,9 @@ copyright = "2019, Zalando"
 author = "the Zalando maintainers"
 
 # The short X.Y version
-version = "1.3"
+version = "2.0"
 # The full version, including alpha/beta/rc tags
-release = "1.3.0"
+release = "2.0.0"
 
 
 # -- General configuration ---------------------------------------------------
