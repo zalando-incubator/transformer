@@ -1,6 +1,7 @@
 import logging
 import os
 from typing import Set
+import re
 
 Denylist = Set[str]
 
@@ -25,6 +26,6 @@ def on_denylist(denylist: Denylist, url: str) -> bool:
     from user's current directory.
     """
     for denylist_item in denylist:
-        if denylist_item in url:
+        if re.search(denylist_item, url):
             return True
     return False
