@@ -114,7 +114,7 @@ venv.bak/
 
 # Project files
 examples/locustfile.py
-.urlignore
+.ignore
 
 # Generated files
 coverage_results

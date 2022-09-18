@@ -164,7 +164,7 @@ class Task2:
         #   See what is done in from_task (but without the LocustRequest part).
         #   See https://github.com/zalando-incubator/Transformer/issues/11.
         for req in sorted(requests, key=lambda r: r.timestamp):
-            if not on_denylist(req.url.netloc):
+            if not on_denylist(req.url.geturl()):
                 yield cls(name=req.task_name(), request=req, statements=...)
 
     @classmethod
@@ -301,7 +301,7 @@ class Task(NamedTuple):
             denylist = get_empty()
 
         for req in sorted(requests, key=lambda r: r.timestamp):
-            if on_denylist(denylist, req.url.netloc):
+            if on_denylist(denylist, req.url.geturl()):
                 continue
             else:
                 yield cls(name=req.task_name(), request=req)

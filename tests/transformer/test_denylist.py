@@ -17,7 +17,7 @@ class TestDenylist:
         denylist = read_denylist()
         assert len(denylist) == 0
         assert on_denylist(denylist, "whatever") is False
-        assert f"Could not read denylist file {os.getcwd()}/.urlignore" in caplog.text
+        assert f"Could not read denylist file {os.getcwd()}/.ignore" in caplog.text
 
     def test_it_returns_false_if_the_denylist_is_empty(self, mock_open):
         mock_open.return_value = io.StringIO("")

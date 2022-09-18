@@ -11,7 +11,11 @@ def get_empty() -> Denylist:
 
 
 def from_file() -> Denylist:
-    denylist_file = f"{os.getcwd()}/.urlignore"
+    if os.path.exists(f"{os.getcwd()}/.urlignore"):
+        logging.warning(
+            "Legacy .urlignore file detected - it will not be used! Rename it to '.ignore' if you want to use it."
+        )
+    denylist_file = f"{os.getcwd()}/.ignore"
     try:
         with open(denylist_file, encoding="utf-8") as file:
             return set(filter(None, [line.rstrip() for line in file]))
