@@ -13,7 +13,7 @@ def get_empty() -> Denylist:
 def from_file() -> Denylist:
     if os.path.exists(f"{os.getcwd()}/.urlignore"):
         logging.warning(
-            "Legacy .urlignore file detected - it will not be used! Rename it to '.ignore' if you want to use it."
+            "Legacy .urlignore file detected - it will not be used! Rename it to '.ignore' if you want to use it, and read about the difference in the documentation."
         )
     denylist_file = f"{os.getcwd()}/.ignore"
     try:
