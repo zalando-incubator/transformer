@@ -15,6 +15,39 @@ The format is based on `Keep a Changelog`_, and this project adheres to
    :local:
    :depth: 1
 
+.. _v3.0.0:
+
+v3.0.0
+======
+
+- Release date: 2022-09-30 19:50
+
+- Diff__.
+
+__ https://github.com/zalando-incubator/transformer/compare/v2.0.0...v3.0.0
+
+Changed
+-------
+
+The `.urlignore` file is no longer supported.
+It is replaced by an `.ignore` file, where each line is a **regular
+expression** applied to **the whole URL** (:pr:`80`).
+By contrast, each line of the `.urlignore` file was a fixed string, and
+Transformer was looking for it to appear as-is in the *domain* part only.
+
+Therefore, you should **be careful when migrating** your `.urlignore` into
+`.ignore` files; a simple copy-and-paste may result in some requests being
+handled differently.
+
+Thank you :user:`cyberw` for this feature request and for contributing the
+implementation!
+
+Removed
+-------
+
+The lowest version of Python supported by Transformer is now 3.7.
+Python 3.6 is no longer supported.
+
 .. _v2.0.0:
 
 v2.0.0

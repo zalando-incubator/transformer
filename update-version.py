@@ -207,8 +207,12 @@ def run():
     actual_successes = 0
     for patch in patches:
         print(patch.pretty())
-        if patch.apply():
-            actual_successes += 1
+        try:
+            if patch.apply():
+                actual_successes += 1
+        except:
+            logging.exception("Failed to apply patch!")
+            raise
         print()
     logging.info(f"Patched {actual_successes}/{expected_successes} of expected files.")
     if actual_successes < expected_successes:
