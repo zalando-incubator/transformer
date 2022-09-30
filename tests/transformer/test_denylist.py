@@ -17,7 +17,7 @@ class TestDenylist:
         denylist = read_denylist()
         assert len(denylist) == 0
         assert on_denylist(denylist, "whatever") is False
-        assert f"Could not read denylist file {os.getcwd()}/.urlignore" in caplog.text
+        assert f"Could not read denylist file {os.getcwd()}/.ignore" in caplog.text
 
     def test_it_returns_false_if_the_denylist_is_empty(self, mock_open):
         mock_open.return_value = io.StringIO("")
@@ -42,3 +42,10 @@ class TestDenylist:
     def test_it_removes_duplicate_entries(self, mock_open):
         mock_open.return_value = io.StringIO("\nwww.amazon.com" * 3)
         assert len(read_denylist()) == 1
+
+    def test_it_returns_true_if_url_matches_regex(self, mock_open):
+        mock_open.return_value = io.StringIO("www.google.com\nwww.ama.*com")
+        denylist = read_denylist()
+        assert on_denylist(denylist, "www.amazon.com") is True
+        assert on_denylist(denylist, "www.google.com") is True
+        assert on_denylist(denylist, "www.goog.com") is False
