@@ -13,7 +13,7 @@ from urllib.parse import urlparse, SplitResult
 from requests.structures import CaseInsensitiveDict
 
 import pendulum
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 
 from transformer.naming import to_identifier
 
@@ -118,7 +118,7 @@ requests-to-urls-with-dynamic-parameters
     method: HttpMethod
     url: SplitResult
     har_entry: dict
-    headers: CaseInsensitiveDict = MappingProxyType({})
+    headers: CaseInsensitiveDict = field(default_factory=lambda: MappingProxyType({}))
     post_data: Optional[dict] = None
     query: List[QueryPair] = ()
     name: Optional[str] = None
