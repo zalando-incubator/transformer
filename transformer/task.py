@@ -39,14 +39,14 @@ from typing import (
 )
 
 import dataclasses
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from requests.structures import CaseInsensitiveDict
 
 import transformer.python as py
 from transformer.denylist import on_denylist, Denylist, get_empty
 from transformer.request import HttpMethod, Request, QueryPair
 
-IMMUTABLE_EMPTY_DICT = MappingProxyType({})
+IMMUTABLE_EMPTY_DICT = field(default_factory=lambda: MappingProxyType({}))
 TIMEOUT = 30
 ACTION_INDENTATION_LEVEL = 12
 JSON_MIME_TYPE = "application/json"
